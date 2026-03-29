@@ -1,0 +1,111 @@
+<div class="pg-head"><div class="pg-title">My <em>Activities</em></div></div>
+  
+  <!-- Segmented Control -->
+  <div class="seg-control">
+    <button class="seg-btn active" onclick="switchActTab('schedule',this)">My Schedule</button>
+    <button class="seg-btn" onclick="switchActTab('groups',this)">Groups</button>
+    <button class="seg-btn" onclick="switchActTab('build',this)">Build</button>
+  </div>
+
+  <!-- Schedule sub-tab -->
+  <div class="act-subtab active" id="actTab-schedule">
+    <div class="glass-card" style="padding:14px">
+      <div class="cal-header">
+        <div class="cal-month" id="calMonth">March 2026</div>
+        <div class="cal-arrows"><button class="cal-arr" id="calPrev">‹</button><button class="cal-arr" id="calNext">›</button></div>
+      </div>
+      <div class="cal-grid" id="calGrid">
+        <div class="cal-day-head">S</div><div class="cal-day-head">M</div><div class="cal-day-head">T</div><div class="cal-day-head">W</div><div class="cal-day-head">T</div><div class="cal-day-head">F</div><div class="cal-day-head">S</div>
+      </div>
+      <div style="display:flex;gap:14px;justify-content:center;margin-top:8px">
+        <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--ink3);font-weight:600"><div style="width:6px;height:6px;border-radius:50%;background:var(--green)"></div>Completed</div>
+        <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--ink3);font-weight:600"><div style="width:6px;height:6px;border-radius:50%;background:var(--orange)"></div>Upcoming</div>
+      </div>
+    </div>
+    <div class="day-popup" id="dayPopup" style="display:none">
+      <div class="day-popup-header"><div class="day-popup-date" id="popupDate"></div><button class="day-popup-close" onclick="closeDayPopup()">✕</button></div>
+      <div class="day-popup-items" id="popupItems"></div>
+    </div>
+    <div class="cal-add-row">
+      <button class="cal-add" onclick="openActivityModal('add')">+ Add Activity</button>
+      <button class="cal-add" onclick="openActivityModal('reminder')">+ Set Reminder</button>
+    </div>
+    <div class="act-modal" id="actModal" style="display:none">
+      <div class="act-modal-header"><div class="rec-panel-title" id="actModalTitle">Add Activity</div><button class="day-popup-close" onclick="closeActivityModal()">✕</button></div>
+      <div id="actModalBody"></div>
+    </div>
+    <div class="label" id="upcomingLabel">Upcoming</div>
+    <div id="upcomingList"></div>
+  </div>
+
+  <!-- Groups sub-tab -->
+  <div class="act-subtab" id="actTab-groups">
+    <div class="label">Your Groups</div>
+    <div class="group"><div class="group-ico" style="background:var(--green-bg)">🎾</div><div class="group-info"><div class="group-name">Westside Tennis Crew</div><div class="group-members">8 members · Active today</div></div><button class="btn-sm" onclick="inviteToGroup(this,'Westside Tennis Crew')">Invite</button></div>
+    <div class="group"><div class="group-ico" style="background:var(--blue-bg)">🏃</div><div class="group-info"><div class="group-name">SM Run Club</div><div class="group-members">24 members · 3 events this week</div></div><button class="btn-sm" onclick="inviteToGroup(this,'SM Run Club')">Invite</button></div>
+    <div class="group"><div class="group-ico" style="background:var(--pink-bg)">🧘</div><div class="group-info"><div class="group-name">Yoga & Chill</div><div class="group-members">12 members · Next: Thursday</div></div><button class="btn-sm" onclick="inviteToGroup(this,'Yoga & Chill')">Invite</button></div>
+    <div class="group"><div class="group-ico" style="background:var(--orange-bg)">🏀</div><div class="group-info"><div class="group-name">Venice Pickup Hoops</div><div class="group-members">16 members · Game tomorrow</div></div><button class="btn-sm" onclick="inviteToGroup(this,'Venice Pickup Hoops')">Invite</button></div>
+
+    <!-- Communal Missions (PRD 2.5) -->
+    <div class="label" style="margin-top:10px">Communal Missions</div>
+    <div class="communal-mission glass-card">
+      <div class="cm-header">
+        <div class="cm-ico">🎾</div>
+        <div class="cm-info"><div class="cm-name">Westside Tennis Crew</div><div class="cm-goal">Log 50 total sets this month</div></div>
+      </div>
+      <div class="cm-bar-outer"><div class="cm-bar-inner" style="width:68%"></div></div>
+      <div class="cm-stats"><span>34/50 sets</span><span>6 contributing · 4 days left</span></div>
+      <div class="cm-reward">🏆 All members earn <strong>+500 XP</strong> on completion</div>
+    </div>
+    <div class="communal-mission glass-card">
+      <div class="cm-header">
+        <div class="cm-ico">🏃</div>
+        <div class="cm-info"><div class="cm-name">SM Run Club</div><div class="cm-goal">Run 200 collective miles</div></div>
+      </div>
+      <div class="cm-bar-outer"><div class="cm-bar-inner" style="width:41%"></div></div>
+      <div class="cm-stats"><span>82/200 mi</span><span>18 contributing · 12 days left</span></div>
+      <div class="cm-reward">🏆 All members earn <strong>+750 XP</strong> on completion</div>
+    </div>
+    <div class="communal-mission glass-card">
+      <div class="cm-header">
+        <div class="cm-ico">🏀</div>
+        <div class="cm-info"><div class="cm-name">Venice Pickup Hoops</div><div class="cm-goal">Win 10 games as a crew</div></div>
+      </div>
+      <div class="cm-bar-outer"><div class="cm-bar-inner" style="width:70%"></div></div>
+      <div class="cm-stats"><span>7/10 wins</span><span>12 contributing · 8 days left</span></div>
+      <div class="cm-reward">🏆 All members earn <strong>+600 XP</strong> on completion</div>
+    </div>
+  </div>
+
+  <!-- Build sub-tab -->
+  <div class="act-subtab" id="actTab-build">
+    <div class="label">Create Something New</div>
+    <div class="create-row">
+      <button class="create-card glass-card" onclick="openCreateModal('group')">
+        <div class="create-ico">👥</div>
+        <div class="create-name">Group Activity</div>
+        <div class="create-desc">Organize a session & invite friends</div>
+      </button>
+      <button class="create-card glass-card" onclick="openCreateModal('league')">
+        <div class="create-ico">🏆</div>
+        <div class="create-name">Rec League</div>
+        <div class="create-desc">Start a league & recruit players</div>
+      </button>
+    </div>
+    <div class="create-row">
+      <button class="create-card glass-card" onclick="openCreateModal('group')">
+        <div class="create-ico">📅</div>
+        <div class="create-name">Recurring Event</div>
+        <div class="create-desc">Set up a weekly session</div>
+      </button>
+      <button class="create-card glass-card" onclick="openCreateModal('league')">
+        <div class="create-ico">🏟️</div>
+        <div class="create-name">Tournament</div>
+        <div class="create-desc">Organize a bracket competition</div>
+      </button>
+    </div>
+    <div class="act-modal" id="createModal" style="display:none">
+      <div class="act-modal-header"><div class="rec-panel-title" id="createModalTitle">Create</div><button class="day-popup-close" onclick="document.getElementById('createModal').style.display='none'">✕</button></div>
+      <div id="createModalBody"></div>
+    </div>
+  </div>
