@@ -164,33 +164,37 @@ document.getElementById('reminderText').innerHTML = todayMsg.text;
   document.getElementById('streakDots').innerHTML = dotsHTML;
 })();
 
-// Tab loading state
-var _tabLoaded = {home:true, you:false, connect:false, record:false, activity:false};
-var _tabIniting = {};
+let currentRadius = 5;
+
+// === LAZY TAB LOADER ===
+var _tabLoaded = {home: true, connect: false, record: false, activity: false, you: false};
+var _tabLoading = {};
 
 async function _loadTab(name) {
-  if (_tabLoaded[name] || _tabIniting[name]) return;
-  _tabIniting[name] = true;
+  if (_tabLoaded[name] || _tabLoading[name]) return;
+  _tabLoading[name] = true;
   var el = document.getElementById('s-' + name);
-  var src = el && el.dataset.src;
-  if (!src) { _tabLoaded[name] = true; _tabIniting[name] = false; return; }
+  if (!el || !el.dataset.src) { _tabLoaded[name] = true; _tabLoading[name] = false; return; }
   try {
-    var resp = await fetch(src);
-    if (!resp.ok) throw new Error(resp.status);
+    var resp = await fetch(el.dataset.src);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
     var html = await resp.text();
     el.innerHTML = html;
     el.removeAttribute('data-src');
     _tabLoaded[name] = true;
-    // Run tab-specific init after HTML injection
-    if (name === 'connect' && typeof initConnectTab === 'function') initConnectTab();
-    if (name === 'record' && typeof initRecordTab === 'function') initRecordTab();
-    if (name === 'activity' && typeof initActivityTab === 'function') initActivityTab();
-    if (name === 'you' && typeof initYouTab === 'function') initYouTab();
-  } catch(e) {
-    console.warn('Tab load failed for ' + name + ':', e);
-    el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--ink3)"><div style="font-size:32px;margin-bottom:8px">⚠️</div><div style="font-size:12px;font-weight:600">Could not load tab</div><div style="font-size:10px;margin-top:4px;color:var(--ink4)">Serve files via a local server (e.g. npx serve)</div></div>';
+    // Bind DOM events for the newly injected tab
+    if (name === 'connect') _initConnect();
+    if (name === 'record') _initRecord();
+    if (name === 'activity') _initActivity();
+    if (name === 'you') _initYou();
+  } catch (e) {
+    console.warn('Tab load error [' + name + ']:', e.message);
+    el.innerHTML = '<div class="tab-error"><div class="tab-error-icon">⚠️</div>' +
+      '<div class="tab-error-title">Could not load tab</div>' +
+      '<div class="tab-error-detail">Make sure all files are in the same folder and served via HTTP.<br>Run: <b>npx serve</b> or <b>python3 -m http.server</b></div>' +
+      '<button class="tab-error-retry" onclick="_tabLoading[\''+name+'\'] = false; _loadTab(\''+name+'\').then(function(){go(\''+name+'\')})">Retry</button></div>';
   }
-  _tabIniting[name] = false;
+  _tabLoading[name] = false;
 }
 
 async function go(n){
@@ -200,8 +204,9 @@ async function go(n){
     var dd = document.getElementById('xpDropdown');
     if(dd) dd.style.display = 'none';
   }
-  // Lazy-load tab HTML if needed
+  // Lazy-load tab if not yet injected
   if (!_tabLoaded[n]) await _loadTab(n);
+  // Switch screens
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('s-'+n).classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
@@ -219,18 +224,16 @@ async function go(n){
 
 // Sport-specific stats for Record tab (Strava-style)
 
-function initConnectTab() {
+function _initConnect() {
+// Bind chip click handlers
 document.querySelectorAll('.chip').forEach(c=>{c.addEventListener('click',()=>{
   if (!c.dataset.sport) { c.classList.toggle('on'); return; }
   if (c.dataset.sport === 'all') {
-    // All deselects everything else
     document.querySelectorAll('#sportPills .chip').forEach(x=>x.classList.remove('on'));
     c.classList.add('on');
   } else {
-    // Toggle this chip, deselect All
     document.querySelector('#sportPills .chip[data-sport="all"]').classList.remove('on');
     c.classList.toggle('on');
-    // If nothing selected, re-select All
     if (!document.querySelector('#sportPills .chip.on')) {
       document.querySelector('#sportPills .chip[data-sport="all"]').classList.add('on');
     }
@@ -239,14 +242,13 @@ document.querySelectorAll('.chip').forEach(c=>{c.addEventListener('click',()=>{
 })});
 
 // Radius buttons
-let currentRadius = 5;
+// Bind radius buttons
 document.querySelectorAll('.rad-btn-float').forEach(btn => {
   btn.addEventListener('click', () => {
     currentRadius = parseInt(btn.dataset.radius);
     document.querySelectorAll('.rad-btn-float').forEach(b => { b.classList.remove('active-rad-f'); });
     btn.classList.add('active-rad-f');
     document.getElementById('radiusLabel').textContent = currentRadius + ' mi';
-    // Animate map radius circle
     const sizes = {3: 110, 5: 155, 10: 260};
     const r = document.getElementById('mapRadius');
     r.style.width = sizes[currentRadius] + 'px';
@@ -255,6 +257,21 @@ document.querySelectorAll('.rad-btn-float').forEach(btn => {
     applyFilters();
   });
 });
+
+// Recap tab toggle
+document.querySelectorAll('.recap-tab').forEach(t=>{t.addEventListener('click',()=>{document.querySelectorAll('.recap-tab').forEach(x=>x.classList.remove('on'));t.classList.add('on')})});
+
+// Bind edge swipe for connect overlays
+setupEdgeSwipe('chatView', function() {
+  document.getElementById('chatView').style.display = 'none';
+  document.getElementById('inbox').style.display = 'block';
+});
+setupEdgeSwipe('profileView', function() {
+  document.getElementById('profileView').style.display = 'none';
+  document.getElementById('connectMain').style.display = 'block';
+  inboxOpen = false;
+});
+} // end _initConnect
 
 function applyFilters() {
   const activeChips = document.querySelectorAll('#sportPills .chip.on');
@@ -288,21 +305,6 @@ function applyFilters() {
   });
   
 }
-document.querySelectorAll('.recap-tab').forEach(t=>{t.addEventListener('click',()=>{document.querySelectorAll('.recap-tab').forEach(x=>x.classList.remove('on'));t.classList.add('on')})});
-
-// Setup edge swipe for connect overlays
-if (typeof setupEdgeSwipe === 'function') {
-  setupEdgeSwipe('chatView', function() {
-    document.getElementById('chatView').style.display = 'none';
-    document.getElementById('inbox').style.display = 'block';
-  });
-  setupEdgeSwipe('profileView', function() {
-    document.getElementById('profileView').style.display = 'none';
-    document.getElementById('connectMain').style.display = 'block';
-    inboxOpen = false;
-  });
-}
-} // end initConnectTab
 
 // Dynamic Calendar
 const today = new Date();
@@ -365,6 +367,7 @@ const allActivities = generateActivities();
 function renderCalendar() {
   const grid = document.getElementById('calGrid');
   const monthLabel = document.getElementById('calMonth');
+  if (!grid || !monthLabel) return;
   monthLabel.textContent = monthNames[calMonth] + ' ' + calYear;
   
   // Clear existing day cells (keep headers)
@@ -443,24 +446,26 @@ function closeDayPopup() {
   document.querySelectorAll('.cal-day').forEach(d => d.classList.remove('selected'));
 }
 
-// Month navigation — bound in initActivityTab
-function initActivityTab() {
-  var prevBtn = document.getElementById('calPrev');
-  var nextBtn = document.getElementById('calNext');
-  if (prevBtn) prevBtn.addEventListener('click', () => {
+// Month navigation — bound in _initActivity
+function _initActivity() {
+  document.getElementById('calPrev').addEventListener('click', () => {
     calMonth--;
     if (calMonth < 0) { calMonth = 11; calYear--; }
     renderCalendar();
   });
-  if (nextBtn) nextBtn.addEventListener('click', () => {
+  document.getElementById('calNext').addEventListener('click', () => {
     calMonth++;
     if (calMonth > 11) { calMonth = 0; calYear++; }
     renderCalendar();
   });
+  renderCalendar();
+  renderUpcoming();
+} // end _initActivity
 
 // Render upcoming events list dynamically
 function renderUpcoming() {
   const list = document.getElementById('upcomingList');
+  if (!list) return;
   const upcoming = [];
   const bgMap = {'🎾':'var(--green-bg)','🏃':'var(--blue-bg)','🏋️':'var(--orange-bg)','🏄':'var(--blue-bg)','🧘':'var(--pink-bg)','🏀':'var(--orange-bg)','⚽':'var(--green-bg)','🥾':'rgba(120,113,108,.1)','🧗':'rgba(249,115,22,.1)','🤸':'rgba(139,92,246,.1)','⛳':'var(--green-bg)','🏊':'rgba(34,211,238,.1)','🏓':'rgba(250,204,21,.1)'};
   
@@ -491,10 +496,6 @@ function renderUpcoming() {
     list.innerHTML = '<div class="no-results">No upcoming activities. Tap + Add Activity to schedule one!</div>';
   }
 }
-
-  renderCalendar();
-  renderUpcoming();
-} // end initActivityTab
 
 // === XP LEVEL SYSTEM ===
 const levels = [
@@ -527,6 +528,7 @@ function getMemberTier(xp) {
 }
 
 function renderXPLevel(currentXP) {
+  var _el = function(id) { return document.getElementById(id); };
   let currentLevel = levels[0];
   let nextLevel = levels[1];
   for (let i = 0; i < levels.length; i++) {
@@ -543,8 +545,8 @@ function renderXPLevel(currentXP) {
   const tier = getMemberTier(currentXP);
   const nextTier = memberTiers[memberTiers.indexOf(tier) + 1];
 
-  // Update You tab handle
-  document.getElementById('youHandle').textContent = '@elisemoves · Level ' + currentLevel.lv + ' ' + currentLevel.name;
+  // Update You tab handle (may not exist if tab not loaded)
+  if (_el('youHandle')) _el('youHandle').textContent = '@elisemoves · Level ' + currentLevel.lv + ' ' + currentLevel.name;
 
   // Update dropdown
   document.getElementById('xpDdBadge').textContent = currentLevel.lv;
@@ -579,9 +581,11 @@ function toggleXPDropdown() {
   dd.style.display = xpDropdownOpen ? 'block' : 'none';
 }
 
-function initYouTab() {
+function _initYou() {
   renderXPLevel(2840);
-} // end initYouTab
+} // end _initYou
+
+renderXPLevel(2840); // also run if inline (fallback)
 
 // === CREATE GROUP ACTIVITY / REC LEAGUE ===
 function openCreateModal(type) {
@@ -1379,7 +1383,7 @@ function setupEdgeSwipe(elId, closeFn) {
   });
 }
 
-// setupEdgeSwipe calls moved to initConnectTab()
+// Edge swipe bindings moved to _initConnect()
 
 function filterFullList(query) {
   var q = query.toLowerCase();
@@ -1682,7 +1686,7 @@ async function initCamera(){
 }
 
 // Draggable data stickers (touch + mouse)
-function initRecordTab() {
+function _initRecord() {
 (function initDraggableStickers(){
   try{
     document.querySelectorAll('.rec-sticker').forEach(function(sticker){
@@ -1727,7 +1731,7 @@ function initRecordTab() {
     });
   }catch(e){console.warn('initDraggableStickers:',e)}
 })();
-} // end initRecordTab
+} // end _initRecord
 
 function pickSport(btn,sport){
   try{
