@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Rally Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="phone">
+<div class="notch"></div>
+<div class="status-bar"><span style="font-weight:700">9:41</span><div class="status-icons"><span>●●●●</span><span>5G</span><span>100%</span></div></div>
+<div class="screens" id="screens">
+
+<div class="screen active" id="s-home">
+  <div class="pg-head">
+    <div><div class="pg-title">Hey, <em>Elise</em> 👋</div><div style="font-size:13px;color:var(--ink3);margin-top:2px" id="subtitleText">Your screen time is embarrassing. Go outside.</div></div>
+    <div class="av" id="homeAvatar" style="background:linear-gradient(135deg,var(--green),var(--blue));cursor:pointer" onclick="toggleXPDropdown()">E</div>
+  </div>
+
+  <!-- XP Dropdown -->
+  <div class="xp-dropdown" id="xpDropdown" style="display:none">
+    <div class="xp-dd-header">
+      <div class="xp-dd-badge" id="xpDdBadge">8</div>
+      <div class="xp-dd-info">
+        <div class="xp-dd-name" id="xpDdName">⚡ Trailblazer</div>
+        <div class="xp-dd-tier" id="xpDdTier">Silver Tier</div>
+      </div>
+      <div class="xp-dd-xp" id="xpDdXP">2,840 XP</div>
+    </div>
+    <div class="xp-bar-outer" style="margin-bottom:6px">
+      <div class="xp-bar-inner" id="xpDdBar" style="width:72%"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--ink4);font-weight:600;margin-bottom:10px">
+      <span id="xpDdLeft">Lv 8 · 2,500 XP</span>
+      <span id="xpDdNext">160 XP to Lv 9</span>
+      <span id="xpDdRight">Lv 9 · 3,000 XP</span>
+    </div>
+    <!-- Membership tier -->
+    <div class="xp-dd-membership" id="xpDdMembership">
+      <div class="xp-dd-medal">🥈</div>
+      <div>
+        <div class="xp-dd-mem-name" id="xpDdMemName">Silver Member</div>
+        <div class="xp-dd-mem-next" id="xpDdMemNext">1,160 XP to Gold</div>
+      </div>
+    </div>
+    <div class="xp-dd-tiers-row">
+      <div class="xp-dd-tier-pip" id="xpPipBronze"><div class="xp-dd-pip-dot" style="background:#cd7f32"></div><span>🥉 Bronze</span></div>
+      <div class="xp-dd-tier-pip" id="xpPipSilver"><div class="xp-dd-pip-dot" style="background:#c0c0c0"></div><span>🥈 Silver</span></div>
+      <div class="xp-dd-tier-pip" id="xpPipGold"><div class="xp-dd-pip-dot" style="background:#ffd700"></div><span>🥇 Gold</span></div>
+    </div>
+    <button class="btn-sm" style="width:100%;text-align:center;margin-top:8px" onclick="go('you');toggleXPDropdown()">View Full Profile →</button>
+  </div>
+  <div class="reminder">
+    <div class="reminder-ico" id="reminderIcon">🛋️</div>
+    <div style="flex:1"><div class="reminder-txt" id="reminderText">Your screen time was <b>4h 37m yesterday.</b> That's more time than you've spent exercising all week. The doomscroll isn't a cardio workout babe.</div></div>
+  </div>
+  <div class="card">
+    <div class="streak-row">
+      <div style="font-size:28px;animation:pulse 1.5s infinite">🔥</div>
+      <div><div class="streak-num" id="streakNum">12</div><div class="streak-lbl" id="streakLbl">Day Streak — your therapist would be proud</div></div>
+    </div>
+    <div class="streak-dots" id="streakDots">
+      <div class="sdot done">M</div><div class="sdot done">T</div><div class="sdot done">W</div><div class="sdot done">T</div><div class="sdot now">F</div><div class="sdot soon">S</div><div class="sdot soon">S</div>
+    </div>
+  </div>
+
+  <!-- Pull to refresh -->
+  <div class="ptr-spinner" id="ptrSpinner">↻ Refreshing your feed...</div>
+
+  <div class="feed" id="feed-0">
+    <div class="feed-top">
+      <div class="av" style="background:linear-gradient(135deg,var(--blue),var(--pink));width:34px;height:34px;font-size:13px">M</div>
+      <div class="feed-who"><div class="feed-name" onclick="openProfile('maya')" style="cursor:pointer">maya.chen</div><div class="feed-meta">🎾 Tennis · Riviera Courts</div></div>
+      <button class="feed-more" onclick="showToast('Post options coming soon')">⋮</button>
+    </div>
+    <div class="feed-img" ondblclick="likeFeedPost(0)">
+      <div class="feed-img-ph">🎾<small>Session Highlight</small></div>
+      <div class="feed-overlay">
+        <div><div class="feed-s">1h 20m</div><div class="feed-sl">Moving Time</div></div>
+        <div><div class="feed-s">520</div><div class="feed-sl">Calories</div></div>
+        <div><div class="feed-s">142 bpm</div><div class="feed-sl">Avg HR</div></div>
+      </div>
+      <div class="dbl-heart" id="dblHeart-0">🤍</div>
+    </div>
+    <div class="feed-acts">
+      <div class="feed-acts-left">
+        <button class="feed-act" id="likeBtn-0" onclick="likeFeedPost(0)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="like-svg" id="likeSvg-0"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></button>
+        <button class="feed-act" onclick="openComments(0)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></button>
+        <button class="feed-act" onclick="openShareSheet(0)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
+      </div>
+      <button class="feed-save" id="saveBtn-0" onclick="toggleSave(0)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" id="saveSvg-0"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg></button>
+    </div>
+    <div class="feed-likes" id="feedLikes-0">24 rallies</div>
+    <div class="feed-cap"><strong onclick="openProfile('maya')" style="cursor:pointer">maya.chen</strong> Backhand slice: unlocked. Emotional stability: still loading. 🎾✨ <span class="feed-cap-more" onclick="this.parentElement.style.maxHeight='none';this.remove()"></span></div>
+    <div class="feed-timestamp">2 hours ago</div>
+    <div class="comment-drawer" id="comments-0" style="display:none">
+      <div class="comment-list" id="commentList-0">
+        <div class="comment-item"><div class="av" style="width:24px;height:24px;font-size:9px;background:linear-gradient(135deg,var(--blue),var(--pink))">S</div><div class="comment-body"><strong>sam.rivera</strong> Your backhand is actually scary now 😳</div></div>
+        <div class="comment-item"><div class="av" style="width:24px;height:24px;font-size:9px;background:linear-gradient(135deg,var(--green),#4ade80)">D</div><div class="comment-body"><strong>derek.osei</strong> Need to get on the court with you 🔥</div></div>
+      </div>
+      <div class="comment-input-row"><div class="av" style="width:24px;height:24px;font-size:9px;background:linear-gradient(135deg,var(--green),var(--blue));flex-shrink:0">E</div><input class="comment-input" placeholder="Add a comment..." id="commentInput-0" onkeydown="if(event.key==='Enter')postComment(0)"><button class="comment-send" onclick="postComment(0)">Post</button></div>
+    </div>
+  </div>
+
+  <div class="feed" id="feed-1">
+    <div class="feed-top">
+      <div class="av" style="background:linear-gradient(135deg,var(--orange),#fbbf24);width:34px;height:34px;font-size:13px">J</div>
+      <div class="feed-who"><div class="feed-name" onclick="openProfile('jordan')" style="cursor:pointer">jordan.park</div><div class="feed-meta">🏄 Surfing · El Porto Beach</div></div>
+      <button class="feed-more" onclick="showToast('Post options coming soon')">⋮</button>
+    </div>
+    <div class="feed-img" ondblclick="likeFeedPost(1)">
+      <div class="feed-img-ph">🌊<small>Morning Session</small></div>
+      <div class="feed-overlay">
+        <div><div class="feed-s">2h 10m</div><div class="feed-sl">Session Time</div></div>
+        <div><div class="feed-s">0.8 mi</div><div class="feed-sl">Paddle Dist</div></div>
+        <div><div class="feed-s">680</div><div class="feed-sl">Calories</div></div>
+      </div>
+      <div class="dbl-heart" id="dblHeart-1">🤍</div>
+    </div>
+    <div class="feed-acts">
+      <div class="feed-acts-left">
+        <button class="feed-act" id="likeBtn-1" onclick="likeFeedPost(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="like-svg" id="likeSvg-1"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></button>
+        <button class="feed-act" onclick="openComments(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></button>
+        <button class="feed-act" onclick="openShareSheet(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
+      </div>
+      <button class="feed-save" id="saveBtn-1" onclick="toggleSave(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" id="saveSvg-1"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg></button>
+    </div>
+    <div class="feed-likes" id="feedLikes-1">41 rallies</div>
+    <div class="feed-cap"><strong onclick="openProfile('jordan')" style="cursor:pointer">jordan.park</strong> Woke up at 5:30am to surf. Not for the algorithm, for my ✨ mental health ✨ <span class="feed-cap-more" onclick="this.parentElement.style.maxHeight='none';this.remove()"></span></div>
+    <div class="feed-timestamp">5 hours ago</div>
+    <div class="comment-drawer" id="comments-1" style="display:none">
+      <div class="comment-list" id="commentList-1">
+        <div class="comment-item"><div class="av" style="width:24px;height:24px;font-size:9px;background:linear-gradient(135deg,var(--pink),var(--orange))">K</div><div class="comment-body"><strong>kai.nakamura</strong> Dawn patrol gang 🌅 next time hmu</div></div>
+        <div class="comment-item"><div class="av" style="width:24px;height:24px;font-size:9px;background:linear-gradient(135deg,var(--orange),#fbbf24)">L</div><div class="comment-body"><strong>lexi.tanaka</strong> 5:30am??? I could never 😂</div></div>
+        <div class="comment-item"><div class="av" style="width:24px;height:24px;font-size:9px;background:linear-gradient(135deg,var(--blue),var(--pink))">M</div><div class="comment-body"><strong>maya.chen</strong> The algorithm comment sent me 💀</div></div>
+      </div>
+      <div class="comment-input-row"><div class="av" style="width:24px;height:24px;font-size:9px;background:linear-gradient(135deg,var(--green),var(--blue));flex-shrink:0">E</div><input class="comment-input" placeholder="Add a comment..." id="commentInput-1" onkeydown="if(event.key==='Enter')postComment(1)"><button class="comment-send" onclick="postComment(1)">Post</button></div>
+    </div>
+  </div>
+
+  <div class="feed" id="feed-2">
+    <div class="feed-top">
+      <div class="av" style="background:linear-gradient(135deg,var(--blue),var(--pink));width:34px;height:34px;font-size:13px">S</div>
+      <div class="feed-who"><div class="feed-name" onclick="openProfile('sam')" style="cursor:pointer">sam.rivera</div><div class="feed-meta">🏃 Running · SM Beach Path</div></div>
+      <button class="feed-more" onclick="showToast('Post options coming soon')">⋮</button>
+    </div>
+    <div class="feed-img" ondblclick="likeFeedPost(2)">
+      <div class="feed-img-ph">🏃<small>Morning Run</small></div>
+      <div class="feed-overlay">
+        <div><div class="feed-s">5.2 mi</div><div class="feed-sl">Distance</div></div>
+        <div><div class="feed-s">42:18</div><div class="feed-sl">Time</div></div>
+        <div><div class="feed-s">8:07</div><div class="feed-sl">Pace</div></div>
+      </div>
+      <div class="dbl-heart" id="dblHeart-2">🤍</div>
+    </div>
+    <div class="feed-acts">
+      <div class="feed-acts-left">
+        <button class="feed-act" id="likeBtn-2" onclick="likeFeedPost(2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="like-svg" id="likeSvg-2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></button>
+        <button class="feed-act" onclick="openComments(2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></button>
+        <button class="feed-act" onclick="openShareSheet(2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
+      </div>
+      <button class="feed-save" id="saveBtn-2" onclick="toggleSave(2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" id="saveSvg-2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg></button>
+    </div>
+    <div class="feed-likes" id="feedLikes-2">37 rallies</div>
+    <div class="feed-cap"><strong onclick="openProfile('sam')" style="cursor:pointer">sam.rivera</strong> Run club hits different when the sun's coming up over the pier. Therapy you can't bill insurance for. 🌅</div>
+    <div class="feed-timestamp">8 hours ago</div>
+    <div class="comment-drawer" id="comments-2" style="display:none">
+      <div class="comment-list" id="commentList-2">
+        <div class="comment-item"><div class="av" style="width:24px;height:24px;font-size:9px;background:linear-gradient(135deg,var(--green),#4ade80)">D</div><div class="comment-body"><strong>derek.osei</strong> Sub 8:10 pace is crazy 🔥</div></div>
+      </div>
+      <div class="comment-input-row"><div class="av" style="width:24px;height:24px;font-size:9px;background:linear-gradient(135deg,var(--green),var(--blue));flex-shrink:0">E</div><input class="comment-input" placeholder="Add a comment..." id="commentInput-2" onkeydown="if(event.key==='Enter')postComment(2)"><button class="comment-send" onclick="postComment(2)">Post</button></div>
+    </div>
+  </div>
+
+  <div class="feed" id="feed-3">
+    <div class="feed-top">
+      <div class="av" style="background:linear-gradient(135deg,var(--green),#4ade80);width:34px;height:34px;font-size:13px">D</div>
+      <div class="feed-who"><div class="feed-name" onclick="openProfile('derek')" style="cursor:pointer">derek.osei</div><div class="feed-meta">🏀 Basketball · Venice Courts</div></div>
+      <button class="feed-more" onclick="showToast('Post options coming soon')">⋮</button>
+    </div>
+    <div class="feed-img" ondblclick="likeFeedPost(3)">
+      <div class="feed-img-ph">🏀<small>Pickup Game</small></div>
+      <div class="feed-overlay">
+        <div><div class="feed-s">1h 45m</div><div class="feed-sl">Duration</div></div>
+        <div><div class="feed-s">780</div><div class="feed-sl">Calories</div></div>
+        <div><div class="feed-s">168 bpm</div><div class="feed-sl">Max HR</div></div>
+      </div>
+      <div class="dbl-heart" id="dblHeart-3">🤍</div>
+    </div>
+    <div class="feed-acts">
+      <div class="feed-acts-left">
+        <button class="feed-act" id="likeBtn-3" onclick="likeFeedPost(3)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="like-svg" id="likeSvg-3"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></button>
+        <button class="feed-act" onclick="openComments(3)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></button>
+        <button class="feed-act" onclick="openShareSheet(3)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
+      </div>
+      <button class="feed-save" id="saveBtn-3" onclick="toggleSave(3)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" id="saveSvg-3"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg></button>
+    </div>
+    <div class="feed-likes" id="feedLikes-3">52 rallies</div>
+    <div class="feed-cap"><strong onclick="openProfile('derek')" style="cursor:pointer">derek.osei</strong> Went 4-1 in pickup today. The court doesn't have a comments section and that's exactly why I love it. 🏀</div>
+    <div class="feed-timestamp">12 hours ago</div>
+    <div class="comment-drawer" id="comments-3" style="display:none">
+      <div class="comment-list" id="commentList-3">
+        <div class="comment-item"><div class="av" style="width:24px;height:24px;font-size:9px;background:linear-gradient(135deg,var(--pink),var(--orange))">K</div><div class="comment-body"><strong>kai.nakamura</strong> Bro you were cooking out there 🔥🔥</div></div>
+        <div class="comment-item"><div class="av" style="width:24px;height:24px;font-size:9px;background:linear-gradient(135deg,#c2410c,#ea580c)">M</div><div class="comment-body"><strong>marcus.t</strong> That crossover in game 3 was filthy</div></div>
+      </div>
+      <div class="comment-input-row"><div class="av" style="width:24px;height:24px;font-size:9px;background:linear-gradient(135deg,var(--green),var(--blue));flex-shrink:0">E</div><input class="comment-input" placeholder="Add a comment..." id="commentInput-3" onkeydown="if(event.key==='Enter')postComment(3)"><button class="comment-send" onclick="postComment(3)">Post</button></div>
+    </div>
+  </div>
+
+  <div class="feed" id="feed-4">
+    <div class="feed-top">
+      <div class="av" style="background:linear-gradient(135deg,var(--orange),#fbbf24);width:34px;height:34px;font-size:13px">L</div>
+      <div class="feed-who"><div class="feed-name" onclick="openProfile('lexi')" style="cursor:pointer">lexi.tanaka</div><div class="feed-meta">🧘 Yoga · The Studio</div></div>
+      <button class="feed-more" onclick="showToast('Post options coming soon')">⋮</button>
+    </div>
+    <div class="feed-img" ondblclick="likeFeedPost(4)">
+      <div class="feed-img-ph">🧘<small>Hot Yoga Flow</small></div>
+      <div class="feed-overlay">
+        <div><div class="feed-s">1h</div><div class="feed-sl">Duration</div></div>
+        <div><div class="feed-s">420</div><div class="feed-sl">Calories</div></div>
+        <div><div class="feed-s">105°F</div><div class="feed-sl">Room Temp</div></div>
+      </div>
+      <div class="dbl-heart" id="dblHeart-4">🤍</div>
+    </div>
+    <div class="feed-acts">
+      <div class="feed-acts-left">
+        <button class="feed-act" id="likeBtn-4" onclick="likeFeedPost(4)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="like-svg" id="likeSvg-4"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></button>
+        <button class="feed-act" onclick="openComments(4)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></button>
+        <button class="feed-act" onclick="openShareSheet(4)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
+      </div>
+      <button class="feed-save" id="saveBtn-4" onclick="toggleSave(4)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" id="saveSvg-4"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg></button>
+    </div>
+    <div class="feed-likes" id="feedLikes-4">19 rallies</div>
+    <div class="feed-cap"><strong onclick="openProfile('lexi')" style="cursor:pointer">lexi.tanaka</strong> Hot yoga is just paying someone to make you sweat in a room that smells like feet. And I love it. 🧘‍♀️🔥</div>
+    <div class="feed-timestamp">Yesterday</div>
+    <div class="comment-drawer" id="comments-4" style="display:none">
+      <div class="comment-list" id="commentList-4">
+        <div class="comment-item"><div class="av" style="width:24px;height:24px;font-size:9px;background:linear-gradient(135deg,var(--blue),var(--pink))">M</div><div class="comment-body"><strong>maya.chen</strong> The feet comment 💀💀 so true tho</div></div>
+      </div>
+      <div class="comment-input-row"><div class="av" style="width:24px;height:24px;font-size:9px;background:linear-gradient(135deg,var(--green),var(--blue));flex-shrink:0">E</div><input class="comment-input" placeholder="Add a comment..." id="commentInput-4" onkeydown="if(event.key==='Enter')postComment(4)"><button class="comment-send" onclick="postComment(4)">Post</button></div>
+    </div>
+  </div>
+
+  <div class="feed" id="feed-5">
+    <div class="feed-top">
+      <div class="av" style="background:linear-gradient(135deg,var(--pink),var(--orange));width:34px;height:34px;font-size:13px">K</div>
+      <div class="feed-who"><div class="feed-name" onclick="openProfile('kai')" style="cursor:pointer">kai.nakamura</div><div class="feed-meta">🧗 Climbing · Sender One</div></div>
+      <button class="feed-more" onclick="showToast('Post options coming soon')">⋮</button>
+    </div>
+    <div class="feed-img" ondblclick="likeFeedPost(5)">
+      <div class="feed-img-ph">🧗<small>Bouldering Session</small></div>
+      <div class="feed-overlay">
+        <div><div class="feed-s">2h</div><div class="feed-sl">Session</div></div>
+        <div><div class="feed-s">V5</div><div class="feed-sl">Top Send</div></div>
+        <div><div class="feed-s">640</div><div class="feed-sl">Calories</div></div>
+      </div>
+      <div class="dbl-heart" id="dblHeart-5">🤍</div>
+    </div>
+    <div class="feed-acts">
+      <div class="feed-acts-left">
+        <button class="feed-act" id="likeBtn-5" onclick="likeFeedPost(5)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="like-svg" id="likeSvg-5"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></button>
+        <button class="feed-act" onclick="openComments(5)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></button>
+        <button class="feed-act" onclick="openShareSheet(5)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
+      </div>
+      <button class="feed-save" id="saveBtn-5" onclick="toggleSave(5)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" id="saveSvg-5"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg></button>
+    </div>
+    <div class="feed-likes" id="feedLikes-5">33 rallies</div>
+    <div class="feed-cap"><strong onclick="openProfile('kai')" style="cursor:pointer">kai.nakamura</strong> Sent my first V5 today. Fingers are destroyed but ego is thriving. This is what reclaiming your dopamine feels like. 🧗‍♂️⚡</div>
+    <div class="feed-timestamp">Yesterday</div>
+    <div class="comment-drawer" id="comments-5" style="display:none">
+      <div class="comment-list" id="commentList-5">
+        <div class="comment-item"><div class="av" style="width:24px;height:24px;font-size:9px;background:linear-gradient(135deg,var(--orange),#fbbf24)">J</div><div class="comment-body"><strong>jordan.park</strong> V5?? Bro you were struggling on V3 last week 😂 growth is real</div></div>
+        <div class="comment-item"><div class="av" style="width:24px;height:24px;font-size:9px;background:linear-gradient(135deg,var(--green),#4ade80)">D</div><div class="comment-body"><strong>derek.osei</strong> Take me climbing next time 💪</div></div>
+      </div>
+      <div class="comment-input-row"><div class="av" style="width:24px;height:24px;font-size:9px;background:linear-gradient(135deg,var(--green),var(--blue));flex-shrink:0">E</div><input class="comment-input" placeholder="Add a comment..." id="commentInput-5" onkeydown="if(event.key==='Enter')postComment(5)"><button class="comment-send" onclick="postComment(5)">Post</button></div>
+    </div>
+  </div>
+
+  <div class="feed" id="feed-6">
+    <div class="feed-top">
+      <div class="av" style="background:linear-gradient(135deg,#a78bfa,#7c3aed);width:34px;height:34px;font-size:13px">J</div>
+      <div class="feed-who"><div class="feed-name">jenna.runs</div><div class="feed-meta">🏃 Running · SM Pier · Sport Edit</div></div>
+      <button class="feed-more" onclick="showToast('Post options coming soon')">⋮</button>
+    </div>
+    <div class="feed-img" ondblclick="likeFeedPost(6)" style="background:linear-gradient(135deg,#dbeafe,#ede9fe)">
+      <div class="feed-img-ph" style="background:linear-gradient(135deg,#dbeafe,#c4b5fd)">🏃<small>5K · Strava Overlay</small></div>
+      <div class="feed-overlay">
+        <div><div class="feed-s">5.0 mi</div><div class="feed-sl">Distance</div></div>
+        <div><div class="feed-s">38:42</div><div class="feed-sl">Time</div></div>
+        <div><div class="feed-s">7:44</div><div class="feed-sl">Pace</div></div>
+      </div>
+      <div style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,.5);color:#fff;font-size:8px;font-weight:700;padding:3px 8px;border-radius:6px;letter-spacing:.5px;text-transform:uppercase">Sport Edit ✨</div>
+      <div class="dbl-heart" id="dblHeart-6">🤍</div>
+    </div>
+    <div class="feed-acts">
+      <div class="feed-acts-left">
+        <button class="feed-act" id="likeBtn-6" onclick="likeFeedPost(6)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="like-svg" id="likeSvg-6"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></button>
+        <button class="feed-act" onclick="openComments(6)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></button>
+        <button class="feed-act" onclick="openShareSheet(6)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
+      </div>
+      <button class="feed-save" id="saveBtn-6" onclick="toggleSave(6)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" id="saveSvg-6"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg></button>
+    </div>
+    <div class="feed-likes" id="feedLikes-6">68 rallies</div>
+    <div class="feed-cap"><strong>jenna.runs</strong> Morning 5K with the Strava overlay because the pain of cardio deserves an aesthetic reward. Run club isn't a phase mom 🏃‍♀️✨ #SportEdit</div>
+    <div class="feed-timestamp">2 days ago</div>
+    <div class="comment-drawer" id="comments-6" style="display:none">
+      <div class="comment-list" id="commentList-6">
+        <div class="comment-item"><div class="av" style="width:24px;height:24px;font-size:9px;background:linear-gradient(135deg,var(--blue),var(--pink))">S</div><div class="comment-body"><strong>sam.rivera</strong> The overlay goes crazy 🔥 how did you edit this</div></div>
+        <div class="comment-item"><div class="av" style="width:24px;height:24px;font-size:9px;background:linear-gradient(135deg,var(--blue),var(--pink))">M</div><div class="comment-body"><strong>maya.chen</strong> Run club aesthetic queen 👑</div></div>
+      </div>
+      <div class="comment-input-row"><div class="av" style="width:24px;height:24px;font-size:9px;background:linear-gradient(135deg,var(--green),var(--blue));flex-shrink:0">E</div><input class="comment-input" placeholder="Add a comment..." id="commentInput-6" onkeydown="if(event.key==='Enter')postComment(6)"><button class="comment-send" onclick="postComment(6)">Post</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- CONNECT (lazy-loaded) -->
+<div class="screen" id="s-connect" data-src="connect.html"></div>
+
+<!-- RECORD (lazy-loaded) -->
+<div class="screen" id="s-record" data-src="record.html"></div>
+
+<!-- ACTIVITY (lazy-loaded) -->
+<div class="screen" id="s-activity" data-src="activity.html"></div>
+
+
+<!-- YOU (lazy-loaded) -->
+<div class="screen" id="s-you" data-src="you.html"></div>
+
+
+</div><!-- /screens -->
+
+<nav class="nav">
+  <button class="nav-btn active" onclick="go('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span></button>
+  <button class="nav-btn" onclick="go('connect')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg><span>Connect</span></button>
+  <button class="nav-rec" onclick="go('record')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg></button>
+  <button class="nav-btn" onclick="go('activity')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Activity</span></button>
+  <button class="nav-btn" onclick="go('you')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>You</span></button>
+</nav>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
