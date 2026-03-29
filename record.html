@@ -1,0 +1,118 @@
+<div class="rec-wrap" id="recWrap" onclick="if(event.target===this||event.target.closest('.rec-ctr'))recTapInit()">
+    <!-- Layer 0: Camera viewfinder (720p for performance) -->
+    <video id="cameraFeed" autoplay playsinline muted></video>
+    <canvas id="captureCanvas" style="display:none"></canvas>
+    <div class="rec-glow" id="recGlow"></div>
+    <div class="vf-filter-overlay" id="vfFilterOverlay" style="position:absolute;inset:0;z-index:1;pointer-events:none"></div>
+
+    <!-- Phase indicator bar -->
+    <div class="rec-phase"><div class="rec-phase-seg done" id="ph1"></div><div class="rec-phase-seg" id="ph2"></div><div class="rec-phase-seg" id="ph3"></div></div>
+
+    <!-- Top HUD — GPS indicator + REC badge + Timer -->
+    <div class="rec-top">
+      <div class="rec-top-l">
+        <div class="rec-gps"><div class="rec-gps-dot"></div>GPS ↗</div>
+        <div class="rec-badge" id="recBadge"><div class="bd"></div>REC</div>
+        <div class="rec-timer" id="recTimer">00:00</div>
+      </div>
+      <div class="rec-top-r">
+        <button class="rec-tb" onclick="toggleFlash()" id="flashBtn">⚡</button>
+        <button class="rec-tb" onclick="toggleTimer()">⏱</button>
+      </div>
+    </div>
+
+    <!-- Layer 1: Draggable Data Stickers (GPU-accelerated) -->
+    <div class="rec-stickers" id="recStickers">
+      <div class="rec-sticker" id="stickerDist" style="top:52px;left:12px" data-ox="12" data-oy="52">
+        <div class="rs-label" id="rsDistLabel">Distance (MI)</div>
+        <div class="rs-value" id="rsDist">0.000</div>
+      </div>
+      <div class="rec-sticker" id="stickerPace" style="top:52px;left:50%;transform:translateX(-50%)" data-ox="140" data-oy="52">
+        <div class="rs-label" id="rsPaceLabel">Pace (/MI)</div>
+        <div class="rs-value" id="rsPace">--:--</div>
+      </div>
+      <div class="rec-sticker" id="stickerBPM" style="top:52px;right:12px" data-ox="280" data-oy="52">
+        <div class="rs-label">BPM</div>
+        <div class="rs-value bpm" id="rsBPM">--</div>
+      </div>
+    </div>
+
+    <!-- Center placeholder -->
+    <div class="rec-ctr" id="recCenter">
+      <div class="rec-ctr-i">📹</div>
+      <div class="rec-ctr-t">Tap to start camera</div>
+    </div>
+
+    <!-- Layer 2: TikTok Vertical Sidebar -->
+    <div class="rec-sidebar" id="recSidebar">
+      <!-- Rotating album art (lazy-loaded, shown when track selected) -->
+      <div class="rec-album" id="recAlbum" onclick="openRecPanel('music')">
+        <div class="rec-album-inner" id="albumArt">♫</div>
+      </div>
+      <button class="rsb" onclick="openRecPanel('music')"><div class="rsb-i">🎵</div><div class="rsb-l">Audio</div></button>
+      <button class="rsb" onclick="openRecPanel('stats')"><div class="rsb-i">📊</div><div class="rsb-l">Stats Layer</div></button>
+      <button class="rsb" onclick="openRecPanel('filter')"><div class="rsb-i">🎨</div><div class="rsb-l">Filters</div></button>
+      <button class="rsb" onclick="toggleTimer()"><div class="rsb-i">⏱</div><div class="rsb-l">Timer</div></button>
+      <button class="rsb" onclick="cycleSpeed()"><div class="rsb-i" id="speedIco">1x</div><div class="rsb-l">Speed</div></button>
+      <button class="rsb" onclick="openRecPanel('effects')"><div class="rsb-i">✨</div><div class="rsb-l">Effects</div></button>
+      <button class="rsb" onclick="openRecPanel('sticker')"><div class="rsb-i">🏷️</div><div class="rsb-l">Stickers</div></button>
+      <button class="rsb" onclick="openRecPanel('trim')"><div class="rsb-i">✂️</div><div class="rsb-l">Trim</div></button>
+    </div>
+
+    <!-- Bottom thumb zone -->
+    <div class="rec-btm">
+      <!-- Timeline clips -->
+      <div class="rec-tl" id="recTL">
+        <div class="rec-c" id="clip0">+</div>
+        <div class="rec-c" id="clip1">+</div>
+        <div class="rec-c" id="clip2">+</div>
+        <div class="rec-c" id="clip3">+</div>
+      </div>
+      <!-- Sport pills -->
+      <div class="rec-sp">
+        <button class="rsp on" onclick="pickSport(this,'run')">🏃</button>
+        <button class="rsp" onclick="pickSport(this,'lift')">🏋️</button>
+        <button class="rsp" onclick="pickSport(this,'cycle')">🚴</button>
+        <button class="rsp" onclick="pickSport(this,'yoga')">🧘</button>
+        <button class="rsp" onclick="pickSport(this,'tennis')">🎾</button>
+        <button class="rsp" onclick="pickSport(this,'surf')">🏄</button>
+        <button class="rsp" onclick="pickSport(this,'hike')">🥾</button>
+        <button class="rsp" onclick="pickSport(this,'climb')">🧗</button>
+        <button class="rsp" onclick="pickSport(this,'ball')">🏀</button>
+        <button class="rsp" onclick="pickSport(this,'pickle')">🏓</button>
+        <button class="rsp" onclick="pickSport(this,'swim')">🏊</button>
+      </div>
+      <!-- Mode switcher -->
+      <div class="rec-modes">
+        <button class="rm" onclick="setMode('photo',this)">Photo</button>
+        <button class="rm on" onclick="setMode('video',this)">Video</button>
+        <button class="rm" onclick="setMode('timelapse',this)">Timelapse</button>
+      </div>
+      <!-- Button row: Gallery — Record — Stop -->
+      <div class="rec-row">
+        <div style="display:flex;flex-direction:column;align-items:center">
+          <button class="rec-side-btn" onclick="document.getElementById('upFile').click()">🖼</button>
+          <input type="file" id="upFile" accept="video/*,image/*" style="display:none" onchange="handleUpload(event)">
+          <div class="rec-side-lbl">Gallery</div>
+        </div>
+        <button class="rec-bookmark" id="recBookmark" onclick="addBookmark()">⭐</button>
+        <div class="rec-o">
+          <svg class="rec-ring-svg" viewBox="0 0 74 74"><circle class="rr-bg" cx="37" cy="37" r="32.5"/><circle class="rr-fill" cx="37" cy="37" r="32.5" id="hrRing"/></svg>
+          <button class="rec-main-btn" id="recMain" onmousedown="recDown()" onmouseup="recUp()" ontouchstart="recDown()" ontouchend="recUp()"><div class="rmb-inner" id="recInner"></div></button>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center">
+          <button class="rec-side-btn" onclick="finishEdit()">⏹</button>
+          <div class="rec-side-lbl">Stop</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide-up panel -->
+  <div class="rec-panel" id="recPanel" style="display:none">
+    <div class="rec-panel-header">
+      <div class="rec-panel-title" id="recPanelTitle">Panel</div>
+      <button style="background:none;border:none;color:#fff;font-size:16px;cursor:pointer" onclick="closeRecPanel()">✕</button>
+    </div>
+    <div id="recPanelBody"></div>
+  </div>
