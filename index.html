@@ -1,11 +1,30 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Rally Prototype</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&display=swap" rel="stylesheet">
+<title>Rally — Elise Nguyen</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&display=swap">
 <link rel="stylesheet" href="styles.css">
+<style>
+/* Fallback: ensure phone frame + nav always visible even if tab fails */
+.phone{display:flex;flex-direction:column}
+.screens{flex:1;min-height:0}
+.nav{flex-shrink:0}
+.screen{display:none}.screen.active{display:block}
+#s-record.active{display:flex!important;flex-direction:column!important}
+/* Tab loading spinner */
+.tab-loading{display:flex;align-items:center;justify-content:center;padding:60px 20px;flex-direction:column;gap:10px}
+.tab-loading-spinner{width:28px;height:28px;border:3px solid var(--surface3,#e4e4ea);border-top-color:var(--green,#22c55e);border-radius:50%;animation:tabSpin .6s linear infinite}
+@keyframes tabSpin{to{transform:rotate(360deg)}}
+.tab-loading-text{font-size:11px;color:var(--ink3,#999);font-weight:600}
+/* Tab error state */
+.tab-error{text-align:center;padding:48px 24px;color:var(--ink3,#999)}
+.tab-error-icon{font-size:36px;margin-bottom:10px}
+.tab-error-title{font-size:13px;font-weight:700;color:var(--ink,#111);margin-bottom:4px}
+.tab-error-detail{font-size:11px;line-height:1.5;color:var(--ink4,#bbb)}
+.tab-error-retry{margin-top:12px;padding:8px 20px;border-radius:10px;background:var(--green,#22c55e);color:#fff;border:none;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer}
+</style>
 </head>
 <body>
 <div class="phone">
@@ -13,6 +32,7 @@
 <div class="status-bar"><span style="font-weight:700">9:41</span><div class="status-icons"><span>●●●●</span><span>5G</span><span>100%</span></div></div>
 <div class="screens" id="screens">
 
+<!-- HOME (inline — always available) -->
 <div class="screen active" id="s-home">
   <div class="pg-head">
     <div><div class="pg-title">Hey, <em>Elise</em> 👋</div><div style="font-size:13px;color:var(--ink3);margin-top:2px" id="subtitleText">Your screen time is embarrassing. Go outside.</div></div>
@@ -315,19 +335,25 @@
   </div>
 </div>
 
-<!-- CONNECT (lazy-loaded) -->
-<div class="screen" id="s-connect" data-src="connect.html"></div>
+<!-- CONNECT (lazy-loaded from connect.html) -->
+<div class="screen" id="s-connect" data-src="connect.html">
+  <div class="tab-loading"><div class="tab-loading-spinner"></div><div class="tab-loading-text">Loading Connect…</div></div>
+</div>
 
-<!-- RECORD (lazy-loaded) -->
-<div class="screen" id="s-record" data-src="record.html"></div>
+<!-- RECORD (lazy-loaded from record.html) -->
+<div class="screen" id="s-record" data-src="record.html">
+  <div class="tab-loading"><div class="tab-loading-spinner"></div><div class="tab-loading-text">Loading Record…</div></div>
+</div>
 
-<!-- ACTIVITY (lazy-loaded) -->
-<div class="screen" id="s-activity" data-src="activity.html"></div>
+<!-- ACTIVITY (lazy-loaded from activity.html) -->
+<div class="screen" id="s-activity" data-src="activity.html">
+  <div class="tab-loading"><div class="tab-loading-spinner"></div><div class="tab-loading-text">Loading Activity…</div></div>
+</div>
 
-
-<!-- YOU (lazy-loaded) -->
-<div class="screen" id="s-you" data-src="you.html"></div>
-
+<!-- YOU (lazy-loaded from you.html) -->
+<div class="screen" id="s-you" data-src="you.html">
+  <div class="tab-loading"><div class="tab-loading-spinner"></div><div class="tab-loading-text">Loading Profile…</div></div>
+</div>
 
 </div><!-- /screens -->
 
