@@ -1,0 +1,110 @@
+<div class="you-header glass-card" style="padding:14px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="you-av" id="youAvatar" onclick="document.getElementById('avatarInput').click()" style="cursor:pointer;position:relative;margin:0;flex-shrink:0">E<div class="av-cam">📷</div></div>
+      <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="handleAvatarUpload(event)">
+      <div style="flex:1;text-align:left">
+        <div class="you-name" style="font-size:18px">Elise Nguyen</div>
+        <div class="you-handle" id="youHandle">@elisemoves · Level 8 Trailblazer</div>
+        <div class="you-stats-row" style="justify-content:flex-start;margin-top:6px">
+          <div class="you-stat-pill"><span class="you-stat-v" id="youXP">2,840</span> XP</div>
+          <div class="you-stat-pill"><span class="you-stat-v">142</span> Activities</div>
+          <div class="you-stat-pill"><span class="you-stat-v">89</span> Friends</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="seg-control" id="youSegControl">
+    <button class="seg-btn active" onclick="switchYouTab('profile',this)">Profile</button>
+    <button class="seg-btn" onclick="switchYouTab('missions',this)">Missions</button>
+    <button class="seg-btn" onclick="switchYouTab('leaderboard',this)">Leaderboard</button>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="you-subtab active" id="youTab-profile">
+    <div class="fit-age-hero glass-card">
+      <div class="fit-age-ring"><div class="fit-age-num">24</div></div>
+      <div class="fit-age-text"><div style="font-size:13px;font-weight:700">Fitness Age</div><div style="font-size:10px;color:var(--ink3);margin-top:1px">3 yrs younger than actual age 💪</div></div>
+    </div>
+    <div class="label">Your Percentile</div>
+    <div class="bento-grid">
+      <div class="bento-cell glass-card"><div class="bento-val" style="color:var(--green)">Top 8%</div><div class="bento-lbl">Weekly Activity</div><div class="bento-bar-bg"><div class="bento-bar" style="width:92%;background:var(--green)"></div></div></div>
+      <div class="bento-cell glass-card"><div class="bento-val" style="color:var(--blue)">Top 15%</div><div class="bento-lbl">Running</div><div class="bento-bar-bg"><div class="bento-bar" style="width:85%;background:var(--blue)"></div></div></div>
+      <div class="bento-cell glass-card"><div class="bento-val" style="color:var(--orange)">Top 12%</div><div class="bento-lbl">Tennis</div><div class="bento-bar-bg"><div class="bento-bar" style="width:88%;background:var(--orange)"></div></div></div>
+      <div class="bento-cell glass-card"><div class="bento-val" style="color:var(--pink)">Top 22%</div><div class="bento-lbl">Consistency</div><div class="bento-bar-bg"><div class="bento-bar" style="width:78%;background:var(--pink)"></div></div></div>
+    </div>
+    <div class="label">Recap</div>
+    <div class="recap glass-card" style="padding:12px">
+      <div class="seg-control" style="margin-bottom:8px">
+        <button class="seg-btn active" onclick="switchRecap('week',this)">W</button>
+        <button class="seg-btn" onclick="switchRecap('month',this)">M</button>
+        <button class="seg-btn" onclick="switchRecap('year',this)">Y</button>
+      </div>
+      <div class="recap-bars" id="recapBars">
+        <div class="recap-col"><div class="recap-bar g" style="height:55%"></div><div class="recap-lbl">M</div></div>
+        <div class="recap-col"><div class="recap-bar g" style="height:80%"></div><div class="recap-lbl">T</div></div>
+        <div class="recap-col"><div class="recap-bar b" style="height:35%"></div><div class="recap-lbl">W</div></div>
+        <div class="recap-col"><div class="recap-bar g" style="height:95%"></div><div class="recap-lbl">T</div></div>
+        <div class="recap-col"><div class="recap-bar b" style="height:25%"></div><div class="recap-lbl">F</div></div>
+        <div class="recap-col"><div class="recap-bar" style="height:10%;background:var(--surface3)"></div><div class="recap-lbl">S</div></div>
+        <div class="recap-col"><div class="recap-bar" style="height:10%;background:var(--surface3)"></div><div class="recap-lbl">S</div></div>
+      </div>
+    </div>
+    <div class="label">Activity Feed</div>
+    <div class="grid-feed">
+      <div class="grid-item" style="background:linear-gradient(135deg,#dcfce7,#bbf7d0)" onclick="openGridPost(0)">🎾<div class="g-overlay">1h 20m</div></div>
+      <div class="grid-item" style="background:linear-gradient(135deg,#dbeafe,#bfdbfe)" onclick="openGridPost(1)">🏃<div class="g-overlay">5.2 mi</div></div>
+      <div class="grid-item" style="background:linear-gradient(135deg,#d6d3d1,#e7e5e4)" onclick="openGridPost(2)">🥾<div class="g-overlay">4.6 mi</div></div>
+      <div class="grid-item" style="background:linear-gradient(135deg,#e0e7ff,#c7d2fe)" onclick="openGridPost(3)">🏄<div class="g-overlay">2h 10m</div></div>
+      <div class="grid-item" style="background:linear-gradient(135deg,#fed7aa,#fdba74)" onclick="openGridPost(4)">🧗<div class="g-overlay">1h 30m</div></div>
+      <div class="grid-item" style="background:linear-gradient(135deg,#dcfce7,#bbf7d0)" onclick="openGridPost(5)">🎾<div class="g-overlay">55 min</div></div>
+      <div class="grid-item" style="background:linear-gradient(135deg,#fef3c7,#fde68a)" onclick="openGridPost(6)">🏋️<div class="g-overlay">45 min</div></div>
+      <div class="grid-item" style="background:linear-gradient(135deg,#d6d3d1,#e7e5e4)" onclick="openGridPost(7)">🥾<div class="g-overlay">6.1 mi</div></div>
+      <div class="grid-item" style="background:linear-gradient(135deg,#fed7aa,#fdba74)" onclick="openGridPost(8)">🧗<div class="g-overlay">2h</div></div>
+      <div class="grid-item" style="background:linear-gradient(135deg,#dbeafe,#bfdbfe)" onclick="openGridPost(9)">🏃<div class="g-overlay">3.8 mi</div></div>
+      <div class="grid-item" style="background:linear-gradient(135deg,#fce7f3,#fbcfe8)" onclick="openGridPost(10)">🧘<div class="g-overlay">30 min</div></div>
+      <div class="grid-item" style="background:linear-gradient(135deg,#dcfce7,#a7f3d0)" onclick="openGridPost(11)">🎾<div class="g-overlay">1h 05m</div></div>
+    </div>
+  </div>
+
+  <!-- MISSIONS -->
+  <div class="you-subtab" id="youTab-missions">
+    <div class="label">Active Missions</div>
+    <div class="missions">
+      <div class="mission glass-card"><div class="mission-ico" style="background:var(--green-bg)">🏃</div><div class="mission-info"><div class="mission-name">Run 3 times this week</div><div class="mission-progress"><div class="mission-bar"><div class="mission-fill" style="width:66%"></div></div><span>2/3</span></div></div><div class="mission-xp">+150 XP</div></div>
+      <div class="mission glass-card"><div class="mission-ico" style="background:var(--orange-bg)">🔥</div><div class="mission-info"><div class="mission-name">Hit a 14-day streak</div><div class="mission-progress"><div class="mission-bar"><div class="mission-fill" style="width:86%"></div></div><span>12/14</span></div></div><div class="mission-xp">+200 XP</div></div>
+      <div class="mission glass-card"><div class="mission-ico" style="background:var(--blue-bg)">👥</div><div class="mission-info"><div class="mission-name">Connect with 5 new people</div><div class="mission-progress"><div class="mission-bar"><div class="mission-fill" style="width:60%"></div></div><span>3/5</span></div></div><div class="mission-xp">+100 XP</div></div>
+      <div class="mission glass-card"><div class="mission-ico" style="background:var(--pink-bg)">🎾</div><div class="mission-info"><div class="mission-name">Try a new sport</div><div class="mission-progress"><div class="mission-bar"><div class="mission-fill" style="width:0%"></div></div><span>0/1</span></div></div><div class="mission-xp">+250 XP</div></div>
+      <div class="mission glass-card"><div class="mission-ico" style="background:rgba(255,215,0,.12)">🏆</div><div class="mission-info"><div class="mission-name">Join a rec league</div><div class="mission-progress"><div class="mission-bar"><div class="mission-fill" style="width:0%"></div></div><span>0/1</span></div></div><div class="mission-xp">+300 XP</div></div>
+    </div>
+    <div class="label" style="margin-top:6px">Completed</div>
+    <div class="missions">
+      <div class="mission glass-card done-mission"><div class="mission-ico" style="background:rgba(34,197,94,.15)">✅</div><div class="mission-info"><div class="mission-name" style="text-decoration:line-through;color:var(--ink4)">Log 5 activities</div><div class="mission-progress"><div class="mission-bar"><div class="mission-fill" style="width:100%"></div></div><span>5/5</span></div></div><div class="mission-xp" style="color:var(--green)">Claimed</div></div>
+      <div class="mission glass-card done-mission"><div class="mission-ico" style="background:rgba(34,197,94,.15)">✅</div><div class="mission-info"><div class="mission-name" style="text-decoration:line-through;color:var(--ink4)">Complete first workout</div><div class="mission-progress"><div class="mission-bar"><div class="mission-fill" style="width:100%"></div></div><span>1/1</span></div></div><div class="mission-xp" style="color:var(--green)">Claimed</div></div>
+      <div class="mission glass-card done-mission"><div class="mission-ico" style="background:rgba(34,197,94,.15)">✅</div><div class="mission-info"><div class="mission-name" style="text-decoration:line-through;color:var(--ink4)">Add 3 connections</div><div class="mission-progress"><div class="mission-bar"><div class="mission-fill" style="width:100%"></div></div><span>3/3</span></div></div><div class="mission-xp" style="color:var(--green)">Claimed</div></div>
+    </div>
+  </div>
+
+  <!-- LEADERBOARD -->
+  <div class="you-subtab" id="youTab-leaderboard">
+    <div class="label">Your Rank</div>
+    <div class="halo-board glass-card" style="padding:16px">
+      <div class="halo-row halo-you" style="padding:10px 8px"><div class="halo-rank" style="font-size:20px">4</div><div class="av" style="background:linear-gradient(135deg,var(--green),var(--blue));width:40px;height:40px;font-size:16px">J</div><div class="halo-info"><div class="halo-name" style="font-size:15px">You</div><div class="halo-xp">2,840 XP · Silver Member</div></div><div class="halo-streak" style="font-size:16px">🔥 12</div></div>
+    </div>
+    <div class="label" style="margin-top:8px">Top Rankings</div>
+    <div class="halo-board glass-card" style="padding:12px">
+      <div class="halo-row"><div class="halo-rank" style="color:#ffd700">1</div><div class="av" style="background:linear-gradient(135deg,var(--pink),var(--orange));width:32px;height:32px;font-size:12px">K</div><div class="halo-info"><div class="halo-name">Kai Nakamura</div><div class="halo-xp">4,210 XP · Gold</div></div><div class="halo-streak">🔥 31</div></div>
+      <div class="halo-divider"></div>
+      <div class="halo-row"><div class="halo-rank" style="color:#c0c0c0">2</div><div class="av" style="background:linear-gradient(135deg,var(--blue),var(--pink));width:32px;height:32px;font-size:12px">S</div><div class="halo-info"><div class="halo-name">Sam Rivera</div><div class="halo-xp">3,580 XP · Silver</div></div><div class="halo-streak">🔥 22</div></div>
+      <div class="halo-divider"></div>
+      <div class="halo-row"><div class="halo-rank" style="color:#cd7f32">3</div><div class="av" style="background:linear-gradient(135deg,var(--green),#4ade80);width:32px;height:32px;font-size:12px">D</div><div class="halo-info"><div class="halo-name">Derek Osei</div><div class="halo-xp">2,960 XP · Silver</div></div><div class="halo-streak">🔥 14</div></div>
+      <div class="halo-divider"></div>
+      <div class="halo-row" style="background:var(--green-bg);border-radius:8px;padding:8px"><div class="halo-rank" style="font-weight:800">4</div><div class="av" style="background:linear-gradient(135deg,var(--green),var(--blue));width:32px;height:32px;font-size:12px">J</div><div class="halo-info"><div class="halo-name" style="font-weight:800">You</div><div class="halo-xp">2,840 XP · Silver</div></div><div class="halo-streak">🔥 12</div></div>
+      <div class="halo-divider"></div>
+      <div class="halo-row"><div class="halo-rank">5</div><div class="av" style="background:linear-gradient(135deg,var(--orange),#fbbf24);width:32px;height:32px;font-size:12px">L</div><div class="halo-info"><div class="halo-name">Lexi Tanaka</div><div class="halo-xp">2,120 XP · Silver</div></div><div class="halo-streak">🔥 8</div></div>
+      <div class="halo-divider"></div>
+      <div class="halo-row"><div class="halo-rank">6</div><div class="av" style="background:linear-gradient(135deg,var(--orange),#fbbf24);width:32px;height:32px;font-size:12px">J</div><div class="halo-info"><div class="halo-name">Jordan Park</div><div class="halo-xp">1,840 XP · Silver</div></div><div class="halo-streak">🔥 5</div></div>
+      <div class="halo-divider"></div>
+      <div class="halo-row"><div class="halo-rank">7</div><div class="av" style="background:linear-gradient(135deg,var(--blue),var(--pink));width:32px;height:32px;font-size:12px">M</div><div class="halo-info"><div class="halo-name">Maya Chen</div><div class="halo-xp">1,520 XP · Bronze</div></div><div class="halo-streak">🔥 3</div></div>
+    </div>
+  </div>
