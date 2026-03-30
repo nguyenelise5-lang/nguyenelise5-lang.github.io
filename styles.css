@@ -19,7 +19,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#e0e0e4;color:var(--i
 .screen{display:none;padding:0 20px 24px;position:relative}
 .screen.active{display:block}
 #s-home{padding-bottom:0}
-#s-connect{overflow:visible;padding-bottom:40px}
+#s-connect{overflow:visible;padding-bottom:100px}
 .nav{height:82px;background:rgba(255,255,255,.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid rgba(0,0,0,.05);display:flex;align-items:center;justify-content:space-around;padding:0 6px;z-index:250;flex-shrink:0}
 .nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;color:var(--ink4);padding:8px 10px;border-radius:12px;font-family:inherit;transition:.2s;position:relative}
 .nav-btn.active{color:var(--green)}
@@ -641,8 +641,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#e0e0e4;color:var(--i
 .mini-map .map-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,0,0,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.03) 1px,transparent 1px);background-size:30px 30px}
 .mini-map-controls{display:flex;justify-content:space-between;align-items:center;padding:8px 12px}
 /* Horizontal Shelves */
-.shelf{display:flex;gap:10px;overflow-x:scroll;overflow-y:hidden;padding:2px 0 16px;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory}
-.shelf .scoreboard{margin-bottom:0}
+.shelf{display:flex;gap:10px;overflow-x:scroll;padding:2px 0 16px;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory}
 .shelf::-webkit-scrollbar{display:none}
 /* Shelf: Person cards — flex column, no fixed height */
 .shelf-card{width:156px;min-width:156px;padding:16px 14px;text-align:center;scroll-snap-align:start;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px}
