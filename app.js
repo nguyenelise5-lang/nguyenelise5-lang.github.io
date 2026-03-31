@@ -22,6 +22,8 @@ function toggleGhostMode(active) {
   var mapWrap = document.getElementById('mapWrap');
   var partnersLabel = document.getElementById('peopleLabel');
   var partnersShelf = partnersLabel ? partnersLabel.nextElementSibling : null;
+  var radiusBtns = document.getElementById('radiusBtns');
+  var radiusLabel = document.getElementById('radiusLabel') ? document.getElementById('radiusLabel').closest('.map-float-radius') : null;
   
   if (active) {
     if (mapWrap) mapWrap.style.display = 'none';
@@ -209,9 +211,10 @@ async function go(n){
   // Switch screens
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('s-'+n).classList.add('active');
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.nav-btn,.nav-rec').forEach(b=>b.classList.remove('active'));
   var m={home:0,connect:1,activity:2,you:3};
-  if(m[n]!==undefined)document.querySelectorAll('.nav-btn')[m[n]].classList.add('active');
+  if(n==='record'){document.querySelector('.nav-rec').classList.add('active');}
+  else if(m[n]!==undefined)document.querySelectorAll('.nav-btn')[m[n]].classList.add('active');
   document.getElementById('screens').scrollTop=0;
   // Init camera when entering Record tab
   if(n==='record' && typeof initCamera === 'function') initCamera();
@@ -225,21 +228,27 @@ async function go(n){
 // Sport-specific stats for Record tab (Strava-style)
 
 function _initConnect() {
-// Bind chip click handlers
-document.querySelectorAll('.chip').forEach(c=>{c.addEventListener('click',()=>{
-  if (!c.dataset.sport) { c.classList.toggle('on'); return; }
-  if (c.dataset.sport === 'all') {
-    document.querySelectorAll('#sportPills .chip').forEach(x=>x.classList.remove('on'));
-    c.classList.add('on');
-  } else {
-    document.querySelector('#sportPills .chip[data-sport="all"]').classList.remove('on');
-    c.classList.toggle('on');
-    if (!document.querySelector('#sportPills .chip.on')) {
-      document.querySelector('#sportPills .chip[data-sport="all"]').classList.add('on');
+// Bind chip click handlers via delegation
+var sportPillsEl = document.getElementById('sportPills');
+if (sportPillsEl) {
+  sportPillsEl.addEventListener('click', function(e) {
+    var c = e.target.closest('.chip');
+    if (!c) return;
+    if (!c.dataset.sport) { c.classList.toggle('on'); applyFilters(); return; }
+    if (c.dataset.sport === 'all') {
+      document.querySelectorAll('#sportPills .chip').forEach(x => x.classList.remove('on'));
+      c.classList.add('on');
+    } else {
+      var allChip = document.querySelector('#sportPills .chip[data-sport="all"]');
+      if (allChip) allChip.classList.remove('on');
+      c.classList.toggle('on');
+      if (!document.querySelector('#sportPills .chip.on')) {
+        if (allChip) allChip.classList.add('on');
+      }
     }
-  }
-  applyFilters();
-})});
+    applyFilters();
+  });
+}
 
 // Radius buttons
 // Bind radius buttons
@@ -271,6 +280,7 @@ setupEdgeSwipe('profileView', function() {
   document.getElementById('connectMain').style.display = 'block';
   inboxOpen = false;
 });
+_initFullListSwipe();
 } // end _initConnect
 
 function applyFilters() {
@@ -529,6 +539,7 @@ function getMemberTier(xp) {
 
 function renderXPLevel(currentXP) {
   var _el = function(id) { return document.getElementById(id); };
+  if (!_el('xpDdBadge')) return; // dropdown not in DOM yet, skip silently
   let currentLevel = levels[0];
   let nextLevel = levels[1];
   for (let i = 0; i < levels.length; i++) {
@@ -1030,9 +1041,16 @@ function openProfile(id) {
   const p = profileData[id];
   if (!p) return;
   
-  // Navigate to Connect tab first if not already there
-  go('connect');
-  
+  // Only navigate to Connect tab if not already there
+  var connectScreen = document.getElementById('s-connect');
+  if (!connectScreen || !connectScreen.classList.contains('active')) {
+    go('connect').then ? go('connect').then(function(){ _openProfileUI(id, p); }) : (go('connect'), setTimeout(function(){ _openProfileUI(id, p); }, 80));
+    return;
+  }
+  _openProfileUI(id, p);
+}
+
+function _openProfileUI(id, p) {
   const pv = document.getElementById('profileView');
   const main = document.getElementById('connectMain');
   const inbox = document.getElementById('inbox');
@@ -1226,10 +1244,11 @@ function closeFullListView() {
   }, 230);
 }
 
-// Swipe right to go back from full list view
-(function() {
+// Swipe right to go back from full list view — called from _initConnect after lazy load
+function _initFullListSwipe() {
   var startX = 0, startY = 0, swiping = false, tracking = false, mouseDown = false;
   var el = document.getElementById('fullListView');
+  if (!el) return;
   
   function getRelX(clientX) {
     var rect = el.getBoundingClientRect();
@@ -1330,7 +1349,7 @@ function closeFullListView() {
       if (!tracking) closeFullListView();
     });
   }
-})();
+} // end _initFullListSwipe
 
 // Reusable edge-swipe-to-dismiss for overlay views
 function setupEdgeSwipe(elId, closeFn) {
@@ -1975,7 +1994,30 @@ function openRecPanel(type){
   }catch(e){console.warn('openRecPanel:',e)}
 }
 function closeRecPanel(){try{document.getElementById('recPanel').style.display='none'}catch(e){}}
-function toggleTimer(){showToast('⏱ 3s countdown')}
+var countdownActive = false;
+function toggleTimer(){
+  try {
+    if (countdownActive) return;
+    if (isRecording) { stopRec(); return; }
+    countdownActive = true;
+    var btn = document.getElementById('timerBtn');
+    var counts = [3,2,1];
+    var i = 0;
+    if (btn) btn.style.color = '#CCFF00';
+    showToast('⏱ Starting in 3...');
+    var iv = setInterval(function(){
+      i++;
+      if (i < counts.length) {
+        showToast('⏱ ' + counts[i] + '...');
+      } else {
+        clearInterval(iv);
+        countdownActive = false;
+        if (btn) btn.style.color = '';
+        startRec();
+      }
+    }, 1000);
+  } catch(e) { console.warn('toggleTimer:', e); }
+}
 
 // === ACTIVITY TAB FUNCTIONAL BUTTONS ===
 function openActivityModal(type) {
