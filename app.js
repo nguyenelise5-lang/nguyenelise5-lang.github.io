@@ -1144,6 +1144,9 @@ var fullListData = {
     {name:'Beach Vibes VB',sport:'🏐 Volleyball',record:'4-2',loc:'SM Beach · 0.9 mi',spots:4,idx:2,sportTag:'volleyball'},
     {name:'Doubles League',sport:'🎾 Tennis',record:'5-3',loc:'Riviera · 1.0 mi',spots:1,idx:3,sportTag:'tennis'},
     {name:'Dink Dynasty',sport:'🏓 Pickleball',record:'6-1',loc:'SM Courts · 1.8 mi',spots:3,idx:4,sportTag:'pickleball'},
+    {name:'SM Run Crew',sport:'🏃 Run Club',record:'Open',loc:'SM Pier · 0.5 mi',spots:99,idx:5,sportTag:'running'},
+    {name:'Sender Squad',sport:'🧗 Climbing',record:'V4–V7',loc:'Sender One · 2.2 mi',spots:5,idx:6,sportTag:'climbing'},
+    {name:'Yoga & Chill',sport:'🧘 Yoga',record:'12 members',loc:'The Studio · 1.1 mi',spots:3,idx:7,sportTag:'yoga'},
   ]
 };
 
@@ -1453,6 +1456,9 @@ var teamData = [
   {name:'Beach Vibes VB',sport:'🏐 VOLLEYBALL',gradient:'linear-gradient(135deg,#1d4ed8,#3b82f6)',w:4,l:2,loc:'Santa Monica Beach · 0.9 mi',spots:4,schedule:'Saturdays · 11AM',format:'Casual 6v6 beach',need:'Any position',ages:'18+',vibe:'Relaxed · Social · Beginners OK',captain:'Jordan P.',captainId:'jordan'},
   {name:'Doubles League',sport:'🎾 TENNIS',gradient:'linear-gradient(135deg,#be185d,#ec4899)',w:5,l:3,loc:'Riviera Tennis Club · 1.0 mi',spots:1,schedule:'Weeknights · 7PM',format:'Mixed doubles league',need:'1 partner · NTRP 3.5+',ages:'21-35',vibe:'Competitive · Fun · Social post-match',captain:'Lexi T.',captainId:'lexi'},
   {name:'Dink Dynasty',sport:'🏓 PICKLEBALL',gradient:'linear-gradient(135deg,#ca8a04,#facc15)',w:6,l:1,loc:'Santa Monica Courts · 1.8 mi',spots:3,schedule:'Sat & Sun · 10AM',format:'Casual doubles round-robin',need:'Any level · Just show up',ages:'All ages',vibe:'Social · Inclusive · Low-barrier · Post-game smoothies',captain:'Alex R.',captainId:'alex'},
+  {name:'SM Run Crew',sport:'🏃 RUN CLUB',gradient:'linear-gradient(135deg,#0369a1,#0ea5e9)',w:31,l:0,loc:'Santa Monica Pier · 0.5 mi',spots:99,schedule:'Tue & Sat · 6:30AM',format:'Open group run · All paces',need:'All paces welcome',ages:'All ages',vibe:'Social · Energetic · Community-first · Post-run coffee',captain:'Jordan P.',captainId:'jordan'},
+  {name:'Sender Squad',sport:'🧗 CLIMBING',gradient:'linear-gradient(135deg,#92400e,#f97316)',w:0,l:0,loc:'Sender One · 2.2 mi',spots:5,schedule:'Wed & Fri · 6PM',format:'Bouldering crew · V4–V7',need:'Intermediate climbers',ages:'18-35',vibe:'Hype · Supportive · Serious sends · Post-climb tacos',captain:'Kai N.',captainId:'kai'},
+  {name:'Yoga & Chill',sport:'🧘 YOGA',gradient:'linear-gradient(135deg,#7c3aed,#a78bfa)',w:0,l:0,loc:'The Studio · 1.1 mi',spots:3,schedule:'Thursdays · 7PM',format:'Flow yoga · All levels',need:'Any experience level',ages:'All ages',vibe:'Calm · Inclusive · Mindful · Herbal tea after',captain:'Lexi T.',captainId:'lexi'},
 ];
 
 function openTeamPopup(i) {
