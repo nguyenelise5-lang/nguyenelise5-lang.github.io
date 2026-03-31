@@ -19,7 +19,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#e0e0e4;color:var(--i
 .screen{display:none;padding:0 20px 24px;position:relative}
 .screen.active{display:block}
 #s-home{padding-bottom:0}
-#s-connect{overflow:visible;padding-bottom:100px}
+#s-connect{padding-bottom:32px}
 .nav{height:82px;background:rgba(255,255,255,.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid rgba(0,0,0,.05);display:flex;align-items:center;justify-content:space-around;padding:0 6px;z-index:250;flex-shrink:0}
 .nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;color:var(--ink4);padding:8px 10px;border-radius:12px;font-family:inherit;transition:.2s;position:relative}
 .nav-btn.active{color:var(--green)}
