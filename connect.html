@@ -214,13 +214,110 @@
 
     <!-- Shelf: Rec Teams -->
     <div class="label" id="teamsLabel">Rec Teams</div>
-    <div class="shelf">
-      <div class="shelf-team filterable scoreboard" data-sports="basketball" data-dist="3.5" style="background:#1a1a1a;border-radius:var(--radius);min-width:148px;max-width:148px;flex-shrink:0;scroll-snap-align:start;cursor:pointer;align-self:flex-start;margin-bottom:0" onclick="openTeamPopup(0)"><div style="padding:7px;text-align:center;font-size:9px;font-weight:700;color:#fff;background:linear-gradient(135deg,#c2410c,#ea580c);letter-spacing:.5px">🏀 BASKETBALL</div><div style="padding:10px;text-align:center"><div style="font-size:11px;font-weight:700;color:#fff">Westside Buckets</div><div style="font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:800;color:#fff;margin:3px 0"><span class="sb-w">7</span>-<span class="sb-l">2</span></div><div style="font-size:9px;color:rgba(255,255,255,.5)">Venice · 1.3 mi</div><div class="sb-spots" style="margin-top:5px;font-size:8px;padding:2px 7px">2 spots</div></div></div>
-      <div class="shelf-team filterable scoreboard" data-sports="soccer" data-dist="2.4" style="background:#1a1a1a;border-radius:var(--radius);min-width:148px;max-width:148px;flex-shrink:0;scroll-snap-align:start;cursor:pointer;align-self:flex-start;margin-bottom:0" onclick="openTeamPopup(1)"><div style="padding:7px;text-align:center;font-size:9px;font-weight:700;color:#fff;background:linear-gradient(135deg,#15803d,#22c55e);letter-spacing:.5px">⚽ SOCCER</div><div style="padding:10px;text-align:center"><div style="font-size:11px;font-weight:700;color:#fff">SM United FC</div><div style="font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:800;color:#fff;margin:3px 0"><span class="sb-w">6</span>-<span class="sb-l">3</span></div><div style="font-size:9px;color:rgba(255,255,255,.5)">Memorial · 1.8 mi</div><div class="sb-spots" style="margin-top:5px;font-size:8px;padding:2px 7px">2 spots</div></div></div>
-      <div class="shelf-team filterable scoreboard" data-sports="volleyball" data-dist="3.2" style="background:#1a1a1a;border-radius:var(--radius);min-width:148px;max-width:148px;flex-shrink:0;scroll-snap-align:start;cursor:pointer;align-self:flex-start;margin-bottom:0" onclick="openTeamPopup(2)"><div style="padding:7px;text-align:center;font-size:9px;font-weight:700;color:#fff;background:linear-gradient(135deg,#1d4ed8,#3b82f6);letter-spacing:.5px">🏐 VOLLEYBALL</div><div style="padding:10px;text-align:center"><div style="font-size:11px;font-weight:700;color:#fff">Beach Vibes VB</div><div style="font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:800;color:#fff;margin:3px 0"><span class="sb-w">4</span>-<span class="sb-l">2</span></div><div style="font-size:9px;color:rgba(255,255,255,.5)">SM Beach · 0.9 mi</div><div class="sb-spots" style="margin-top:5px;font-size:8px;padding:2px 7px">4 spots</div></div></div>
-      <div class="shelf-team filterable scoreboard" data-sports="tennis" data-dist="1.0" style="background:#1a1a1a;border-radius:var(--radius);min-width:148px;max-width:148px;flex-shrink:0;scroll-snap-align:start;cursor:pointer;align-self:flex-start;margin-bottom:0" onclick="openTeamPopup(3)"><div style="padding:7px;text-align:center;font-size:9px;font-weight:700;color:#fff;background:linear-gradient(135deg,#be185d,#ec4899);letter-spacing:.5px">🎾 TENNIS</div><div style="padding:10px;text-align:center"><div style="font-size:11px;font-weight:700;color:#fff">Doubles League</div><div style="font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:800;color:#fff;margin:3px 0"><span class="sb-w">5</span>-<span class="sb-l">3</span></div><div style="font-size:9px;color:rgba(255,255,255,.5)">Riviera · 1.0 mi</div><div class="sb-spots" style="margin-top:5px;font-size:8px;padding:2px 7px">1 spot</div></div></div>
-      <div class="shelf-team filterable scoreboard" data-sports="pickleball" data-dist="1.8" style="background:#1a1a1a;border-radius:var(--radius);min-width:148px;max-width:148px;flex-shrink:0;scroll-snap-align:start;cursor:pointer;align-self:flex-start;margin-bottom:0" onclick="openTeamPopup(4)"><div style="padding:7px;text-align:center;font-size:9px;font-weight:700;color:#fff;background:linear-gradient(135deg,#ca8a04,#facc15);letter-spacing:.5px">🏓 PICKLEBALL</div><div style="padding:10px;text-align:center"><div style="font-size:11px;font-weight:700;color:#fff">Dink Dynasty</div><div style="font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:800;color:#fff;margin:3px 0"><span class="sb-w">6</span>-<span class="sb-l">1</span></div><div style="font-size:9px;color:rgba(255,255,255,.5)">SM Courts · 1.8 mi</div><div class="sb-spots" style="margin-top:5px;font-size:8px;padding:2px 7px">3 spots</div></div></div>
-      <div class="shelf-seeall glass-card" onclick="openFullListView('teams')"><div class="shelf-seeall-arrow">→</div><div class="shelf-seeall-txt">See all<br>Teams</div></div>
+    <div class="shelf" id="teamsShelf">
+
+      <!-- Basketball -->
+      <div class="sc-card filterable scoreboard" data-sports="basketball" data-dist="1.3" onclick="openTeamPopup(0)">
+        <div class="sc-header" style="background:linear-gradient(135deg,#c2410c,#ea580c)">🏀 BASKETBALL</div>
+        <div class="sc-body">
+          <div class="sc-name">Westside Buckets</div>
+          <div class="sc-record"><span class="sb-w">7</span><span class="sc-dash">-</span><span class="sb-l">2</span></div>
+          <div class="sc-meta">Venice · 1.3 mi</div>
+          <div class="sc-schedule">Tue & Thu · 7PM</div>
+          <div class="sb-spots">2 spots left</div>
+        </div>
+      </div>
+
+      <!-- Pickleball -->
+      <div class="sc-card filterable scoreboard" data-sports="pickleball" data-dist="1.8" onclick="openTeamPopup(4)">
+        <div class="sc-header" style="background:linear-gradient(135deg,#ca8a04,#facc15)">🏓 PICKLEBALL</div>
+        <div class="sc-body">
+          <div class="sc-name">Dink Dynasty</div>
+          <div class="sc-record"><span class="sb-w">6</span><span class="sc-dash">-</span><span class="sb-l">1</span></div>
+          <div class="sc-meta">SM Courts · 1.8 mi</div>
+          <div class="sc-schedule">Sat & Sun · 10AM</div>
+          <div class="sb-spots">3 spots left</div>
+        </div>
+      </div>
+
+      <!-- Tennis -->
+      <div class="sc-card filterable scoreboard" data-sports="tennis" data-dist="1.0" onclick="openTeamPopup(3)">
+        <div class="sc-header" style="background:linear-gradient(135deg,#be185d,#ec4899)">🎾 TENNIS</div>
+        <div class="sc-body">
+          <div class="sc-name">Doubles League</div>
+          <div class="sc-record"><span class="sb-w">5</span><span class="sc-dash">-</span><span class="sb-l">3</span></div>
+          <div class="sc-meta">Riviera · 1.0 mi</div>
+          <div class="sc-schedule">Weeknights · 7PM</div>
+          <div class="sb-spots">1 spot left</div>
+        </div>
+      </div>
+
+      <!-- Soccer -->
+      <div class="sc-card filterable scoreboard" data-sports="soccer" data-dist="1.8" onclick="openTeamPopup(1)">
+        <div class="sc-header" style="background:linear-gradient(135deg,#15803d,#22c55e)">⚽ SOCCER</div>
+        <div class="sc-body">
+          <div class="sc-name">SM United FC</div>
+          <div class="sc-record"><span class="sb-w">6</span><span class="sc-dash">-</span><span class="sb-l">3</span></div>
+          <div class="sc-meta">Memorial · 1.8 mi</div>
+          <div class="sc-schedule">Sundays · 4PM</div>
+          <div class="sb-spots">2 spots left</div>
+        </div>
+      </div>
+
+      <!-- Volleyball -->
+      <div class="sc-card filterable scoreboard" data-sports="volleyball" data-dist="0.9" onclick="openTeamPopup(2)">
+        <div class="sc-header" style="background:linear-gradient(135deg,#1d4ed8,#3b82f6)">🏐 VOLLEYBALL</div>
+        <div class="sc-body">
+          <div class="sc-name">Beach Vibes VB</div>
+          <div class="sc-record"><span class="sb-w">4</span><span class="sc-dash">-</span><span class="sb-l">2</span></div>
+          <div class="sc-meta">SM Beach · 0.9 mi</div>
+          <div class="sc-schedule">Saturdays · 11AM</div>
+          <div class="sb-spots">4 spots left</div>
+        </div>
+      </div>
+
+      <!-- Running -->
+      <div class="sc-card filterable scoreboard" data-sports="running" data-dist="0.5" onclick="openTeamPopup(5)">
+        <div class="sc-header" style="background:linear-gradient(135deg,#0369a1,#0ea5e9)">🏃 RUN CLUB</div>
+        <div class="sc-body">
+          <div class="sc-name">SM Run Crew</div>
+          <div class="sc-record"><span class="sb-w">31</span><span class="sc-dash">mi</span><span class="sb-l" style="font-size:9px">avg</span></div>
+          <div class="sc-meta">SM Pier · 0.5 mi</div>
+          <div class="sc-schedule">Tue & Sat · 6:30AM</div>
+          <div class="sb-spots">Open · All paces</div>
+        </div>
+      </div>
+
+      <!-- Climbing -->
+      <div class="sc-card filterable scoreboard" data-sports="climbing" data-dist="2.2" onclick="openTeamPopup(6)">
+        <div class="sc-header" style="background:linear-gradient(135deg,#92400e,#f97316)">🧗 CLIMBING</div>
+        <div class="sc-body">
+          <div class="sc-name">Sender Squad</div>
+          <div class="sc-record"><span class="sb-w">V4</span><span class="sc-dash">–</span><span class="sb-l">V7</span></div>
+          <div class="sc-meta">Sender One · 2.2 mi</div>
+          <div class="sc-schedule">Wed & Fri · 6PM</div>
+          <div class="sb-spots">5 spots left</div>
+        </div>
+      </div>
+
+      <!-- Yoga -->
+      <div class="sc-card filterable scoreboard" data-sports="yoga" data-dist="1.1" onclick="openTeamPopup(7)">
+        <div class="sc-header" style="background:linear-gradient(135deg,#7c3aed,#a78bfa)">🧘 YOGA</div>
+        <div class="sc-body">
+          <div class="sc-name">Yoga & Chill</div>
+          <div class="sc-record"><span class="sb-w">12</span><span class="sc-dash" style="font-size:9px">members</span><span class="sb-l"></span></div>
+          <div class="sc-meta">The Studio · 1.1 mi</div>
+          <div class="sc-schedule">Thursdays · 7PM</div>
+          <div class="sb-spots">3 spots left</div>
+        </div>
+      </div>
+
+      <!-- See All -->
+      <div class="shelf-seeall glass-card" onclick="openFullListView('teams')">
+        <div class="shelf-seeall-arrow">→</div>
+        <div class="shelf-seeall-txt">See all<br>Teams</div>
+      </div>
+
     </div>
   </div>
 
