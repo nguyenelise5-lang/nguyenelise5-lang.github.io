@@ -727,12 +727,13 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#e0e0e4;color:var(--i
 .shelf-evt-body{padding:10px 12px}
 .shelf-evt-title{font-size:12px;font-weight:700}
 .shelf-evt-detail{font-size:10px;color:var(--ink3);margin-top:2px}
-.shelf-team{width:148px;min-width:148px;max-width:148px;overflow:hidden;scroll-snap-align:start;flex-shrink:0;padding:0;margin-bottom:0;color:#fff;align-self:flex-start}
-.shelf-team-header{padding:8px 10px;text-align:center;font-size:10px;font-weight:700;color:#fff;letter-spacing:.5px;border-radius:var(--radius) var(--radius) 0 0}
-.shelf-team-body{padding:10px 12px;text-align:center}
-.shelf-team-name{font-size:12px;font-weight:700}
-.shelf-team-record{font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:800;margin:4px 0}
-.shelf-team-meta{font-size:9px;color:var(--ink3)}
+.shelf-team{width:148px;min-width:148px;max-width:148px;overflow:hidden;scroll-snap-align:start;flex-shrink:0;padding:0;margin-bottom:0;color:#fff;align-self:flex-start;cursor:pointer;background:#1a1a1a;border-radius:var(--radius);box-shadow:0 2px 12px rgba(0,0,0,.12)}
+.shelf-team-header{padding:7px;text-align:center;font-size:9px;font-weight:700;color:#fff;letter-spacing:.5px}
+.shelf-team-body{padding:10px;text-align:center}
+.shelf-team-name{font-size:11px;font-weight:700;color:#fff}
+.shelf-team-record{font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:800;color:#fff;margin:3px 0}
+.shelf-team-meta{font-size:9px;color:rgba(255,255,255,.5)}
+.shelf-team .sb-spots{display:inline-block;margin-top:5px;font-size:8px;padding:2px 7px}
 /* Segmented Control */
 .seg-control{display:flex;background:var(--surface2);border-radius:12px;padding:3px;margin-bottom:14px;gap:3px}
 .seg-btn{flex:1;padding:8px 0;border:none;border-radius:10px;font-family:inherit;font-size:12px;font-weight:700;color:var(--ink3);background:none;cursor:pointer;transition:.2s}
