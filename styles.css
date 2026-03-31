@@ -734,7 +734,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#e0e0e4;color:var(--i
 .shelf-team-meta{font-size:9px;color:rgba(255,255,255,.5)}
 .shelf-team .sb-spots{display:inline-block;margin-top:5px;font-size:8px;padding:2px 7px}
 /* Standardized scoreboard card */
-.sc-card{width:148px;min-width:148px;max-width:148px;overflow:hidden;scroll-snap-align:start;flex-shrink:0;background:#1a1a1a;border-radius:var(--radius);box-shadow:0 2px 16px rgba(0,0,0,.18);cursor:pointer;transition:transform .15s,box-shadow .15s;align-self:flex-start}
+.sc-card{width:148px;min-width:148px;max-width:148px;overflow:hidden;scroll-snap-align:start;flex-shrink:0;background:#1a1a1a;border-radius:var(--radius);box-shadow:0 2px 16px rgba(0,0,0,.18);cursor:pointer;transition:transform .15s,box-shadow .15s;align-self:stretch;display:flex;flex-direction:column}
 .sc-card:hover,.sc-card:active{transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,0,0,.28)}
 .sc-header{padding:7px 10px;text-align:center;font-size:9px;font-weight:800;color:#fff;letter-spacing:.8px;text-transform:uppercase}
 .sc-body{padding:10px 10px 12px;text-align:center}
