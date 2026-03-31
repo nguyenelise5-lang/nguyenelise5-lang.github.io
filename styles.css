@@ -641,9 +641,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#e0e0e4;color:var(--i
 .mini-map .map-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,0,0,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.03) 1px,transparent 1px);background-size:30px 30px}
 .mini-map-controls{display:flex;justify-content:space-between;align-items:center;padding:8px 12px}
 /* Horizontal Shelves */
-.shelf{display:flex;gap:10px;overflow-x:scroll;padding:2px 0 16px;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory}
+.shelf{display:flex;gap:10px;overflow-x:scroll;padding:2px 0 16px;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;align-items:flex-start}
 .shelf::-webkit-scrollbar{display:none}
-.shelf-teams{align-items:flex-start}
 /* Shelf: Person cards — flex column, no fixed height */
 .shelf-card{width:156px;min-width:156px;padding:16px 14px;text-align:center;scroll-snap-align:start;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px}
 .shelf-name{font-size:12px;font-weight:700;cursor:pointer;line-height:1.2}.shelf-name:hover{color:var(--green)}
