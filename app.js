@@ -306,6 +306,12 @@ function applyFilters() {
     }
   });
   
+  // Always keep See All cards visible — they should never be filtered out
+  document.querySelectorAll('.shelf-seeall').forEach(el => {
+    el.classList.remove('hidden');
+    el.style.display = '';
+  });
+
   document.querySelectorAll('.map-pin').forEach(pin => {
     const pinSports = (pin.dataset.sports || '').split(',');
     const pinDist = parseFloat(pin.dataset.dist || 0);
