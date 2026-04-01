@@ -642,7 +642,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#e0e0e4;color:var(--i
 .mini-map .map-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,0,0,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.03) 1px,transparent 1px);background-size:30px 30px}
 .mini-map-controls{display:flex;justify-content:space-between;align-items:center;padding:8px 12px}
 /* Horizontal Shelves */
-.shelf{display:flex;gap:10px;overflow-x:scroll;padding:2px 20px 16px 0;-webkit-overflow-scrolling:touch;align-items:stretch}
+.shelf{display:flex;gap:10px;overflow-x:scroll;padding:2px 0 16px;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory}
 .shelf::-webkit-scrollbar{display:none}
 /* Shelf: Person cards — flex column, no fixed height */
 .shelf-card{width:156px;min-width:156px;padding:16px 14px;text-align:center;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px}
@@ -659,7 +659,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#e0e0e4;color:var(--i
 .shelf-msg{width:34px;padding:6px 0;border:1.5px solid var(--surface3);border-radius:8px;background:none;font-size:12px;cursor:pointer;transition:.15s}
 .shelf-msg:hover{border-color:var(--blue);background:rgba(59,130,246,.05)}
 /* See All tile */
-.shelf-seeall{min-width:148px;width:148px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;flex-shrink:0;padding:12px;text-align:center;background:rgba(255,255,255,.5)!important;border:1.5px dashed var(--surface3)!important;border-radius:var(--radius);transition:.2s;align-self:stretch}
+.shelf-seeall{min-width:90px;width:90px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;scroll-snap-align:start;flex-shrink:0;padding:12px;text-align:center;background:rgba(255,255,255,.5)!important;border:1.5px dashed var(--surface3)!important;transition:.2s}
 .shelf-seeall:hover{border-color:var(--green)!important;background:var(--green-bg)!important}
 .shelf-seeall-arrow{font-size:22px;font-weight:300;color:var(--green)}
 .shelf-seeall-txt{font-size:10px;font-weight:700;color:var(--ink3);line-height:1.3}
