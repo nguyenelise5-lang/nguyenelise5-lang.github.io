@@ -734,21 +734,33 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#e0e0e4;color:var(--i
 .shelf-team-record{font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:800;color:#fff;margin:3px 0}
 .shelf-team-meta{font-size:9px;color:rgba(255,255,255,.5)}
 .shelf-team .sb-spots{display:inline-block;margin-top:5px;font-size:8px;padding:2px 7px}
-/* Rec Teams — vertical list */
-.rt-list{overflow:hidden;margin-bottom:14px}
-.rt-row{display:flex;align-items:center;gap:10px;padding:10px 12px 10px 0;cursor:pointer;border-bottom:1px solid var(--surface2);transition:background .15s;background:transparent}
-.rt-row:last-of-type{border-bottom:none}
-.rt-row:active,.rt-row:hover{background:var(--surface2)}
-.rt-bar{width:4px;height:40px;border-radius:2px;flex-shrink:0;margin-left:12px}
-.rt-icon{font-size:20px;width:28px;text-align:center;flex-shrink:0}
-.rt-body{flex:1;min-width:0}
-.rt-name{font-size:13px;font-weight:700;color:var(--ink)}
-.rt-meta{font-size:10px;color:var(--ink3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rt-score{font-family:'Bricolage Grotesque',sans-serif;font-size:16px;font-weight:800;display:flex;align-items:center;gap:1px;flex-shrink:0}
-.rt-sep{color:var(--ink4);font-weight:300;font-size:13px;margin:0 1px}
-.rt-badge{font-size:9px;font-weight:700;color:var(--green);background:var(--green-bg);padding:2px 7px;border-radius:20px;white-space:nowrap;flex-shrink:0;margin-left:6px}
-.rt-seeall-btn{display:block;width:100%;padding:10px 12px;text-align:center;font-size:12px;font-weight:700;color:var(--green);background:none;border:none;border-top:1px solid var(--surface2);cursor:pointer;font-family:inherit;transition:background .15s}
-.rt-seeall-btn:hover{background:var(--green-bg)}
+/* Connect tab — two-section design */
+.cn-seg{display:flex;background:var(--surface2);border-radius:12px;padding:3px;gap:3px;margin-bottom:16px}
+.cn-seg-btn{flex:1;padding:8px;border-radius:10px;border:none;background:none;font-family:inherit;font-size:12px;font-weight:600;color:var(--ink3);cursor:pointer;transition:.2s}
+.cn-seg-btn.active{background:var(--surface);color:var(--ink);font-weight:700;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.cn-section{display:none}
+.cn-section.active{display:block}
+
+/* Join list — teams and events */
+.join-list{margin-bottom:16px;overflow:visible}
+.jn-row{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;border-bottom:1px solid var(--surface2);transition:background .15s}
+.jn-row:last-of-type{border-bottom:none}
+.jn-row:active{background:var(--surface2)}
+.jn-bar{width:4px;height:36px;border-radius:2px;flex-shrink:0}
+.jn-icon{font-size:20px;width:26px;text-align:center;flex-shrink:0}
+.jn-body{flex:1;min-width:0}
+.jn-name{font-size:13px;font-weight:700;color:var(--ink)}
+.jn-meta{font-size:10px;color:var(--ink3);margin-top:1px}
+.jn-score{font-family:'Bricolage Grotesque',sans-serif;font-size:15px;font-weight:800;display:flex;align-items:center;flex-shrink:0;margin-right:8px}
+.jn-sep{color:var(--ink4);font-weight:300;font-size:12px;margin:0 2px}
+.jn-badge{font-size:9px;font-weight:700;color:var(--green);background:var(--green-bg);padding:2px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.jn-seeall{display:block;width:100%;padding:10px 14px;text-align:center;font-size:12px;font-weight:700;color:var(--green);background:none;border:none;border-top:1px solid var(--surface2);cursor:pointer;font-family:inherit;transition:background .15s}
+.jn-seeall:hover{background:var(--green-bg)}
+.jn-evt-row{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;border-bottom:1px solid var(--surface2);transition:background .15s}
+.jn-evt-row:last-of-type{border-bottom:none}
+.jn-evt-row:active{background:var(--surface2)}
+.jn-evt-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.jn-evt-join{flex-shrink:0;padding:5px 12px!important;font-size:10px!important}
 /* Standardized scoreboard card */
 .sc-card{width:148px;min-width:148px;max-width:148px;overflow:hidden;scroll-snap-align:start;flex-shrink:0;background:#1a1a1a;border-radius:var(--radius);box-shadow:0 2px 16px rgba(0,0,0,.18);cursor:pointer;transition:transform .15s,box-shadow .15s;align-self:stretch;display:flex;flex-direction:column}
 .sc-card:hover,.sc-card:active{transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,0,0,.28)}
