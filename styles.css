@@ -14,7 +14,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#e0e0e4;color:var(--i
 .notch{width:120px;height:32px;background:#111;border-radius:18px;position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:200}
 .status-bar{height:44px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 30px 6px;font-size:13px;font-weight:600;flex-shrink:0;z-index:150;background:var(--bg)}
 .status-icons{display:flex;gap:5px;font-size:10px;color:var(--ink2)}
-.screens{flex:1;min-height:0;overflow-y:scroll;overflow-x:clip;-webkit-overflow-scrolling:touch}
+.screens{flex:1;min-height:0;overflow-y:scroll;overflow-x:hidden;-webkit-overflow-scrolling:touch}
 .screens::-webkit-scrollbar{display:none}
 .screen{display:none;padding:0 20px 24px;position:relative}
 .screen.active{display:block}
@@ -642,9 +642,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#e0e0e4;color:var(--i
 .mini-map .map-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,0,0,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.03) 1px,transparent 1px);background-size:30px 30px}
 .mini-map-controls{display:flex;justify-content:space-between;align-items:center;padding:8px 12px}
 /* Horizontal Shelves */
-.shelf{display:flex;gap:10px;overflow-x:auto;margin:0 -20px;padding:2px 20px 16px 20px;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;align-items:stretch}
+.shelf{display:flex;gap:10px;overflow-x:auto;padding:2px 4px 16px;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;align-items:stretch}
 .shelf::-webkit-scrollbar{display:none}
-.shelf::after{content:'';display:block;min-width:8px;flex-shrink:0}
 /* Shelf: Person cards — flex column, no fixed height */
 .shelf-card{width:148px;min-width:148px;max-width:148px;height:180px;padding:14px 12px;text-align:center;scroll-snap-align:start;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px;align-self:flex-start}
 .shelf-name{font-size:12px;font-weight:700;cursor:pointer;line-height:1.2}.shelf-name:hover{color:var(--green)}
