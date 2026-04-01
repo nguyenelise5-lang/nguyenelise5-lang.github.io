@@ -44,6 +44,15 @@ function toggleGhostMode(active) {
   }
 }
 
+function switchConnectSection(section, btn) {
+  document.querySelectorAll('.cn-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.cn-seg-btn').forEach(b => b.classList.remove('active'));
+  var el = document.getElementById('cn-' + section);
+  if (el) el.classList.add('active');
+  if (btn) btn.classList.add('active');
+  document.getElementById('screens').scrollTop = 0;
+}
+
 // Activity tab segmented control
 function switchActTab(tab, btn) {
   document.querySelectorAll('.act-subtab').forEach(t => t.classList.remove('active'));
