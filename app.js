@@ -302,7 +302,7 @@ function applyFilters() {
     if (show) {
       if (el.classList.contains('person')) peoplVisible++;
       else if (el.classList.contains('evt')) evtVisible++;
-      else if (el.classList.contains('scoreboard')) teamVisible++;
+      else if (el.classList.contains('scoreboard') || el.classList.contains('rt-row')) teamVisible++;
     }
   });
   
