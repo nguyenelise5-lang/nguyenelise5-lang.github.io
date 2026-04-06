@@ -178,7 +178,7 @@ document.getElementById('reminderText').innerHTML = todayMsg.text;
 let currentRadius = 5;
 
 // === LAZY TAB LOADER ===
-var _tabLoaded = {home: true, connect: false, record: false, activity: false, you: false};
+var _tabLoaded = {home: true, connect: true, record: false, activity: false, you: false};
 var _tabLoading = {};
 
 async function _loadTab(name) {
@@ -208,6 +208,7 @@ async function _loadTab(name) {
   _tabLoading[name] = false;
 }
 
+var _connectInited = false;
 async function go(n){
   // Close XP dropdown if open
   if(typeof xpDropdownOpen !== 'undefined' && xpDropdownOpen){
@@ -225,6 +226,8 @@ async function go(n){
   if(n==='record'){document.querySelector('.nav-rec').classList.add('active');}
   else if(m[n]!==undefined)document.querySelectorAll('.nav-btn')[m[n]].classList.add('active');
   document.getElementById('screens').scrollTop=0;
+  // Init connect on first visit (now inline, not lazy)
+  if(n==='connect' && !_connectInited){ _connectInited=true; _initConnect(); }
   // Init camera when entering Record tab
   if(n==='record' && typeof initCamera === 'function') initCamera();
   // Stop camera when leaving Record tab
