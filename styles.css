@@ -720,7 +720,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#e0e0e4;color:var(--i
 .notif-banner-time{font-size:9px;color:var(--ink4);flex-shrink:0}
 .pv-msg-btn{background:var(--surface);color:var(--ink);border:1.5px solid var(--surface3)}
 .pv-msg-btn:hover{border-color:var(--blue);color:var(--blue)}
-.shelf-evt{width:180px;min-width:180px;max-width:180px;overflow:hidden;flex-shrink:0;padding:0;box-sizing:border-box}
+.shelf-evt{width:180px;min-width:180px;overflow:hidden;scroll-snap-align:start;flex-shrink:0;padding:0}
 .shelf-evt-banner{height:50px;display:flex;align-items:center;justify-content:center;font-size:24px;border-radius:var(--radius) var(--radius) 0 0}
 .shelf-evt-body{padding:10px 12px}
 .shelf-evt-title{font-size:12px;font-weight:700}
