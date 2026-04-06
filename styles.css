@@ -14,12 +14,12 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#e0e0e4;color:var(--i
 .notch{width:120px;height:32px;background:#111;border-radius:18px;position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:200}
 .status-bar{height:44px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 30px 6px;font-size:13px;font-weight:600;flex-shrink:0;z-index:150;background:var(--bg)}
 .status-icons{display:flex;gap:5px;font-size:10px;color:var(--ink2)}
-.screens{flex:1;min-height:0;overflow-y:scroll;-webkit-overflow-scrolling:touch}
+.screens{flex:1;min-height:0;overflow-y:scroll;overflow-x:hidden;-webkit-overflow-scrolling:touch}
 .screens::-webkit-scrollbar{display:none}
 .screen{display:none;padding:0 20px 24px;position:relative;width:100%;box-sizing:border-box}
 .screen.active{display:block}
 #s-home{padding-bottom:0}
-#s-connect{width:100%;padding-bottom:20px}
+#s-connect{overflow:visible}
 .nav{height:82px;background:rgba(255,255,255,.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid rgba(0,0,0,.05);display:flex;align-items:center;justify-content:space-around;padding:0 6px;z-index:250;flex-shrink:0}
 .nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;color:var(--ink4);padding:8px 10px;border-radius:12px;font-family:inherit;transition:.2s;position:relative}
 .nav-btn.active{color:var(--green)}
@@ -642,9 +642,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#e0e0e4;color:var(--i
 .mini-map .map-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,0,0,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.03) 1px,transparent 1px);background-size:30px 30px}
 .mini-map-controls{display:flex;justify-content:space-between;align-items:center;padding:8px 12px}
 /* Horizontal Shelves */
-.shelf{display:flex;flex-wrap:nowrap;overflow-x:auto;margin:0 -20px;padding:2px 20px 16px;-webkit-overflow-scrolling:touch;gap:12px}
+.shelf{display:flex;gap:10px;overflow-x:scroll;padding:2px 0 16px;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory}
 .shelf::-webkit-scrollbar{display:none}
-.shelf::after{content:'';flex:0 0 8px}
 /* Shelf: Person cards — flex column, no fixed height */
 .shelf-name{font-size:12px;font-weight:700;cursor:pointer;line-height:1.2}.shelf-name:hover{color:var(--green)}
 .shelf-sports{font-size:9px;color:var(--ink2);line-height:1.4;font-weight:600;white-space:normal}
@@ -659,7 +658,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#e0e0e4;color:var(--i
 .shelf-msg{width:34px;padding:6px 0;border:1.5px solid var(--surface3);border-radius:8px;background:none;font-size:12px;cursor:pointer;transition:.15s}
 .shelf-msg:hover{border-color:var(--blue);background:rgba(59,130,246,.05)}
 /* See All tile */
-.shelf-seeall{flex:0 0 148px;width:148px;min-height:110px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;padding:12px;text-align:center;background:rgba(255,255,255,.5)!important;border:1.5px dashed var(--surface3)!important;border-radius:var(--radius);transition:.2s;box-sizing:border-box}
+.shelf-seeall{min-width:90px;width:90px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;scroll-snap-align:start;flex-shrink:0;padding:12px;text-align:center;background:rgba(255,255,255,.5)!important;border:1.5px dashed var(--surface3)!important;transition:.2s}
 .shelf-seeall:hover{border-color:var(--green)!important;background:var(--green-bg)!important}
 .shelf-seeall-arrow{font-size:22px;font-weight:300;color:var(--green)}
 .shelf-seeall-txt{font-size:10px;font-weight:700;color:var(--ink3);line-height:1.3}
@@ -726,14 +725,18 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#e0e0e4;color:var(--i
 .shelf-evt-body{padding:10px 12px}
 .shelf-evt-title{font-size:12px;font-weight:700}
 .shelf-evt-detail{font-size:10px;color:var(--ink3);margin-top:2px}
-.shelf-team{flex:0 0 148px;width:148px;overflow:hidden;padding:0;cursor:pointer}
-.shelf-card{flex:0 0 148px;width:148px;padding:16px 14px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;box-sizing:border-box}
+.shelf-team{width:150px;min-width:150px;overflow:hidden;scroll-snap-align:start;flex-shrink:0;padding:0}
+.shelf-card{width:156px;min-width:156px;padding:16px 14px;text-align:center;scroll-snap-align:start;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px}
 .shelf-team-header{padding:7px;text-align:center;font-size:9px;font-weight:700;color:#fff;letter-spacing:.5px}
 .shelf-team-body{padding:10px;text-align:center}
 .shelf-team-name{font-size:11px;font-weight:700;color:#fff}
 .shelf-team-record{font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:800;color:#fff;margin:3px 0}
 .shelf-team-meta{font-size:9px;color:rgba(255,255,255,.5)}
 .shelf-team .sb-spots{display:inline-block;margin-top:5px;font-size:8px;padding:2px 7px}
+/* Partner avatar row */
+.partner-av-item{display:flex;flex-direction:column;align-items:center;cursor:pointer;flex-shrink:0;min-width:56px}
+.pav-name{font-size:10px;font-weight:600;color:var(--ink2);text-align:center}
+.pav-dist{font-size:9px;color:var(--ink4);text-align:center;margin-top:1px}
 /* Connect tab — two-section design */
 .cn-seg{display:flex;background:var(--surface2);border-radius:12px;padding:3px;gap:3px;margin-bottom:16px}
 .cn-seg-btn{flex:1;padding:8px;border-radius:10px;border:none;background:none;font-family:inherit;font-size:12px;font-weight:600;color:var(--ink3);cursor:pointer;transition:.2s}
