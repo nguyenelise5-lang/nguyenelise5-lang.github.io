@@ -7,8 +7,37 @@
   var RR2 = window.RR2 = {
     capTimer: null,
     capSec: 0,
-    currentSport: 'run'
+    currentSport: 'run',
+    currentCat: 'recent'
   };
+
+  // Category definitions drive the horizontal tab row in the setup phase.
+  // "recent" is synthesized from RR2.recentSports (default curated list).
+  RR2.cats = [
+    {key:'recent',   label:'Recent'},
+    {key:'foot',     label:'Run'},
+    {key:'cycle',    label:'Cycle'},
+    {key:'water',    label:'Water'},
+    {key:'court',    label:'Court'},
+    {key:'team',     label:'Team'},
+    {key:'strength', label:'Strength'},
+    {key:'winter',   label:'Winter'},
+    {key:'other',    label:'Other'}
+  ];
+  // Which category each sport belongs to. Mirrors sportCatMap in app.js.
+  RR2.sportCats = {
+    run:'foot', walk:'foot', hike:'foot', trail:'foot',
+    cycle:'cycle', mtb:'cycle', gravel:'cycle', ebike:'cycle',
+    swim:'water', surf:'water', kayak:'water', sup:'water', row:'water', windsurf:'water',
+    tennis:'court', pickle:'court', badminton:'court', squash:'court', padel:'court', racquetball:'court',
+    soccer:'team', basketball:'team', volleyball:'team', football:'team', lacrosse:'team', cricket:'team',
+    lift:'strength', crossfit:'strength', hiit:'strength', yoga:'strength', pilates:'strength', climb:'strength',
+    ski:'winter', snowboard:'winter', xcski:'winter',
+    golf:'other', skate:'other', dance:'other', martial:'other', horse:'other'
+  };
+  // Curated "recent" list — shows the 6 most-common sports on first load.
+  // Swap this out for real recency data later.
+  RR2.recentSports = ['run','cycle','lift','swim','tennis','yoga'];
 
   // ===== SPORT CATALOG =====
   // Single source of truth for the Record tab's sport picker.
@@ -87,11 +116,32 @@
     horse:'1 hr trail ride'
   };
 
-  // Build the sport pill grid from RR2.sportList. Called from _initRecord.
+  // Build the category tab row (Recent / Run / Cycle / ... / Other).
+  RR2.buildCatRow = function(){
+    var row = document.getElementById('rr2Cats');
+    if(!row) return;
+    row.innerHTML = RR2.cats.map(function(c){
+      var sel = c.key === RR2.currentCat ? ' sel' : '';
+      return '<button class="rr2-cat'+sel+'" data-cat="'+c.key+'" onclick="rr2SelectCat(this)">'+c.label+'</button>';
+    }).join('');
+  };
+
+  // Build the sport pill grid, filtered by the active category.
+  // Called from _initRecord and from rr2SelectCat.
   RR2.buildSportGrid = function(){
     var grid = document.getElementById('rr2Sports');
     if(!grid) return;
-    grid.innerHTML = RR2.sportList.map(function(k){
+    var list;
+    if(RR2.currentCat === 'recent'){
+      list = RR2.recentSports.slice();
+    } else {
+      list = RR2.sportList.filter(function(k){ return RR2.sportCats[k] === RR2.currentCat; });
+    }
+    if(!list.length){
+      grid.innerHTML = '<div class="rr2-sport-empty">No sports in this category.</div>';
+      return;
+    }
+    grid.innerHTML = list.map(function(k){
       var s = RR2.sports[k];
       if(!s) return '';
       return '<button class="rr2-pill" data-sport="'+k+'" data-color="'+s.color+'" data-rgb="'+s.rgb+'" onclick="rr2SelectSport(this)">'+
@@ -99,6 +149,26 @@
                '<span class="rr2-pill-sub">'+s.stats+'</span>'+
              '</button>';
     }).join('');
+    // Reapply the current sport's selected state if it's visible in this filter
+    var active = grid.querySelector('.rr2-pill[data-sport="'+RR2.currentSport+'"]');
+    if(active) active.classList.add('sel');
+  };
+
+  // Category tab click — switch filter, rebuild grid.
+  // If the currently-selected sport isn't in the new category, auto-pick
+  // the first sport in the filtered grid so the capture phase stays themed.
+  window.rr2SelectCat = function(el){
+    RR2.currentCat = el.dataset.cat;
+    document.querySelectorAll('.rr2-cat').forEach(function(c){ c.classList.remove('sel'); });
+    el.classList.add('sel');
+    RR2.buildSportGrid();
+    var grid = document.getElementById('rr2Sports');
+    if(!grid) return;
+    var stillVisible = grid.querySelector('.rr2-pill[data-sport="'+RR2.currentSport+'"]');
+    if(!stillVisible){
+      var first = grid.querySelector('.rr2-pill');
+      if(first) window.rr2SelectSport(first);
+    }
   };
 
   // Phase switcher (scoped to the rr2 partial)
@@ -239,6 +309,7 @@
   // ===== OVERRIDE _initRecord in app.js =====
   // This runs once, after the Record tab HTML has been fetched and injected.
   window._initRecord = function(){
+    RR2.buildCatRow();
     RR2.buildSportGrid();
     var first = document.querySelector('.rr2-pill[data-sport="run"]') || document.querySelector('.rr2-pill');
     if(first){ first.classList.add('sel'); window.rr2SelectSport(first); }
@@ -261,6 +332,7 @@
     var grid = document.getElementById('rr2Sports');
     if(!root || !grid) return false;
     if(grid.dataset.rr2Ready === '1') return true;
+    RR2.buildCatRow();
     RR2.buildSportGrid();
     var first = root.querySelector('.rr2-pill[data-sport="run"]') || root.querySelector('.rr2-pill');
     if(first){
