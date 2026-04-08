@@ -45,13 +45,22 @@
 .rr2-title{font-size:36px;line-height:.95;font-weight:800;letter-spacing:-.03em;margin:0 0 4px;color:var(--rr2-ink)}
 .rr2-sub{font-size:14px;color:var(--rr2-muted);margin:0 0 22px;font-weight:500}
 
-.rr2-sport-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:18px}
-.rr2-pill{background:#fff;border:1px solid var(--rr2-line);border-radius:13px;padding:14px 14px;text-align:left;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;gap:5px;font-family:inherit;color:var(--rr2-ink)}
+/* Sport category tab row — horizontal scroll, filters the sport grid below.
+   Lets us show all 40 sports without making the setup screen scroll forever. */
+.rr2-cat-row{display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;margin:0 -22px 12px;padding:2px 22px 6px;scrollbar-width:none;-ms-overflow-style:none}
+.rr2-cat-row::-webkit-scrollbar{display:none}
+.rr2-cat{flex:0 0 auto;background:transparent;border:1px solid var(--rr2-line);border-radius:20px;padding:7px 13px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--rr2-muted);cursor:pointer;transition:all .15s;white-space:nowrap}
+.rr2-cat:hover{color:var(--rr2-ink);border-color:var(--rr2-ink)}
+.rr2-cat.sel{background:var(--rr2-ink);border-color:var(--rr2-ink);color:#fff}
+
+.rr2-sport-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin-bottom:16px}
+.rr2-pill{background:#fff;border:1px solid var(--rr2-line);border-radius:12px;padding:11px 13px;text-align:left;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;gap:3px;font-family:inherit;color:var(--rr2-ink)}
 .rr2-pill:hover{border-color:var(--rr2-ink)}
 .rr2-pill.sel{border-color:var(--rr2-ink);background:var(--rr2-ink);color:#fff}
 .rr2-pill.sel .rr2-pill-sub{color:rgba(255,255,255,.55)}
-.rr2-pill-name{font-size:16px;font-weight:700;letter-spacing:-.01em}
-.rr2-pill-sub{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--rr2-muted);text-transform:uppercase;letter-spacing:.1em}
+.rr2-pill-name{font-size:15px;font-weight:700;letter-spacing:-.01em}
+.rr2-pill-sub{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--rr2-muted);text-transform:uppercase;letter-spacing:.08em}
+.rr2-sport-empty{grid-column:1/-1;text-align:center;padding:24px 0;font-size:12px;color:var(--rr2-muted)}
 
 .rr2-setup-bot{margin-top:auto;padding-top:14px}
 .rr2-goal{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-top:1px solid var(--rr2-line)}
@@ -184,6 +193,9 @@
       </div>
       <h1 class="rr2-title">What are<br>you training<br>for today?</h1>
       <p class="rr2-sub">Pick a sport — we'll tune the capture.</p>
+
+      <!-- Category row filters the grid below. Populated by record-init.js. -->
+      <div class="rr2-cat-row" id="rr2Cats"></div>
 
       <!-- Sport grid is populated by record-init.js (_initRecord) from RR2.sportList.
            To add/remove/reorder sports, edit record-init.js, NOT this file. -->
@@ -323,15 +335,3 @@
         </div>
         <div class="rr2-tl-track">
           <span class="rr2-tl-track-lbl">T1 · TEXT</span>
-          <div class="rr2-clip caption" style="width:8%;margin-left:6%"></div>
-          <div class="rr2-clip caption" style="width:10%;margin-left:14%"></div>
-          <div class="rr2-clip caption" style="width:6%;margin-left:18%"></div>
-        </div>
-        <div class="rr2-tl-ruler">
-          <span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:18</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-</div>
