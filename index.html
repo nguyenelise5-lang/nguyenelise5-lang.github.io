@@ -480,9 +480,21 @@
       </div>
     </div>
 
-    <!-- Filter pills -->
-    <div class="pills" id="sportPills" style="margin-top:10px">
-      <button class="chip on" data-sport="all">All</button><button class="chip" data-sport="tennis">🎾 Tennis</button><button class="chip" data-sport="basketball">🏀 Basketball</button><button class="chip" data-sport="surfing">🏄 Surfing</button><button class="chip" data-sport="running">🏃 Running</button><button class="chip" data-sport="soccer">⚽ Soccer</button><button class="chip" data-sport="gym">🏋️ Gym</button><button class="chip" data-sport="yoga">🧘 Yoga</button><button class="chip" data-sport="volleyball">🏐 Volleyball</button><button class="chip" data-sport="hiking">🥾 Hiking</button><button class="chip" data-sport="climbing">🧗 Climbing</button><button class="chip" data-sport="pilates">🤸 Pilates</button><button class="chip" data-sport="golf">⛳ Golf</button><button class="chip" data-sport="swimming">🏊 Swim</button><button class="chip" data-sport="pickleball">🏓 Pickleball</button>
+    <!-- Filter — category chips, then sport sub-chips -->
+    <div class="cn-filter" id="cnFilter">
+      <div class="cnf-cats" id="cnfCats">
+        <button class="cnf-cat active" data-cat="all" onclick="filterCat(this)">All</button>
+        <button class="cnf-cat" data-cat="foot" onclick="filterCat(this)">🦶 Run</button>
+        <button class="cnf-cat" data-cat="cycle" onclick="filterCat(this)">🚴 Cycle</button>
+        <button class="cnf-cat" data-cat="court" onclick="filterCat(this)">🎾 Court</button>
+        <button class="cnf-cat" data-cat="team" onclick="filterCat(this)">🏅 Team</button>
+        <button class="cnf-cat" data-cat="water" onclick="filterCat(this)">🌊 Water</button>
+        <button class="cnf-cat" data-cat="strength" onclick="filterCat(this)">💪 Strength</button>
+        <button class="cnf-cat" data-cat="winter" onclick="filterCat(this)">❄️ Winter</button>
+      </div>
+      <div class="cnf-sub" id="cnfSub" style="display:none">
+        <div class="cnf-sub-chips" id="cnfSubChips"></div>
+      </div>
     </div>
 
     <!-- Ghost Mode Toggle -->
