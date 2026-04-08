@@ -1,115 +1,336 @@
-<div class="rec-wrap" id="recWrap" onclick="if(event.target===this||event.target.closest('.rec-ctr'))recTapInit()">
-    <!-- Layer 0: Camera viewfinder (720p for performance) -->
-    <video id="cameraFeed" autoplay playsinline muted></video>
+<!-- ═══════════════════════════════════════════
+     RALLY RECORD — Phase-based: Setup→Record→Edit
+     Sport-color themes, Strava×TikTok fusion
+═══════════════════════════════════════════ -->
+<div class="rally-rec" id="rallyRec">
+
+  <!-- ── PHASE 1: SETUP ── -->
+  <div class="rp rp-setup active" id="rpSetup">
+    <!-- Sport color backdrop -->
+    <div class="rp-setup-bg" id="setupBg"></div>
+
+    <!-- Header -->
+    <div class="rp-setup-head">
+      <div class="rp-setup-title">What's your session?</div>
+      <div class="rp-setup-sub">Pick a sport to set your stats theme</div>
+    </div>
+
+    <!-- Sport grid -->
+    <div class="sport-cats" id="sportCats">
+  <div class="scat">
+    <div class="scat-head" onclick="toggleCat(this)">
+      <span class="scat-ico">🦶</span>
+      <span class="scat-lbl">Run & Walk</span>
+      <span class="scat-arr" style="transform:rotate(90deg)">›</span>
+    </div>
+    <div class="scat-grid" style="max-height:400px">
+      <button class="sg-item active" data-sport="run" data-color="#22c55e" data-rgb="34,197,94" onclick="selectSport(this)"><div class="sg-icon">🏃</div><div class="sg-label">Run</div></button>
+      <button class="sg-item" data-sport="walk" data-color="#84cc16" data-rgb="132,204,22" onclick="selectSport(this)"><div class="sg-icon">🚶</div><div class="sg-label">Walk</div></button>
+      <button class="sg-item" data-sport="hike" data-color="#78716c" data-rgb="120,113,108" onclick="selectSport(this)"><div class="sg-icon">🥾</div><div class="sg-label">Hike</div></button>
+      <button class="sg-item" data-sport="trail" data-color="#16a34a" data-rgb="22,163,74" onclick="selectSport(this)"><div class="sg-icon">🌲</div><div class="sg-label">Trail Run</div></button>
+    </div>
+  </div>
+  <div class="scat">
+    <div class="scat-head" onclick="toggleCat(this)">
+      <span class="scat-ico">🚴</span>
+      <span class="scat-lbl">Cycle</span>
+      <span class="scat-arr">›</span>
+    </div>
+    <div class="scat-grid" style="max-height:0px">
+      <button class="sg-item" data-sport="cycle" data-color="#3b82f6" data-rgb="59,130,246" onclick="selectSport(this)"><div class="sg-icon">🚴</div><div class="sg-label">Cycle</div></button>
+      <button class="sg-item" data-sport="mtb" data-color="#1d4ed8" data-rgb="29,78,216" onclick="selectSport(this)"><div class="sg-icon">🚵</div><div class="sg-label">MTB</div></button>
+      <button class="sg-item" data-sport="gravel" data-color="#2563eb" data-rgb="37,99,235" onclick="selectSport(this)"><div class="sg-icon">🚵</div><div class="sg-label">Gravel</div></button>
+      <button class="sg-item" data-sport="ebike" data-color="#0ea5e9" data-rgb="14,165,233" onclick="selectSport(this)"><div class="sg-icon">⚡</div><div class="sg-label">E-Bike</div></button>
+    </div>
+  </div>
+  <div class="scat">
+    <div class="scat-head" onclick="toggleCat(this)">
+      <span class="scat-ico">🌊</span>
+      <span class="scat-lbl">Water</span>
+      <span class="scat-arr">›</span>
+    </div>
+    <div class="scat-grid" style="max-height:0px">
+      <button class="sg-item" data-sport="swim" data-color="#0ea5e9" data-rgb="14,165,233" onclick="selectSport(this)"><div class="sg-icon">🏊</div><div class="sg-label">Swim</div></button>
+      <button class="sg-item" data-sport="surf" data-color="#06b6d4" data-rgb="6,182,212" onclick="selectSport(this)"><div class="sg-icon">🏄</div><div class="sg-label">Surf</div></button>
+      <button class="sg-item" data-sport="kayak" data-color="#0891b2" data-rgb="8,145,178" onclick="selectSport(this)"><div class="sg-icon">🛶</div><div class="sg-label">Kayak</div></button>
+      <button class="sg-item" data-sport="sup" data-color="#22d3ee" data-rgb="34,211,238" onclick="selectSport(this)"><div class="sg-icon">🏄</div><div class="sg-label">SUP</div></button>
+      <button class="sg-item" data-sport="row" data-color="#0284c7" data-rgb="2,132,199" onclick="selectSport(this)"><div class="sg-icon">🚣</div><div class="sg-label">Row</div></button>
+      <button class="sg-item" data-sport="windsurf" data-color="#0369a1" data-rgb="3,105,161" onclick="selectSport(this)"><div class="sg-icon">🏄</div><div class="sg-label">Windsurf</div></button>
+    </div>
+  </div>
+  <div class="scat">
+    <div class="scat-head" onclick="toggleCat(this)">
+      <span class="scat-ico">🎾</span>
+      <span class="scat-lbl">Court</span>
+      <span class="scat-arr">›</span>
+    </div>
+    <div class="scat-grid" style="max-height:0px">
+      <button class="sg-item" data-sport="tennis" data-color="#eab308" data-rgb="234,179,8" onclick="selectSport(this)"><div class="sg-icon">🎾</div><div class="sg-label">Tennis</div></button>
+      <button class="sg-item" data-sport="pickle" data-color="#84cc16" data-rgb="132,204,22" onclick="selectSport(this)"><div class="sg-icon">🏓</div><div class="sg-label">Pickleball</div></button>
+      <button class="sg-item" data-sport="badminton" data-color="#ca8a04" data-rgb="202,138,4" onclick="selectSport(this)"><div class="sg-icon">🏸</div><div class="sg-label">Badminton</div></button>
+      <button class="sg-item" data-sport="squash" data-color="#d97706" data-rgb="217,119,6" onclick="selectSport(this)"><div class="sg-icon">🎾</div><div class="sg-label">Squash</div></button>
+      <button class="sg-item" data-sport="padel" data-color="#f59e0b" data-rgb="245,158,11" onclick="selectSport(this)"><div class="sg-icon">🎾</div><div class="sg-label">Padel</div></button>
+      <button class="sg-item" data-sport="racquetball" data-color="#fbbf24" data-rgb="251,191,36" onclick="selectSport(this)"><div class="sg-icon">🎾</div><div class="sg-label">Racquetball</div></button>
+    </div>
+  </div>
+  <div class="scat">
+    <div class="scat-head" onclick="toggleCat(this)">
+      <span class="scat-ico">🏅</span>
+      <span class="scat-lbl">Team</span>
+      <span class="scat-arr">›</span>
+    </div>
+    <div class="scat-grid" style="max-height:0px">
+      <button class="sg-item" data-sport="soccer" data-color="#22c55e" data-rgb="34,197,94" onclick="selectSport(this)"><div class="sg-icon">⚽</div><div class="sg-label">Soccer</div></button>
+      <button class="sg-item" data-sport="basketball" data-color="#f97316" data-rgb="249,115,22" onclick="selectSport(this)"><div class="sg-icon">🏀</div><div class="sg-label">Basketball</div></button>
+      <button class="sg-item" data-sport="volleyball" data-color="#3b82f6" data-rgb="59,130,246" onclick="selectSport(this)"><div class="sg-icon">🏐</div><div class="sg-label">Volleyball</div></button>
+      <button class="sg-item" data-sport="football" data-color="#7c3aed" data-rgb="124,58,237" onclick="selectSport(this)"><div class="sg-icon">🏈</div><div class="sg-label">Football</div></button>
+      <button class="sg-item" data-sport="lacrosse" data-color="#db2777" data-rgb="219,39,119" onclick="selectSport(this)"><div class="sg-icon">🥍</div><div class="sg-label">Lacrosse</div></button>
+      <button class="sg-item" data-sport="cricket" data-color="#16a34a" data-rgb="22,163,74" onclick="selectSport(this)"><div class="sg-icon">🏏</div><div class="sg-label">Cricket</div></button>
+    </div>
+  </div>
+  <div class="scat">
+    <div class="scat-head" onclick="toggleCat(this)">
+      <span class="scat-ico">💪</span>
+      <span class="scat-lbl">Strength</span>
+      <span class="scat-arr">›</span>
+    </div>
+    <div class="scat-grid" style="max-height:0px">
+      <button class="sg-item" data-sport="lift" data-color="#f97316" data-rgb="249,115,22" onclick="selectSport(this)"><div class="sg-icon">🏋️</div><div class="sg-label">Lift</div></button>
+      <button class="sg-item" data-sport="crossfit" data-color="#ef4444" data-rgb="239,68,68" onclick="selectSport(this)"><div class="sg-icon">💪</div><div class="sg-label">CrossFit</div></button>
+      <button class="sg-item" data-sport="hiit" data-color="#dc2626" data-rgb="220,38,38" onclick="selectSport(this)"><div class="sg-icon">⚡</div><div class="sg-label">HIIT</div></button>
+      <button class="sg-item" data-sport="yoga" data-color="#a855f7" data-rgb="168,85,247" onclick="selectSport(this)"><div class="sg-icon">🧘</div><div class="sg-label">Yoga</div></button>
+      <button class="sg-item" data-sport="pilates" data-color="#ec4899" data-rgb="236,72,153" onclick="selectSport(this)"><div class="sg-icon">🤸</div><div class="sg-label">Pilates</div></button>
+      <button class="sg-item" data-sport="climb" data-color="#f97316" data-rgb="249,115,22" onclick="selectSport(this)"><div class="sg-icon">🧗</div><div class="sg-label">Climb</div></button>
+    </div>
+  </div>
+  <div class="scat">
+    <div class="scat-head" onclick="toggleCat(this)">
+      <span class="scat-ico">❄️</span>
+      <span class="scat-lbl">Winter</span>
+      <span class="scat-arr">›</span>
+    </div>
+    <div class="scat-grid" style="max-height:0px">
+      <button class="sg-item" data-sport="ski" data-color="#60a5fa" data-rgb="96,165,250" onclick="selectSport(this)"><div class="sg-icon">⛷️</div><div class="sg-label">Ski</div></button>
+      <button class="sg-item" data-sport="snowboard" data-color="#7c3aed" data-rgb="124,58,237" onclick="selectSport(this)"><div class="sg-icon">🏂</div><div class="sg-label">Snowboard</div></button>
+      <button class="sg-item" data-sport="xcski" data-color="#3b82f6" data-rgb="59,130,246" onclick="selectSport(this)"><div class="sg-icon">⛷️</div><div class="sg-label">XC Ski</div></button>
+    </div>
+  </div>
+  <div class="scat">
+    <div class="scat-head" onclick="toggleCat(this)">
+      <span class="scat-ico">🎯</span>
+      <span class="scat-lbl">Other</span>
+      <span class="scat-arr">›</span>
+    </div>
+    <div class="scat-grid" style="max-height:0px">
+      <button class="sg-item" data-sport="golf" data-color="#16a34a" data-rgb="22,163,74" onclick="selectSport(this)"><div class="sg-icon">⛳</div><div class="sg-label">Golf</div></button>
+      <button class="sg-item" data-sport="skate" data-color="#60a5fa" data-rgb="96,165,250" onclick="selectSport(this)"><div class="sg-icon">⛸️</div><div class="sg-label">Skate</div></button>
+      <button class="sg-item" data-sport="dance" data-color="#ec4899" data-rgb="236,72,153" onclick="selectSport(this)"><div class="sg-icon">💃</div><div class="sg-label">Dance</div></button>
+      <button class="sg-item" data-sport="martial" data-color="#ef4444" data-rgb="239,68,68" onclick="selectSport(this)"><div class="sg-icon">🥊</div><div class="sg-label">Martial Arts</div></button>
+      <button class="sg-item" data-sport="horse" data-color="#92400e" data-rgb="146,64,14" onclick="selectSport(this)"><div class="sg-icon">🐎</div><div class="sg-label">Horse Ride</div></button>
+    </div>
+  </div>
+</div>
+
+        <!-- Stats preview strip -->
+    <div class="setup-stats-preview" id="setupStatsPreview">
+      <div class="ssp-label">Your stats overlay will show</div>
+      <div class="ssp-pills" id="sspPills">
+        <div class="ssp-pill" id="ssp0">📍 Distance</div>
+        <div class="ssp-pill" id="ssp1">⚡ Pace</div>
+        <div class="ssp-pill" id="ssp2">❤️ BPM</div>
+      </div>
+    </div>
+
+    <!-- Music selector -->
+    <div class="setup-music" id="setupMusic" onclick="openRecPanel('music')">
+      <div class="sm-icon" id="smIcon">🎵</div>
+      <div class="sm-info">
+        <div class="sm-label" id="smLabel">Add music</div>
+        <div class="sm-sub" id="smSub">Tap to pick a track</div>
+      </div>
+      <div class="sm-arrow">›</div>
+    </div>
+
+    <!-- Start button -->
+    <button class="setup-start" id="setupStart" onclick="goToRecord()">
+      <div class="setup-start-inner">
+        <span class="setup-start-icon" id="setupStartIcon">🏃</span>
+        <span>Start Session</span>
+      </div>
+    </button>
+  </div>
+
+  <!-- ── PHASE 2: RECORD ── -->
+  <div class="rp rp-record" id="rpRecord">
+    <!-- Camera full bleed -->
+    <video id="cameraFeed" autoplay playsinline muted style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0"></video>
     <canvas id="captureCanvas" style="display:none"></canvas>
-    <div class="rec-glow" id="recGlow"></div>
     <div class="vf-filter-overlay" id="vfFilterOverlay" style="position:absolute;inset:0;z-index:1;pointer-events:none"></div>
 
-    <!-- Phase indicator bar -->
-    <div class="rec-phase"><div class="rec-phase-seg done" id="ph1"></div><div class="rec-phase-seg" id="ph2"></div><div class="rec-phase-seg" id="ph3"></div></div>
-
-    <!-- Top HUD — GPS indicator + REC badge + Timer -->
-    <div class="rec-top">
-      <div class="rec-top-l">
-        <div class="rec-gps"><div class="rec-gps-dot"></div>GPS ↗</div>
-        <div class="rec-badge" id="recBadge"><div class="bd"></div>REC</div>
-        <div class="rec-timer" id="recTimer">00:00</div>
-      </div>
-      <div class="rec-top-r">
-        <button class="rec-tb" onclick="toggleFlash()" id="flashBtn">⚡</button>
-        <button class="rec-tb" onclick="switchCamera()">🔄</button>
-        <button class="rec-tb" onclick="toggleTimer()" id="timerBtn">⏱</button>
-      </div>
-    </div>
-
-    <!-- Layer 1: Draggable Data Stickers (GPU-accelerated) -->
-    <div class="rec-stickers" id="recStickers">
-      <div class="rec-sticker" id="stickerDist" style="top:52px;left:12px" data-ox="12" data-oy="52">
-        <div class="rs-label" id="rsDistLabel">Distance (MI)</div>
-        <div class="rs-value" id="rsDist">0.000</div>
-      </div>
-      <div class="rec-sticker" id="stickerPace" style="top:52px;left:50%;transform:translateX(-50%)" data-ox="140" data-oy="52">
-        <div class="rs-label" id="rsPaceLabel">Pace (/MI)</div>
-        <div class="rs-value" id="rsPace">--:--</div>
-      </div>
-      <div class="rec-sticker" id="stickerBPM" style="top:52px;right:12px" data-ox="280" data-oy="52">
-        <div class="rs-label">BPM</div>
-        <div class="rs-value bpm" id="rsBPM">--</div>
-      </div>
-    </div>
-
-    <!-- Center placeholder -->
-    <div class="rec-ctr" id="recCenter">
+    <!-- Tap to start camera overlay -->
+    <div class="rec-ctr" id="recCenter" onclick="recTapInit()" style="z-index:5">
       <div class="rec-ctr-i">📹</div>
       <div class="rec-ctr-t">Tap to start camera</div>
     </div>
 
-    <!-- Layer 2: TikTok Vertical Sidebar -->
-    <div class="rec-sidebar" id="recSidebar">
-      <!-- Rotating album art (lazy-loaded, shown when track selected) -->
-      <div class="rec-album" id="recAlbum" onclick="openRecPanel('music')">
-        <div class="rec-album-inner" id="albumArt">♫</div>
+    <!-- Top bar -->
+    <div class="rr-top" style="z-index:10">
+      <button class="rr-back" onclick="goToSetup()">‹</button>
+      <div class="rr-sport-badge" id="rrSportBadge">🏃 RUN</div>
+      <div class="rr-top-right">
+        <div class="rec-badge" id="recBadge" style="display:none"><div class="bd"></div>REC</div>
+        <div class="rr-timer" id="recTimer">00:00</div>
+        <button class="rr-pill-btn" onclick="switchCamera()">🔄</button>
+        <button class="rr-pill-btn" onclick="toggleFlash()" id="flashBtn">⚡</button>
       </div>
-      <button class="rsb" onclick="openRecPanel('music')"><div class="rsb-i">🎵</div><div class="rsb-l">Audio</div></button>
-      <button class="rsb" onclick="openRecPanel('stats')"><div class="rsb-i">📊</div><div class="rsb-l">Stats Layer</div></button>
-      <button class="rsb" onclick="openRecPanel('filter')"><div class="rsb-i">🎨</div><div class="rsb-l">Filters</div></button>
-      <button class="rsb" onclick="toggleTimer()"><div class="rsb-i">⏱</div><div class="rsb-l">Timer</div></button>
-      <button class="rsb" onclick="cycleSpeed()"><div class="rsb-i" id="speedIco">1x</div><div class="rsb-l">Speed</div></button>
-      <button class="rsb" onclick="openRecPanel('effects')"><div class="rsb-i">✨</div><div class="rsb-l">Effects</div></button>
-      <button class="rsb" onclick="openRecPanel('sticker')"><div class="rsb-i">🏷️</div><div class="rsb-l">Stickers</div></button>
-      <button class="rsb" onclick="openRecPanel('trim')"><div class="rsb-i">✂️</div><div class="rsb-l">Trim</div></button>
     </div>
 
-    <!-- Bottom thumb zone -->
-    <div class="rec-btm">
-      <!-- Timeline clips -->
-      <div class="rec-tl" id="recTL">
-        <div class="rec-c" id="clip0">+</div>
-        <div class="rec-c" id="clip1">+</div>
-        <div class="rec-c" id="clip2">+</div>
-        <div class="rec-c" id="clip3">+</div>
+    <!-- Floating sport-colored stats -->
+    <div class="rr-stats" id="rrStats" style="z-index:6">
+      <div class="rr-stat-card draggable" id="statCard0" style="top:90px;left:14px">
+        <div class="rsc-label" id="statLabel0">DISTANCE</div>
+        <div class="rsc-value" id="statValue0">0.00</div>
+        <div class="rsc-unit" id="statUnit0">mi</div>
       </div>
-      <!-- Sport pills -->
-      <div class="rec-sp">
-        <button class="rsp on" onclick="pickSport(this,'run')">🏃</button>
-        <button class="rsp" onclick="pickSport(this,'lift')">🏋️</button>
-        <button class="rsp" onclick="pickSport(this,'cycle')">🚴</button>
-        <button class="rsp" onclick="pickSport(this,'yoga')">🧘</button>
-        <button class="rsp" onclick="pickSport(this,'tennis')">🎾</button>
-        <button class="rsp" onclick="pickSport(this,'surf')">🏄</button>
-        <button class="rsp" onclick="pickSport(this,'hike')">🥾</button>
-        <button class="rsp" onclick="pickSport(this,'climb')">🧗</button>
-        <button class="rsp" onclick="pickSport(this,'ball')">🏀</button>
-        <button class="rsp" onclick="pickSport(this,'pickle')">🏓</button>
-        <button class="rsp" onclick="pickSport(this,'swim')">🏊</button>
+      <div class="rr-stat-card draggable" id="statCard1" style="top:90px;right:14px">
+        <div class="rsc-label" id="statLabel1">PACE</div>
+        <div class="rsc-value" id="statValue1">--:--</div>
+        <div class="rsc-unit" id="statUnit1">/mi</div>
       </div>
-      <!-- Mode switcher -->
-      <div class="rec-modes">
-        <button class="rm" onclick="setMode('photo',this)">Photo</button>
-        <button class="rm on" onclick="setMode('video',this)">Video</button>
-        <button class="rm" onclick="setMode('timelapse',this)">Timelapse</button>
+      <div class="rr-stat-card draggable" id="statCard2" style="top:200px;left:14px">
+        <div class="rsc-label" id="statLabel2">HEART RATE</div>
+        <div class="rsc-value" id="statValue2">--</div>
+        <div class="rsc-unit" id="statUnit2">bpm</div>
       </div>
-      <!-- Button row: Gallery — Record — Stop -->
-      <div class="rec-row">
-        <div style="display:flex;flex-direction:column;align-items:center">
-          <button class="rec-side-btn" onclick="document.getElementById('upFile').click()">🖼</button>
+    </div>
+
+    <!-- HR ring + record button -->
+    <div class="rr-btm" style="z-index:10">
+      <!-- mode -->
+      <div class="rr-modes">
+        <button class="rrm" onclick="setMode('photo',this)">Photo</button>
+        <button class="rrm active" onclick="setMode('video',this)">Video</button>
+        <button class="rrm" onclick="setMode('timelapse',this)">Timelapse</button>
+      </div>
+      <!-- controls -->
+      <div class="rr-controls">
+        <div class="rr-side">
+          <button class="rr-side-btn" onclick="document.getElementById('upFile').click()">🖼</button>
           <input type="file" id="upFile" accept="video/*,image/*" style="display:none" onchange="handleUpload(event)">
-          <div class="rec-side-lbl">Gallery</div>
+          <div class="rr-side-lbl">Gallery</div>
         </div>
-        <button class="rec-bookmark" id="recBookmark" onclick="addBookmark()">⭐</button>
-        <div class="rec-o">
+        <div class="rr-record-wrap">
           <svg class="rec-ring-svg" viewBox="0 0 74 74"><circle class="rr-bg" cx="37" cy="37" r="32.5"/><circle class="rr-fill" cx="37" cy="37" r="32.5" id="hrRing"/></svg>
           <button class="rec-main-btn" id="recMain" onmousedown="recDown()" onmouseup="recUp()" ontouchstart="recDown()" ontouchend="recUp()"><div class="rmb-inner" id="recInner"></div></button>
         </div>
-        <div style="display:flex;flex-direction:column;align-items:center">
-          <button class="rec-side-btn" onclick="finishEdit()">⏹</button>
-          <div class="rec-side-lbl">Stop</div>
+        <div class="rr-side">
+          <button class="rr-side-btn" onclick="finishSession()">✓</button>
+          <div class="rr-side-lbl">Finish</div>
         </div>
       </div>
+      <!-- timer countdown helper -->
+      <div class="rr-countdown" id="rrCountdown" style="display:none"></div>
     </div>
   </div>
 
-  <!-- Slide-up panel -->
+  <!-- ── PHASE 3: EDIT ── -->
+  <div class="rp rp-edit" id="rpEdit">
+
+    <!-- Clip preview window -->
+    <div class="clip-preview" id="clipPreview">
+      <div class="clip-bg" id="clipBg"></div>
+
+      <!-- Template: RAW (default) -->
+      <div class="tpl tpl-raw active" id="tplRaw">
+        <div class="tpl-raw-top">
+          <div class="tpl-raw-sport" id="rawSport">RUN</div>
+          <div class="tpl-raw-date" id="rawDate">APR 2025</div>
+        </div>
+        <div class="tpl-raw-hero" id="rawHero">2.4<span class="tpl-raw-unit" id="rawUnit">mi</span></div>
+        <div class="tpl-raw-grid">
+          <div class="tpl-raw-stat"><div class="trs-val" id="rawS1">21:08</div><div class="trs-lbl" id="rawL1">TIME</div></div>
+          <div class="tpl-raw-divider"></div>
+          <div class="tpl-raw-stat"><div class="trs-val" id="rawS2">8:49</div><div class="trs-lbl" id="rawL2">PACE</div></div>
+          <div class="tpl-raw-divider"></div>
+          <div class="tpl-raw-stat"><div class="trs-val" id="rawS3">142</div><div class="trs-lbl" id="rawL3">BPM</div></div>
+        </div>
+        <div class="tpl-raw-brand">RALLY</div>
+        <!-- filmstrip -->
+        <div class="filmstrip"><div class="fs-dot"></div><div class="fs-dot fs-mid"></div><div class="fs-dot"></div><div class="fs-dot"></div><div class="fs-dot"></div><div class="fs-dot"></div><div class="fs-dot"></div></div>
+      </div>
+
+      <!-- Template: LOUD -->
+      <div class="tpl tpl-loud" id="tplLoud">
+        <div class="loud-slash" id="loudSlash"></div>
+        <div class="loud-tag" id="loudTag">RUN</div>
+        <div class="loud-hero" id="loudHero">2.4</div>
+        <div class="loud-unit" id="loudUnit">MILES</div>
+        <div class="loud-sub">
+          <span id="loudS1">21:08</span>
+          <span class="loud-dot">·</span>
+          <span id="loudS2">8:49 /mi</span>
+          <span class="loud-dot">·</span>
+          <span id="loudS3">142 bpm</span>
+        </div>
+        <div class="loud-name">ELISE NGUYEN</div>
+        <div class="loud-brand">RALLY</div>
+      </div>
+
+      <!-- Template: CLEAN -->
+      <div class="tpl tpl-clean" id="tplClean">
+        <div class="clean-top">
+          <div class="clean-line" id="cleanLine"></div>
+          <div class="clean-sport" id="cleanSport">RUN</div>
+        </div>
+        <div class="clean-body">
+          <div class="clean-big" id="cleanBig">2.4 <span id="cleanUnit">mi</span></div>
+          <div class="clean-row">
+            <div class="clean-s"><div class="clean-v" id="cleanS1">21:08</div><div class="clean-l" id="cleanL1">time</div></div>
+            <div class="clean-s"><div class="clean-v" id="cleanS2">8:49</div><div class="clean-l" id="cleanL2">pace</div></div>
+            <div class="clean-s"><div class="clean-v" id="cleanS3">142</div><div class="clean-l" id="cleanL3">bpm</div></div>
+          </div>
+        </div>
+        <div class="clean-footer">
+          <div class="clean-name">Elise Nguyen · <span id="cleanXP">+85 XP</span></div>
+          <div class="clean-brand">RALLY</div>
+        </div>
+      </div>
+
+      <!-- XP badge -->
+      <div class="xp-badge">+<span id="editXP">85</span> XP</div>
+    </div>
+
+    <!-- Template picker -->
+    <div class="tpl-picker">
+      <button class="tp-btn active" onclick="switchTpl('raw',this)">Raw</button>
+      <button class="tp-btn" onclick="switchTpl('loud',this)">Loud</button>
+      <button class="tp-btn" onclick="switchTpl('clean',this)">Clean</button>
+    </div>
+
+    <!-- Tool row -->
+    <div class="edit-tool-row">
+      <button class="et-btn" onclick="openRecPanel('music')"><div class="et-btn-icon">🎵</div><div class="et-btn-lbl">Music</div></button>
+      <button class="et-btn" onclick="openRecPanel('stats')"><div class="et-btn-icon">📊</div><div class="et-btn-lbl">Stats</div></button>
+      <button class="et-btn" onclick="openRecPanel('filter')"><div class="et-btn-icon">🎨</div><div class="et-btn-lbl">Style</div></button>
+      <button class="et-btn" onclick="openRecPanel('trim')"><div class="et-btn-icon">✂️</div><div class="et-btn-lbl">Trim</div></button>
+    </div>
+
+    <!-- Caption -->
+    <div class="edit-caption-wrap">
+      <input class="edit-caption" id="editCaption" placeholder="Add a caption... 🔥" maxlength="150">
+    </div>
+
+    <!-- Actions -->
+    <div class="edit-actions">
+      <button class="edit-btn-secondary" onclick="goToRecord()">← Re-record</button>
+      <button class="edit-btn-save" onclick="showToast('💾 Saved to gallery')">Save</button>
+      <button class="edit-btn-post" id="editPostBtn" onclick="postSession()">Post to Rally 🚀</button>
+    </div>
+    <button class="edit-discard" onclick="goToSetup()">Start over</button>
+
+  </div>
+
+  <!-- Slide-up panel (shared across phases) -->
   <div class="rec-panel" id="recPanel" style="display:none">
     <div class="rec-panel-header">
       <div class="rec-panel-title" id="recPanelTitle">Panel</div>
@@ -117,3 +338,5 @@
     </div>
     <div id="recPanelBody"></div>
   </div>
+
+</div>
