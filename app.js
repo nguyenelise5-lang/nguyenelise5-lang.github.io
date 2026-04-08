@@ -74,27 +74,54 @@ var sportCatLabels = {
   winter:['Skiing','Snowboard','XC Ski'],
   other:['Golf','Skating','Dance','Martial Arts','Horse Riding'],
 };
-var activeSportCat = 'all';
+// Multi-select connect filters:
+// - activeSportCats: array of active top-level category keys. Empty = "All".
+// - activeSportSubs: array of active sub-sport labels (lowercased).
+// Clicking "All" clears all categories + subs. Clicking any category toggles it.
+// Sub-chip row only shows when exactly one category is selected (UI sanity).
+var activeSportCats = [];
 var activeSportSubs = [];
 
 function filterCat(btn) {
-  document.querySelectorAll('.cnf-cat').forEach(function(b){ b.classList.remove('active'); });
-  btn.classList.add('active');
-  activeSportCat = btn.dataset.cat;
-  activeSportSubs = [];
+  var cat = btn.dataset.cat;
+  var allBtn = document.querySelector('.cnf-cat[data-cat="all"]');
 
+  if (cat === 'all') {
+    // Reset to All — clear everything
+    activeSportCats = [];
+    activeSportSubs = [];
+    document.querySelectorAll('.cnf-cat').forEach(function(b){ b.classList.remove('active'); });
+    if (allBtn) allBtn.classList.add('active');
+  } else {
+    // Toggle this category on/off
+    var idx = activeSportCats.indexOf(cat);
+    if (idx >= 0) {
+      activeSportCats.splice(idx, 1);
+      btn.classList.remove('active');
+    } else {
+      activeSportCats.push(cat);
+      btn.classList.add('active');
+    }
+    // Any specific category active → deactivate "All"
+    if (allBtn) allBtn.classList.toggle('active', activeSportCats.length === 0);
+    // Subs are scoped to a single active category — switching categories wipes them
+    activeSportSubs = [];
+  }
+
+  // Rebuild sub-chip row: only show when exactly one category is active
   var subWrap = document.getElementById('cnfSub');
   var subChips = document.getElementById('cnfSubChips');
-
-  if (activeSportCat === 'all') {
-    subWrap.style.display = 'none';
-  } else {
-    var labels = sportCatLabels[activeSportCat] || [];
+  if (activeSportCats.length === 1) {
+    var labels = sportCatLabels[activeSportCats[0]] || [];
     subChips.innerHTML = labels.map(function(l) {
       return '<button class="cnf-chip" onclick="toggleSubSport(this,\'' + l.toLowerCase() + '\')">' + l + '</button>';
     }).join('');
     subWrap.style.display = labels.length ? 'block' : 'none';
+  } else {
+    subWrap.style.display = 'none';
+    subChips.innerHTML = '';
   }
+
   applyConnectFilter();
 }
 
@@ -106,9 +133,22 @@ function toggleSubSport(btn, sport) {
   applyConnectFilter();
 }
 
+// Build the union of sport tokens across all active categories.
+// Used as the match set when filtering people/pins.
+function getActiveCatSports() {
+  if (activeSportCats.length === 0) return [];
+  var out = [];
+  activeSportCats.forEach(function(cat){
+    (sportCatMap[cat] || []).forEach(function(s){
+      if (out.indexOf(s) < 0) out.push(s);
+    });
+  });
+  return out;
+}
+
 function applyConnectFilter() {
-  var isAll = activeSportCat === 'all';
-  var catSports = isAll ? [] : (sportCatMap[activeSportCat] || []);
+  var isAll = activeSportCats.length === 0;
+  var catSports = getActiveCatSports();
 
   document.querySelectorAll('.filterable').forEach(function(el) {
     var elSports = (el.dataset.sports || '').toLowerCase().split(',');
@@ -119,6 +159,7 @@ function applyConnectFilter() {
     if (isAll) {
       sportMatch = true;
     } else if (activeSportSubs.length > 0) {
+      // Sub-chip selection takes precedence (only possible with a single active cat)
       sportMatch = elSports.some(function(s) {
         return activeSportSubs.some(function(sub) { return s.includes(sub) || sub.includes(s); });
       });
@@ -131,13 +172,14 @@ function applyConnectFilter() {
     el.classList.toggle('hidden', !(sportMatch && distMatch));
   });
 
-  // Map pins
+  // Map pins — same match logic
   document.querySelectorAll('.map-pin').forEach(function(pin) {
     var pinSports = (pin.dataset.sports || '').toLowerCase().split(',');
     var pinDist = parseFloat(pin.dataset.dist || 0);
     var distMatch = pinDist <= currentRadius;
+    var matchSet = activeSportSubs.length > 0 ? activeSportSubs : catSports;
     var sportMatch = isAll || pinSports.some(function(s) {
-      return (activeSportSubs.length > 0 ? activeSportSubs : (sportCatMap[activeSportCat]||[])).some(function(c){ return s.includes(c)||c.includes(s); });
+      return matchSet.some(function(c){ return s.includes(c) || c.includes(s); });
     });
     pin.style.display = (sportMatch && distMatch) ? '' : 'none';
   });
