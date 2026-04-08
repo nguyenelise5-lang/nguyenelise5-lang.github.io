@@ -67,9 +67,9 @@ var sportCatMap = {
 var sportCatLabels = {
   foot:['Run','Walk','Hike','Trail Run'],
   cycle:['Cycling','MTB','Gravel','E-Bike'],
-  court:['Tennis','Pickleball','Badminton','Squash','Padel'],
+  court:['Tennis','Pickleball','Badminton','Squash','Padel','Racquetball'],
   team:['Soccer','Basketball','Volleyball','Football','Lacrosse','Cricket'],
-  water:['Swimming','Surfing','Kayak','SUP','Rowing'],
+  water:['Swimming','Surfing','Kayak','SUP','Rowing','Windsurf'],
   strength:['Weightlifting','CrossFit','HIIT','Yoga','Pilates','Climbing'],
   winter:['Skiing','Snowboard','XC Ski'],
   other:['Golf','Skating','Dance','Martial Arts','Horse Riding'],
