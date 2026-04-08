@@ -53,6 +53,96 @@ function switchConnectSection(section, btn) {
   document.getElementById('screens').scrollTop = 0;
 }
 
+// Connect tab — category filter
+var sportCatMap = {
+  foot:     ['run','walk','hike','trail','running','hiking'],
+  cycle:    ['cycle','mtb','gravel','ebike','cycling','biking'],
+  court:    ['tennis','pickle','pickleball','badminton','squash','padel','racquetball'],
+  team:     ['soccer','basketball','volleyball','football','lacrosse','cricket'],
+  water:    ['swim','surf','kayak','sup','row','windsurf','swimming','surfing'],
+  strength: ['lift','crossfit','hiit','yoga','pilates','climb','climbing','gym'],
+  winter:   ['ski','snowboard','xcski'],
+  other:    ['golf','skate','dance','martial','horse'],
+};
+var sportCatLabels = {
+  foot:['Run','Walk','Hike','Trail Run'],
+  cycle:['Cycling','MTB','Gravel','E-Bike'],
+  court:['Tennis','Pickleball','Badminton','Squash','Padel'],
+  team:['Soccer','Basketball','Volleyball','Football','Lacrosse','Cricket'],
+  water:['Swimming','Surfing','Kayak','SUP','Rowing'],
+  strength:['Weightlifting','CrossFit','HIIT','Yoga','Pilates','Climbing'],
+  winter:['Skiing','Snowboard','XC Ski'],
+  other:['Golf','Skating','Dance','Martial Arts','Horse Riding'],
+};
+var activeSportCat = 'all';
+var activeSportSubs = [];
+
+function filterCat(btn) {
+  document.querySelectorAll('.cnf-cat').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  activeSportCat = btn.dataset.cat;
+  activeSportSubs = [];
+
+  var subWrap = document.getElementById('cnfSub');
+  var subChips = document.getElementById('cnfSubChips');
+
+  if (activeSportCat === 'all') {
+    subWrap.style.display = 'none';
+  } else {
+    var labels = sportCatLabels[activeSportCat] || [];
+    subChips.innerHTML = labels.map(function(l) {
+      return '<button class="cnf-chip" onclick="toggleSubSport(this,\'' + l.toLowerCase() + '\')">' + l + '</button>';
+    }).join('');
+    subWrap.style.display = labels.length ? 'block' : 'none';
+  }
+  applyConnectFilter();
+}
+
+function toggleSubSport(btn, sport) {
+  btn.classList.toggle('active');
+  var idx = activeSportSubs.indexOf(sport);
+  if (idx >= 0) activeSportSubs.splice(idx, 1);
+  else activeSportSubs.push(sport);
+  applyConnectFilter();
+}
+
+function applyConnectFilter() {
+  var isAll = activeSportCat === 'all';
+  var catSports = isAll ? [] : (sportCatMap[activeSportCat] || []);
+
+  document.querySelectorAll('.filterable').forEach(function(el) {
+    var elSports = (el.dataset.sports || '').toLowerCase().split(',');
+    var elDist = parseFloat(el.dataset.dist || 0);
+    var distMatch = elDist <= currentRadius;
+
+    var sportMatch;
+    if (isAll) {
+      sportMatch = true;
+    } else if (activeSportSubs.length > 0) {
+      sportMatch = elSports.some(function(s) {
+        return activeSportSubs.some(function(sub) { return s.includes(sub) || sub.includes(s); });
+      });
+    } else {
+      sportMatch = elSports.some(function(s) {
+        return catSports.some(function(c) { return s.includes(c) || c.includes(s); });
+      });
+    }
+
+    el.classList.toggle('hidden', !(sportMatch && distMatch));
+  });
+
+  // Map pins
+  document.querySelectorAll('.map-pin').forEach(function(pin) {
+    var pinSports = (pin.dataset.sports || '').toLowerCase().split(',');
+    var pinDist = parseFloat(pin.dataset.dist || 0);
+    var distMatch = pinDist <= currentRadius;
+    var sportMatch = isAll || pinSports.some(function(s) {
+      return (activeSportSubs.length > 0 ? activeSportSubs : (sportCatMap[activeSportCat]||[])).some(function(c){ return s.includes(c)||c.includes(s); });
+    });
+    pin.style.display = (sportMatch && distMatch) ? '' : 'none';
+  });
+}
+
 // Activity tab segmented control
 function switchActTab(tab, btn) {
   document.querySelectorAll('.act-subtab').forEach(t => t.classList.remove('active'));
@@ -240,56 +330,37 @@ async function go(n){
 // Sport-specific stats for Record tab (Strava-style)
 
 function _initConnect() {
-// Bind chip click handlers via delegation
-var sportPillsEl = document.getElementById('sportPills');
-if (sportPillsEl) {
-  sportPillsEl.addEventListener('click', function(e) {
-    var c = e.target.closest('.chip');
-    if (!c) return;
-    if (!c.dataset.sport) { c.classList.toggle('on'); applyFilters(); return; }
-    if (c.dataset.sport === 'all') {
-      document.querySelectorAll('#sportPills .chip').forEach(x => x.classList.remove('on'));
-      c.classList.add('on');
-    } else {
-      var allChip = document.querySelector('#sportPills .chip[data-sport="all"]');
-      if (allChip) allChip.classList.remove('on');
-      c.classList.toggle('on');
-      if (!document.querySelector('#sportPills .chip.on')) {
-        if (allChip) allChip.classList.add('on');
-      }
-    }
-    applyFilters();
-  });
-}
-
 // Radius buttons
-// Bind radius buttons
-document.querySelectorAll('.rad-btn-float').forEach(btn => {
-  btn.addEventListener('click', () => {
-    currentRadius = parseInt(btn.dataset.radius);
-    document.querySelectorAll('.rad-btn-float').forEach(b => { b.classList.remove('active-rad-f'); });
+document.querySelectorAll('.rad-btn-float').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.rad-btn-float').forEach(function(b){ b.classList.remove('active-rad-f'); });
     btn.classList.add('active-rad-f');
-    document.getElementById('radiusLabel').textContent = currentRadius + ' mi';
-    const sizes = {3: 110, 5: 155, 10: 260};
-    const r = document.getElementById('mapRadius');
-    r.style.width = sizes[currentRadius] + 'px';
-    r.style.height = sizes[currentRadius] + 'px';
-    r.style.transition = 'all 0.3s ease';
-    applyFilters();
+    currentRadius = parseInt(btn.dataset.radius);
+    var lbl = document.getElementById('radiusLabel');
+    if (lbl) lbl.textContent = currentRadius + ' mi';
+    var sizes = {3:110, 5:155, 10:260};
+    var r = document.getElementById('mapRadius');
+    if (r) { r.style.width = sizes[currentRadius]+'px'; r.style.height = sizes[currentRadius]+'px'; r.style.transition = 'all .3s ease'; }
+    applyConnectFilter();
   });
 });
 
-// Recap tab toggle
-document.querySelectorAll('.recap-tab').forEach(t=>{t.addEventListener('click',()=>{document.querySelectorAll('.recap-tab').forEach(x=>x.classList.remove('on'));t.classList.add('on')})});
+// Ghost mode toggle
+var gc = document.getElementById('ghostCheckbox');
+if (gc) gc.addEventListener('change', function(){ toggleGhostMode(this.checked); });
 
-// Bind edge swipe for connect overlays
+// Edge swipe for chat/profile overlays
 setupEdgeSwipe('chatView', function() {
-  document.getElementById('chatView').style.display = 'none';
-  document.getElementById('inbox').style.display = 'block';
+  var cv = document.getElementById('chatView');
+  var ib = document.getElementById('inbox');
+  if (cv) cv.style.display = 'none';
+  if (ib) ib.style.display = 'block';
 });
 setupEdgeSwipe('profileView', function() {
-  document.getElementById('profileView').style.display = 'none';
-  document.getElementById('connectMain').style.display = 'block';
+  var pv = document.getElementById('profileView');
+  var cm = document.getElementById('connectMain');
+  if (pv) pv.style.display = 'none';
+  if (cm) cm.style.display = 'block';
   inboxOpen = false;
 });
 _initFullListSwipe();
@@ -1668,380 +1739,445 @@ function showToast(msg) {
   setTimeout(() => t.remove(), 2500);
 }
 
-// === RECORD TAB - TIKTOK-STYLE ===
-let isRecording = false;
-let recInterval = null;
-let recSeconds = 0;
+// === RECORD TAB — Phase-based: Setup → Record → Edit ===
 
-// === RECORD ENGINE — Three-Layer Stack (try-catch wrapped) ===
-var cameraStream=null,facingMode='environment',recMode='video',flashOn=false,recSpeed=1;
-var holdTimer=null,isHolding=false,clipCount=0,bookmarks=[];
-var activeTrack=-1,stickerColor='#CCFF00',currentSport='run';
+var cameraStream = null, facingMode = 'environment', recMode = 'video', flashOn = false;
+var isRecording = false, recRAF = null, recStartTime = 0, recSeconds = 0;
+var countdownActive = false;
 
-// Sport-specific data themes
-var sportThemes={
-  run:{stats:['Distance (MI)','Pace (/MI)','BPM'],icons:['📍','⚡','❤️']},
-  lift:{stats:['Reps','Sets','BPM'],icons:['💪','📊','❤️']},
-  cycle:{stats:['Distance (MI)','MPH','BPM'],icons:['📍','💨','❤️']},
-  yoga:{stats:['Duration','Flow','Cal'],icons:['⏱','🧘','🔥']},
-  tennis:{stats:['Rally','Aces','Cal'],icons:['🎾','🏆','🔥']},
-  surf:{stats:['Waves','Time','BPM'],icons:['🌊','⏱','❤️']},
-  hike:{stats:['Distance (MI)','Elev (FT)','BPM'],icons:['📍','⛰️','❤️']},
-  climb:{stats:['Grade','Time','Cal'],icons:['🧗','⏱','🔥']},
-  ball:{stats:['Pts','Duration','BPM'],icons:['🏀','⏱','❤️']},
-  pickle:{stats:['Rally','Duration','Cal'],icons:['🏓','⏱','🔥']},
-  swim:{stats:['Laps','Yards','BPM'],icons:['🏊','📍','❤️']}
+// Sport themes: color, rgb, stats labels, units, icons
+var sportThemes = {
+  run:{color:'#22c55e',rgb:'34,197,94',icon:'🏃',label:'Run',cat:'foot',stats:["Distance", "Pace", "Heart Rate"],units:["mi", "/mi", "bpm"],vals:["0.00", "--:--", "--"]},
+  walk:{color:'#84cc16',rgb:'132,204,22',icon:'🚶',label:'Walk',cat:'foot',stats:["Distance", "Steps", "Heart Rate"],units:["mi", "k", "bpm"],vals:["0.00", "0", "--"]},
+  hike:{color:'#78716c',rgb:'120,113,108',icon:'🥾',label:'Hike',cat:'foot',stats:["Distance", "Elevation", "Heart Rate"],units:["mi", "ft", "bpm"],vals:["0.00", "0", "--"]},
+  trail:{color:'#16a34a',rgb:'22,163,74',icon:'🌲',label:'Trail Run',cat:'foot',stats:["Distance", "Elevation", "Heart Rate"],units:["mi", "ft", "bpm"],vals:["0.00", "0", "--"]},
+  cycle:{color:'#3b82f6',rgb:'59,130,246',icon:'🚴',label:'Cycle',cat:'cycle',stats:["Distance", "Speed", "Heart Rate"],units:["mi", "mph", "bpm"],vals:["0.00", "0.0", "--"]},
+  mtb:{color:'#1d4ed8',rgb:'29,78,216',icon:'🚵',label:'MTB',cat:'cycle',stats:["Distance", "Elevation", "Heart Rate"],units:["mi", "ft", "bpm"],vals:["0.00", "0", "--"]},
+  gravel:{color:'#2563eb',rgb:'37,99,235',icon:'🚵',label:'Gravel',cat:'cycle',stats:["Distance", "Speed", "Heart Rate"],units:["mi", "mph", "bpm"],vals:["0.00", "0.0", "--"]},
+  ebike:{color:'#0ea5e9',rgb:'14,165,233',icon:'⚡',label:'E-Bike',cat:'cycle',stats:["Distance", "Speed", "Assist"],units:["mi", "mph", "%"],vals:["0.00", "0.0", "0"]},
+  swim:{color:'#0ea5e9',rgb:'14,165,233',icon:'🏊',label:'Swim',cat:'water',stats:["Laps", "Distance", "Heart Rate"],units:["", "yd", "bpm"],vals:["0", "0", "--"]},
+  surf:{color:'#06b6d4',rgb:'6,182,212',icon:'🏄',label:'Surf',cat:'water',stats:["Waves", "Session", "Heart Rate"],units:["", "min", "bpm"],vals:["0", "0", "--"]},
+  kayak:{color:'#0891b2',rgb:'8,145,178',icon:'🛶',label:'Kayak',cat:'water',stats:["Distance", "Pace", "Heart Rate"],units:["mi", "/mi", "bpm"],vals:["0.00", "--:--", "--"]},
+  sup:{color:'#22d3ee',rgb:'34,211,238',icon:'🏄',label:'SUP',cat:'water',stats:["Distance", "Speed", "Heart Rate"],units:["mi", "mph", "bpm"],vals:["0.00", "0.0", "--"]},
+  row:{color:'#0284c7',rgb:'2,132,199',icon:'🚣',label:'Row',cat:'water',stats:["Distance", "Split", "Strokes"],units:["mi", "/500m", "spm"],vals:["0.00", "--:--", "0"]},
+  windsurf:{color:'#0369a1',rgb:'3,105,161',icon:'🏄',label:'Windsurf',cat:'water',stats:["Distance", "Speed", "Heart Rate"],units:["mi", "mph", "bpm"],vals:["0.00", "0.0", "--"]},
+  tennis:{color:'#eab308',rgb:'234,179,8',icon:'🎾',label:'Tennis',cat:'court',stats:["Rally", "Aces", "Calories"],units:["", "", "kcal"],vals:["0", "0", "0"]},
+  pickle:{color:'#84cc16',rgb:'132,204,22',icon:'🏓',label:'Pickleball',cat:'court',stats:["Rally", "Time", "Calories"],units:["", "min", "kcal"],vals:["0", "0", "0"]},
+  badminton:{color:'#ca8a04',rgb:'202,138,4',icon:'🏸',label:'Badminton',cat:'court',stats:["Sets", "Time", "Calories"],units:["", "min", "kcal"],vals:["0", "0", "0"]},
+  squash:{color:'#d97706',rgb:'217,119,6',icon:'🎾',label:'Squash',cat:'court',stats:["Games", "Time", "Calories"],units:["", "min", "kcal"],vals:["0", "0", "0"]},
+  padel:{color:'#f59e0b',rgb:'245,158,11',icon:'🎾',label:'Padel',cat:'court',stats:["Sets", "Time", "Calories"],units:["", "min", "kcal"],vals:["0", "0", "0"]},
+  racquetball:{color:'#fbbf24',rgb:'251,191,36',icon:'🎾',label:'Racquetball',cat:'court',stats:["Games", "Time", "Calories"],units:["", "min", "kcal"],vals:["0", "0", "0"]},
+  soccer:{color:'#22c55e',rgb:'34,197,94',icon:'⚽',label:'Soccer',cat:'team',stats:["Distance", "Time", "Heart Rate"],units:["mi", "min", "bpm"],vals:["0.00", "0", "--"]},
+  basketball:{color:'#f97316',rgb:'249,115,22',icon:'🏀',label:'Basketball',cat:'team',stats:["Points", "Time", "Heart Rate"],units:["", "min", "bpm"],vals:["0", "0", "--"]},
+  volleyball:{color:'#3b82f6',rgb:'59,130,246',icon:'🏐',label:'Volleyball',cat:'team',stats:["Sets", "Time", "Heart Rate"],units:["", "min", "bpm"],vals:["0", "0", "--"]},
+  football:{color:'#7c3aed',rgb:'124,58,237',icon:'🏈',label:'Football',cat:'team',stats:["Distance", "Time", "Heart Rate"],units:["mi", "min", "bpm"],vals:["0.00", "0", "--"]},
+  lacrosse:{color:'#db2777',rgb:'219,39,119',icon:'🥍',label:'Lacrosse',cat:'team',stats:["Distance", "Time", "Heart Rate"],units:["mi", "min", "bpm"],vals:["0.00", "0", "--"]},
+  cricket:{color:'#16a34a',rgb:'22,163,74',icon:'🏏',label:'Cricket',cat:'team',stats:["Runs", "Overs", "Heart Rate"],units:["", "", "bpm"],vals:["0", "0", "--"]},
+  lift:{color:'#f97316',rgb:'249,115,22',icon:'🏋️',label:'Lift',cat:'strength',stats:["Reps", "Sets", "Heart Rate"],units:["", "", "bpm"],vals:["0", "0", "--"]},
+  crossfit:{color:'#ef4444',rgb:'239,68,68',icon:'💪',label:'CrossFit',cat:'strength',stats:["Rounds", "Reps", "Heart Rate"],units:["", "", "bpm"],vals:["0", "0", "--"]},
+  hiit:{color:'#dc2626',rgb:'220,38,38',icon:'⚡',label:'HIIT',cat:'strength',stats:["Rounds", "Time", "Calories"],units:["", "min", "kcal"],vals:["0", "0", "0"]},
+  yoga:{color:'#a855f7',rgb:'168,85,247',icon:'🧘',label:'Yoga',cat:'strength',stats:["Duration", "Flow", "Calories"],units:["min", "", "kcal"],vals:["0", "☯", "0"]},
+  pilates:{color:'#ec4899',rgb:'236,72,153',icon:'🤸',label:'Pilates',cat:'strength',stats:["Duration", "Reps", "Calories"],units:["min", "", "kcal"],vals:["0", "0", "0"]},
+  climb:{color:'#f97316',rgb:'249,115,22',icon:'🧗',label:'Climb',cat:'strength',stats:["Grade", "Time", "Calories"],units:["", "min", "kcal"],vals:["V0", "0", "0"]},
+  ski:{color:'#60a5fa',rgb:'96,165,250',icon:'⛷️',label:'Ski',cat:'winter',stats:["Distance", "Speed", "Runs"],units:["mi", "mph", ""],vals:["0.00", "0.0", "0"]},
+  snowboard:{color:'#7c3aed',rgb:'124,58,237',icon:'🏂',label:'Snowboard',cat:'winter',stats:["Distance", "Speed", "Runs"],units:["mi", "mph", ""],vals:["0.00", "0.0", "0"]},
+  xcski:{color:'#3b82f6',rgb:'59,130,246',icon:'⛷️',label:'XC Ski',cat:'winter',stats:["Distance", "Pace", "Heart Rate"],units:["mi", "/mi", "bpm"],vals:["0.00", "--:--", "--"]},
+  golf:{color:'#16a34a',rgb:'22,163,74',icon:'⛳',label:'Golf',cat:'other',stats:["Holes", "Strokes", "Distance"],units:["", "", "mi"],vals:["0", "0", "0.00"]},
+  skate:{color:'#60a5fa',rgb:'96,165,250',icon:'⛸️',label:'Skate',cat:'other',stats:["Distance", "Speed", "Heart Rate"],units:["mi", "mph", "bpm"],vals:["0.00", "0.0", "--"]},
+  dance:{color:'#ec4899',rgb:'236,72,153',icon:'💃',label:'Dance',cat:'other',stats:["Duration", "Steps", "Calories"],units:["min", "", "kcal"],vals:["0", "0", "0"]},
+  martial:{color:'#ef4444',rgb:'239,68,68',icon:'🥊',label:'Martial Arts',cat:'other',stats:["Rounds", "Time", "Heart Rate"],units:["", "min", "bpm"],vals:["0", "0", "--"]},
+  horse:{color:'#92400e',rgb:'146,64,14',icon:'🐎',label:'Horse Ride',cat:'other',stats:["Distance", "Time", "Heart Rate"],units:["mi", "min", "bpm"],vals:["0.00", "0", "--"]},
 };
 
-var trackList=[
-  {title:'Blinding Lights',artist:'The Weeknd',dur:'3:22',bg:'linear-gradient(135deg,#e03131,#c92a2a)'},
-  {title:'Redbone',artist:'Childish Gambino',dur:'5:26',bg:'linear-gradient(135deg,#1864ab,#1c7ed6)'},
-  {title:'HUMBLE.',artist:'Kendrick Lamar',dur:'2:57',bg:'linear-gradient(135deg,#d9480f,#e8590c)'},
-  {title:'Kiss Me More',artist:'Doja Cat ft. SZA',dur:'3:28',bg:'linear-gradient(135deg,#c2255c,#e64980)'},
-  {title:'Industry Baby',artist:'Lil Nas X',dur:'3:32',bg:'linear-gradient(135deg,#d6336c,#f06595)'},
-  {title:'Unstoppable',artist:'Sia',dur:'3:37',bg:'linear-gradient(135deg,#5f3dc4,#7048e8)'},
-  {title:'Lose Yourself',artist:'Eminem',dur:'5:26',bg:'linear-gradient(135deg,#495057,#868e96)'},
-  {title:'Levitating',artist:'Dua Lipa',dur:'3:23',bg:'linear-gradient(135deg,#0b7285,#15aabf)'},
-];
+var currentSport = 'run';
 
-function recTapInit(){try{if(!cameraStream&&typeof initCamera==='function')initCamera()}catch(e){console.warn('recTapInit:',e)}}
+function selectSport(btn) {
+  document.querySelectorAll('.sg-item').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentSport = btn.dataset.sport;
+  var t = sportThemes[currentSport];
 
-// 720p camera for performance (not 4K)
-async function initCamera(){
-  try{
-    var v=document.getElementById('cameraFeed'),c=document.getElementById('recCenter');
-    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
-      if(c)c.innerHTML='<div class="rec-ctr-i">📹</div><div class="rec-ctr-t">Camera ready — preview limited</div>';
-      showToast('📹 Camera ready');return;
+  // Update CSS variable on rally-rec element
+  var rec = document.getElementById('rallyRec');
+  if (rec) {
+    rec.style.setProperty('--sport-color', t.color);
+    rec.style.setProperty('--sport-rgb', t.rgb);
+  }
+  // Update setup background glow
+  var bg = document.getElementById('setupBg');
+  if (bg) bg.style.background = 'radial-gradient(circle at 50% 0%, ' + t.color + ', transparent 70%)';
+
+  // Update start button
+  var startIcon = document.getElementById('setupStartIcon');
+  if (startIcon) startIcon.textContent = t.icon;
+
+  // Update stats preview pills
+  var pills = ['ssp0','ssp1','ssp2'];
+  var icons = ['📍','⚡','❤️'];
+  t.stats.forEach(function(s, i) {
+    var el = document.getElementById(pills[i]);
+    if (el) el.textContent = icons[i] + ' ' + s;
+  });
+}
+
+function toggleCat(head) {
+  var grid = head.nextElementSibling;
+  var arr  = head.querySelector('.scat-arr');
+  var open = grid.style.maxHeight && grid.style.maxHeight !== '0px';
+  grid.style.maxHeight = open ? '0px' : '400px';
+  if (arr) arr.style.transform = open ? '' : 'rotate(90deg)';
+}
+
+function goToRecord() {
+  document.getElementById('rpSetup').classList.remove('active');
+  document.getElementById('rpRecord').classList.add('active');
+  document.getElementById('rpEdit').classList.remove('active');
+
+  var t = sportThemes[currentSport];
+
+  // Set sport badge
+  var badge = document.getElementById('rrSportBadge');
+  if (badge) badge.textContent = t.icon + ' ' + t.label;
+
+  // Update stat cards
+  for (var i = 0; i < 3; i++) {
+    var lbl = document.getElementById('statLabel' + i);
+    var val = document.getElementById('statValue' + i);
+    var unit = document.getElementById('statUnit' + i);
+    if (lbl) lbl.textContent = t.stats[i];
+    if (val) val.textContent = t.values[i];
+    if (unit) unit.textContent = t.units[i];
+  }
+
+  // Init camera
+  initCamera();
+}
+
+function goToSetup() {
+  stopRec();
+  stopCamera();
+  document.getElementById('rpSetup').classList.add('active');
+  document.getElementById('rpRecord').classList.remove('active');
+  document.getElementById('rpEdit').classList.remove('active');
+}
+
+function switchTpl(name, btn) {
+  document.querySelectorAll('.tpl').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.tp-btn').forEach(function(b){ b.classList.remove('active'); });
+  var el = document.getElementById('tpl' + name.charAt(0).toUpperCase() + name.slice(1));
+  if (el) el.classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+function finishSession() {
+  stopRec();
+  stopCamera();
+  var t = sportThemes[currentSport];
+  var timer = document.getElementById('recTimer');
+  var elapsed = timer ? timer.textContent : '00:00';
+  var s0 = document.getElementById('statValue0');
+  var s1 = document.getElementById('statValue1');
+  var s2 = document.getElementById('statValue2');
+  var dist = s0 ? s0.textContent : '0.00';
+  var pace = s1 ? s1.textContent : '--:--';
+  var bpm  = s2 ? s2.textContent : '--';
+
+  // Sport bg on clip preview
+  var clipBg = document.getElementById('clipBg');
+  if (clipBg) clipBg.style.background = 'linear-gradient(160deg,color-mix(in srgb,' + t.color + ' 15%,#000),#0a0a0a 70%)';
+
+  // RAW template
+  var rawSport = document.getElementById('rawSport'); if (rawSport) rawSport.textContent = t.label;
+  var rawDate  = document.getElementById('rawDate');  if (rawDate)  rawDate.textContent  = new Date().toLocaleDateString('en-US',{month:'short',year:'numeric'}).toUpperCase();
+  var rawHero  = document.getElementById('rawHero');
+  if (rawHero) rawHero.innerHTML = dist + '<span class="tpl-raw-unit" id="rawUnit">' + t.units[0] + '</span>';
+  var rawS1 = document.getElementById('rawS1'); if (rawS1) rawS1.textContent = elapsed;
+  var rawS2 = document.getElementById('rawS2'); if (rawS2) rawS2.textContent = pace;
+  var rawS3 = document.getElementById('rawS3'); if (rawS3) rawS3.textContent = bpm;
+  var rawL1 = document.getElementById('rawL1'); if (rawL1) rawL1.textContent = 'TIME';
+  var rawL2 = document.getElementById('rawL2'); if (rawL2) rawL2.textContent = t.stats[1];
+  var rawL3 = document.getElementById('rawL3'); if (rawL3) rawL3.textContent = t.stats[2];
+
+  // LOUD template
+  var loudTag  = document.getElementById('loudTag');  if (loudTag)  loudTag.textContent  = t.label;
+  var loudHero = document.getElementById('loudHero'); if (loudHero) loudHero.textContent = dist;
+  var loudUnit = document.getElementById('loudUnit'); if (loudUnit) loudUnit.textContent = t.units[0].toUpperCase();
+  var loudS1   = document.getElementById('loudS1');   if (loudS1)   loudS1.textContent   = elapsed;
+  var loudS2   = document.getElementById('loudS2');   if (loudS2)   loudS2.textContent   = pace + ' /' + t.units[0];
+  var loudS3   = document.getElementById('loudS3');   if (loudS3)   loudS3.textContent   = bpm + ' bpm';
+
+  // CLEAN template
+  var cleanSport = document.getElementById('cleanSport'); if (cleanSport) cleanSport.textContent = t.label;
+  var cleanBig   = document.getElementById('cleanBig');
+  if (cleanBig) cleanBig.innerHTML = dist + ' <span id="cleanUnit">' + t.units[0] + '</span>';
+  var cleanS1 = document.getElementById('cleanS1'); if (cleanS1) cleanS1.textContent = elapsed;
+  var cleanS2 = document.getElementById('cleanS2'); if (cleanS2) cleanS2.textContent = pace;
+  var cleanS3 = document.getElementById('cleanS3'); if (cleanS3) cleanS3.textContent = bpm;
+  var cleanL1 = document.getElementById('cleanL1'); if (cleanL1) cleanL1.textContent = 'time';
+  var cleanL2 = document.getElementById('cleanL2'); if (cleanL2) cleanL2.textContent = t.stats[1].toLowerCase();
+  var cleanL3 = document.getElementById('cleanL3'); if (cleanL3) cleanL3.textContent = t.stats[2].toLowerCase();
+  var cleanXP = document.getElementById('cleanXP'); if (cleanXP) cleanXP.textContent = '+' + Math.max(10, Math.floor(recSeconds/6)) + ' XP';
+
+  // XP badge
+  var xpEl = document.getElementById('editXP'); if (xpEl) xpEl.textContent = Math.max(10, Math.floor(recSeconds/6));
+
+  // Post button color
+  var postBtn = document.getElementById('editPostBtn');
+  if (postBtn) postBtn.style.background = t.color;
+
+  // Reset to Raw template
+  switchTpl('raw', document.querySelector('.tp-btn'));
+
+  document.getElementById('rpSetup').classList.remove('active');
+  document.getElementById('rpRecord').classList.remove('active');
+  document.getElementById('rpEdit').classList.add('active');
+}
+
+function postSession() {
+  var caption = document.getElementById('editCaption');
+  var txt = caption ? caption.value.trim() : '';
+  showToast('🚀 Posted to Rally!' + (txt ? ' "' + txt.substring(0,20) + (txt.length>20?'…':'') + '"' : ''));
+  goToSetup();
+}
+
+function stopCamera() {
+  if (cameraStream) {
+    cameraStream.getTracks().forEach(function(t) { t.stop(); });
+    cameraStream = null;
+  }
+  var v = document.getElementById('cameraFeed');
+  if (v) v.srcObject = null;
+}
+
+function recTapInit() {
+  try { if (!cameraStream) initCamera(); } catch(e) {}
+}
+
+async function initCamera() {
+  try {
+    var v = document.getElementById('cameraFeed');
+    var c = document.getElementById('recCenter');
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      showToast('📹 Camera preview limited'); return;
     }
-    if(cameraStream)cameraStream.getTracks().forEach(function(t){t.stop()});
-    // 720p for performance — no 4K thrashing
-    cameraStream=await navigator.mediaDevices.getUserMedia({
-      video:{facingMode:facingMode,width:{ideal:1280},height:{ideal:720}},
-      audio:true
+    if (cameraStream) cameraStream.getTracks().forEach(function(t){t.stop();});
+    cameraStream = await navigator.mediaDevices.getUserMedia({
+      video:{facingMode:facingMode, width:{ideal:1280}, height:{ideal:720}}, audio:true
     });
-    v.srcObject=cameraStream;if(c)c.style.display='none';
-  }catch(e){
-    var c2=document.getElementById('recCenter');
-    if(c2)c2.innerHTML='<div class="rec-ctr-i">📹</div><div class="rec-ctr-t">Tap record to start</div>';
-    showToast('📹 Ready');
+    v.srcObject = cameraStream;
+    if (c) c.style.display = 'none';
+  } catch(e) {
+    showToast('📹 Tap to record');
   }
 }
 
-// Draggable data stickers (touch + mouse)
-function _initRecord() {
-(function initDraggableStickers(){
-  try{
-    document.querySelectorAll('.rec-sticker').forEach(function(sticker){
-      var offsetX=0,offsetY=0,dragging=false;
-      function startDrag(cx,cy){
-        dragging=true;
-        var rect=sticker.getBoundingClientRect();
-        var parentRect=sticker.parentElement.getBoundingClientRect();
-        offsetX=cx-rect.left;offsetY=cy-rect.top;
-        sticker.classList.add('dragging');
-        // Remove any centering transform
-        sticker.style.transform='none';
-      }
-      function moveDrag(cx,cy){
-        if(!dragging)return;
-        var parentRect=sticker.parentElement.getBoundingClientRect();
-        var x=cx-parentRect.left-offsetX;
-        var y=cy-parentRect.top-offsetY;
-        // Clamp within parent
-        x=Math.max(0,Math.min(x,parentRect.width-sticker.offsetWidth));
-        y=Math.max(0,Math.min(y,parentRect.height-sticker.offsetHeight));
-        sticker.style.left=x+'px';sticker.style.top=y+'px';
-        sticker.style.right='auto';
-      }
-      function endDrag(){
-        dragging=false;sticker.classList.remove('dragging');
-      }
-      // Touch
-      sticker.addEventListener('touchstart',function(e){
-        e.preventDefault();startDrag(e.touches[0].clientX,e.touches[0].clientY);
-      },{passive:false});
-      sticker.addEventListener('touchmove',function(e){
-        e.preventDefault();moveDrag(e.touches[0].clientX,e.touches[0].clientY);
-      },{passive:false});
-      sticker.addEventListener('touchend',endDrag);
-      // Mouse
-      sticker.addEventListener('mousedown',function(e){
-        e.preventDefault();startDrag(e.clientX,e.clientY);
-      });
-      window.addEventListener('mousemove',function(e){moveDrag(e.clientX,e.clientY)});
-      window.addEventListener('mouseup',endDrag);
-    });
-  }catch(e){console.warn('initDraggableStickers:',e)}
-})();
-} // end _initRecord
-
-function pickSport(btn,sport){
-  try{
-    document.querySelectorAll('.rsp').forEach(function(b){b.classList.remove('on')});
-    btn.classList.add('on');
-    currentSport=sport;
-    var th=sportThemes[sport]||sportThemes.run;
-    var dl=document.getElementById('rsDistLabel');
-    var pl=document.getElementById('rsPaceLabel');
-    if(dl)dl.textContent=th.stats[0];
-    if(pl)pl.textContent=th.stats[1];
-  }catch(e){console.warn('pickSport:',e)}
+async function switchCamera() {
+  facingMode = facingMode === 'environment' ? 'user' : 'environment';
+  await initCamera();
+  showToast('🔄 Camera flipped');
 }
 
-function setMode(mode,btn){
-  try{
-    recMode=mode;
-    document.querySelectorAll('.rm').forEach(function(b){b.classList.remove('on')});
-    btn.classList.add('on');
-    var m=document.getElementById('recMain');
-    m.className='rec-main-btn'+(mode==='photo'?' photo-m':'');
-  }catch(e){console.warn('setMode:',e)}
-}
-
-function recDown(){
-  try{
-    isHolding=false;
-    holdTimer=setTimeout(function(){isHolding=true;if(!isRecording)startRec()},300);
-  }catch(e){console.warn('recDown:',e)}
-}
-function recUp(){
-  try{
-    clearTimeout(holdTimer);
-    if(isHolding&&isRecording)stopRec();
-    else if(!isHolding){if(recMode==='photo')snapPhoto();else toggleRec();}
-    isHolding=false;
-  }catch(e){console.warn('recUp:',e)}
-}
-
-function setPhase(n){
-  try{
-    for(var i=1;i<=3;i++){
-      var s=document.getElementById('ph'+i);
-      s.className='rec-phase-seg'+(i<n?' done':i===n?' active':'');
+function toggleFlash() {
+  flashOn = !flashOn;
+  var btn = document.getElementById('flashBtn');
+  if (btn) btn.textContent = flashOn ? '🔦' : '⚡';
+  if (cameraStream) {
+    var track = cameraStream.getVideoTracks()[0];
+    if (track && track.getCapabilities && track.getCapabilities().torch) {
+      track.applyConstraints({advanced:[{torch:flashOn}]});
     }
-  }catch(e){console.warn('setPhase:',e)}
+  }
+  showToast(flashOn ? '⚡ Flash on' : '🔦 Flash off');
 }
 
-// requestAnimationFrame-based timer (no setInterval thread blocking)
-var recRAF=null,recStartTime=0;
+function setMode(mode, btn) {
+  recMode = mode;
+  document.querySelectorAll('.rrm').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+}
 
-function startRec(){
-  try{
-    isRecording=true;setPhase(2);
-    var m=document.getElementById('recMain'),b=document.getElementById('recBadge');
-    var g=document.getElementById('recGlow'),c=document.getElementById('recCenter');
-    var bk=document.getElementById('recBookmark'),al=document.getElementById('recAlbum');
-    m.classList.add('recording');b.style.display='flex';g.classList.add('on');
-    bk.classList.add('on');if(c)c.style.display='none';
-    if(activeTrack>=0&&al)al.classList.add('on');
-    document.getElementById('recTimer').style.opacity='1';
-    recSeconds=0;bookmarks=[];recStartTime=performance.now();
-    // Show stickers
-    document.getElementById('recStickers').classList.remove('rec-stickers-hidden');
-    // RAF timer loop
-    function tick(now){
-      if(!isRecording)return;
-      recSeconds=Math.floor((now-recStartTime)/1000);
-      var mn=String(Math.floor(recSeconds/60)).padStart(2,'0');
-      var sc=String(recSeconds%60).padStart(2,'0');
-      document.getElementById('recTimer').textContent=mn+':'+sc;
-      // HR ring progress (green→yellow→red over 2min)
-      var zone=Math.min(recSeconds/120,1);
-      var ring=document.getElementById('hrRing');
-      ring.style.strokeDashoffset=String(204-(204*zone));
-      ring.style.stroke='hsl('+(80-zone*80)+',100%,50%)';
-      // Simulated stats
-      var bpm=Math.floor(95+zone*70+Math.random()*5);
-      document.getElementById('rsBPM').textContent=bpm;
-      // Simulated distance (0.1 mi/min)
-      var dist=(recSeconds/600).toFixed(3);
-      document.getElementById('rsDist').textContent=dist;
-      // Simulated pace
-      if(recSeconds>5){
-        var paceTotal=recSeconds/(parseFloat(dist)||0.001);
-        var pm=Math.floor(paceTotal/60);var ps=Math.floor(paceTotal%60);
-        document.getElementById('rsPace').textContent=pm+':'+String(ps).padStart(2,'0');
+function recDown() {
+  holdTimer = setTimeout(function(){ if (!isRecording) startRec(); }, 300);
+}
+function recUp() {
+  clearTimeout(holdTimer);
+  if (!isRecording) {
+    if (recMode === 'photo') snapPhoto(); else toggleRec();
+  }
+}
+var holdTimer = null;
+
+function toggleRec() { if (isRecording) stopRec(); else startRec(); }
+
+function startRec() {
+  isRecording = true;
+  recSeconds = 0;
+  recStartTime = performance.now();
+  var btn = document.getElementById('recMain');
+  var badge = document.getElementById('recBadge');
+  var timerEl = document.getElementById('recTimer');
+  if (btn) btn.classList.add('recording');
+  if (badge) badge.style.display = 'flex';
+  if (timerEl) timerEl.style.opacity = '1';
+
+  function tick(now) {
+    if (!isRecording) return;
+    recSeconds = Math.floor((now - recStartTime) / 1000);
+    var mn = String(Math.floor(recSeconds / 60)).padStart(2,'0');
+    var sc = String(recSeconds % 60).padStart(2,'0');
+    if (timerEl) timerEl.textContent = mn + ':' + sc;
+
+    // Animate HR ring
+    var zone = Math.min(recSeconds / 120, 1);
+    var ring = document.getElementById('hrRing');
+    if (ring) {
+      ring.style.strokeDashoffset = String(204 - (204 * zone));
+    }
+
+    // Simulate stats
+    var t = sportThemes[currentSport];
+    var dist = (recSeconds / 600).toFixed(2);
+    var bpm = Math.floor(95 + zone * 70 + Math.random() * 5);
+
+    var v0 = document.getElementById('statValue0');
+    var v1 = document.getElementById('statValue1');
+    var v2 = document.getElementById('statValue2');
+    if (currentSport === 'run' || currentSport === 'cycle' || currentSport === 'hike') {
+      if (v0) v0.textContent = dist;
+      if (v1 && recSeconds > 5) {
+        var pace = recSeconds / (parseFloat(dist)||0.001);
+        v1.textContent = Math.floor(pace/60) + ':' + String(Math.floor(pace%60)).padStart(2,'0');
       }
-      recRAF=requestAnimationFrame(tick);
     }
-    recRAF=requestAnimationFrame(tick);
-    showToast('🔴 Recording');
-  }catch(e){console.warn('startRec:',e)}
+    if (v2) v2.textContent = bpm;
+
+    recRAF = requestAnimationFrame(tick);
+  }
+  recRAF = requestAnimationFrame(tick);
+  showToast('🔴 Recording');
 }
 
-function stopRec(){
-  try{
-    isRecording=false;setPhase(3);
-    cancelAnimationFrame(recRAF);
-    document.getElementById('recMain').classList.remove('recording');
-    document.getElementById('recBadge').style.display='none';
-    document.getElementById('recGlow').classList.remove('on');
-    document.getElementById('recBookmark').classList.remove('on');
-    if(recSeconds>0&&clipCount<4){
-      var dur=document.getElementById('recTimer').textContent;
-      var cl=document.getElementById('clip'+clipCount);
-      cl.className='rec-c has';
-      cl.innerHTML=dur+(bookmarks.length>0?'<div class="rec-c-bm">⭐</div>':'');
-      clipCount++;
-      showToast('🎬 Clip '+clipCount+' saved · '+bookmarks.length+' bookmark'+(bookmarks.length!==1?'s':''));
-    }
-  }catch(e){console.warn('stopRec:',e)}
+function stopRec() {
+  if (!isRecording) return;
+  isRecording = false;
+  cancelAnimationFrame(recRAF);
+  var btn = document.getElementById('recMain');
+  var badge = document.getElementById('recBadge');
+  if (btn) btn.classList.remove('recording');
+  if (badge) badge.style.display = 'none';
 }
 
-function toggleRec(){if(isRecording)stopRec();else startRec()}
-
-function snapPhoto(){
-  try{
-    var el=document.querySelector('.rec-wrap');
-    if(el){el.style.filter='brightness(4)';setTimeout(function(){el.style.filter=''},100)}
-    showToast('📸 Photo captured!');
-  }catch(e){console.warn('snapPhoto:',e)}
+function snapPhoto() {
+  var el = document.querySelector('.rp-record');
+  if (el) { el.style.filter = 'brightness(3)'; setTimeout(function(){ el.style.filter=''; }, 120); }
+  showToast('📸 Captured!');
 }
 
-function addBookmark(){
-  try{
-    bookmarks.push(recSeconds);
-    showToast('⭐ Moment bookmarked at '+document.getElementById('recTimer').textContent);
-  }catch(e){console.warn('addBookmark:',e)}
+function handleUpload(e) {
+  try { var f = e.target.files[0]; if(f) showToast((f.type.startsWith('video')?'🎬':'📸')+' Imported'); } catch(e2){}
 }
 
-function finishEdit(){
-  try{
-    if(clipCount===0){showToast('Record a clip first');return;}
-    setPhase(3);
-    var panel=document.getElementById('recPanel');
-    var title=document.getElementById('recPanelTitle');
-    var body=document.getElementById('recPanelBody');
-    title.textContent='✨ Magic Edit';
-    var th=sportThemes[currentSport]||sportThemes.run;
-    body.innerHTML='<div style="display:flex;gap:6px;margin-bottom:10px">'+
-      '<button style="flex:1;padding:8px;border-radius:8px;background:rgba(204,255,0,.1);border:1px solid rgba(204,255,0,.2);color:#CCFF00;font-family:inherit;font-size:9px;font-weight:800;cursor:pointer" onclick="showToast(\'⚡ Auto-cut to beat — '+bookmarks.length+' moments synced\');closeRecPanel()">⚡ Auto-Sync to Beat</button>'+
-      '<button style="flex:1;padding:8px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#fff;font-family:inherit;font-size:9px;font-weight:700;cursor:pointer" onclick="showToast(\'📊 End card added\');closeRecPanel()">📊 Add End Card</button>'+
-    '</div>'+
-    '<div style="font-size:8px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:6px">End Card Preview</div>'+
-    '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;text-align:center">'+
-      '<div style="font-family:\'Bricolage Grotesque\',sans-serif;font-size:20px;font-weight:800;color:#CCFF00;margin-bottom:4px">Rally Summary</div>'+
-      '<div style="display:flex;justify-content:center;gap:16px;margin-top:8px">'+
-        '<div><div style="font-size:16px;font-weight:800;color:#fff">'+document.getElementById('recTimer').textContent+'</div><div style="font-size:7px;color:rgba(255,255,255,.35)">Duration</div></div>'+
-        '<div><div style="font-size:16px;font-weight:800;color:#fff">'+document.getElementById('rsBPM').textContent+'</div><div style="font-size:7px;color:rgba(255,255,255,.35)">BPM</div></div>'+
-        '<div><div style="font-size:16px;font-weight:800;color:#CCFF00">+85</div><div style="font-size:7px;color:rgba(255,255,255,.35)">XP</div></div>'+
-      '</div>'+
-      '<div style="margin-top:8px;display:flex;gap:4px;justify-content:center">'+
-        '<button style="padding:6px 16px;border-radius:8px;background:#CCFF00;border:none;color:#0a0a0a;font-family:inherit;font-size:10px;font-weight:800;cursor:pointer" onclick="showToast(\'🚀 Posted to Rally!\');closeRecPanel()">Post to Rally</button>'+
-        '<button style="padding:6px 12px;border-radius:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#fff;font-family:inherit;font-size:10px;font-weight:700;cursor:pointer" onclick="showToast(\'💾 Saved to gallery\');closeRecPanel()">Save</button>'+
-      '</div>'+
-    '</div>';
-    panel.style.display='block';
-  }catch(e){console.warn('finishEdit:',e)}
-}
-
-async function switchCamera(){
-  try{
-    facingMode=facingMode==='environment'?'user':'environment';
-    await initCamera();showToast('🔄 Flipped');
-  }catch(e){console.warn('switchCamera:',e)}
-}
-function toggleFlash(){
-  try{
-    flashOn=!flashOn;document.getElementById('flashBtn').textContent=flashOn?'🔦':'⚡';
-    if(cameraStream){var t=cameraStream.getVideoTracks()[0];if(t.getCapabilities&&t.getCapabilities().torch)t.applyConstraints({advanced:[{torch:flashOn}]})}
-    showToast(flashOn?'⚡ Flash on':'🔦 Flash off');
-  }catch(e){console.warn('toggleFlash:',e)}
-}
-function cycleSpeed(){
-  try{
-    var sp=[0.5,1,2,3],i=sp.indexOf(recSpeed);recSpeed=sp[(i+1)%sp.length];
-    document.getElementById('speedIco').textContent=recSpeed+'x';
-    showToast(recSpeed===0.5?'🐌 Slow-mo':recSpeed===1?'▶ Normal':recSpeed===2?'⏩ 2x':'🚀 3x');
-  }catch(e){console.warn('cycleSpeed:',e)}
-}
-function handleUpload(e){try{var f=e.target.files[0];if(f)showToast((f.type.startsWith('video')?'🎬':'📸')+' Imported')}catch(e2){}}
-
-// Lazy-loaded album art — only fetched when Music panel opens
-function selectTrack(i){
-  try{
-    activeTrack=i;
-    var al=document.getElementById('recAlbum'),art=document.getElementById('albumArt');
-    art.style.background=trackList[i].bg;
-    art.textContent=trackList[i].title.charAt(0);
-    if(isRecording)al.classList.add('on');
-    openRecPanel('music');
-    showToast('🎵 '+trackList[i].title);
-  }catch(e){console.warn('selectTrack:',e)}
-}
-
-function openRecPanel(type){
-  try{
-    var panel=document.getElementById('recPanel'),title=document.getElementById('recPanelTitle'),body=document.getElementById('recPanelBody');
-    var titles={music:'🎵 Audio Library',filter:'🎨 Filters',effects:'✨ Effects',sticker:'🏷️ Data Stickers',trim:'✂️ Trim',stats:'📊 Stats Layer'};
-    title.textContent=titles[type]||type;
-    if(type==='music'){
-      // Lazy-load track list only when opened
-      body.innerHTML='<div style="display:flex;gap:6px;margin-bottom:8px"><input style="flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:6px 10px;color:#fff;font-family:inherit;font-size:10px;outline:none" placeholder="Search tracks..."><button style="background:#CCFF00;color:#0a0a0a;border:none;border-radius:8px;padding:6px 10px;font-family:inherit;font-size:9px;font-weight:800;cursor:pointer" onclick="showToast(\'⚡ Magic Sync active\')">⚡Sync</button></div>'+
-        '<div style="display:flex;flex-direction:column;gap:3px">'+trackList.map(function(s,i){
-          var sel=activeTrack===i;
-          return '<div style="display:flex;align-items:center;gap:8px;padding:6px;border-radius:8px;background:rgba(255,255,255,.02);cursor:pointer;border:1.5px solid '+(sel?'#CCFF00':'transparent')+'" onclick="selectTrack('+i+')">'+
-            '<div style="width:40px;height:40px;border-radius:6px;background:'+s.bg+';display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;font-weight:800;color:#fff">'+s.title.charAt(0)+'</div>'+
-            '<div style="flex:1;min-width:0"><div style="font-size:11px;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+s.title+'</div><div style="font-size:8px;color:rgba(255,255,255,.3)">'+s.artist+'</div></div>'+
-            '<div style="font-size:8px;color:rgba(255,255,255,.2)">'+s.dur+(sel?'<div style="color:#CCFF00;font-weight:800;margin-top:1px">♫</div>':'')+'</div></div>';
-        }).join('')+'</div>';
-    }else if(type==='sticker'){
-      var stk=['Max Effort 🔥','PR Pace ⚡','145 BPM ❤️','5.2 mi 📍','+320ft ⛰️','Zone 4 🟠','Speed 💨','Cal 🔋'];
-      body.innerHTML='<div style="display:flex;flex-wrap:wrap;gap:5px">'+stk.map(function(s){
-        return '<button style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:4px 10px;color:#CCFF00;font-size:9px;font-weight:700;cursor:pointer;font-family:inherit" onclick="showToast(\'🏷️ '+s.split(' ')[0]+'\');closeRecPanel()">'+s+'</button>';
-      }).join('')+'</div>';
-    }else if(type==='effects'){
-      var fx=[{n:'Normal',i:'⊘'},{n:'Neon',i:'💚'},{n:'Film',i:'🎞️'},{n:'Vignette',i:'◉'},{n:'Contrast',i:'◼️'},{n:'Warm',i:'🌅'},{n:'Cool',i:'❄️'},{n:'Ghost',i:'👻'}];
-      body.innerHTML='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">'+fx.map(function(e){
-        return '<button style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 2px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);cursor:pointer;color:#fff;font-family:inherit" onclick="showToast(\''+e.n+' ✨\');closeRecPanel()"><div style="font-size:16px">'+e.i+'</div><div style="font-size:7px;color:rgba(255,255,255,.3)">'+e.n+'</div></button>';
-      }).join('')+'</div>';
-    }else if(type==='filter'){
-      var fl=[{n:'None',c:'transparent'},{n:'Warm',c:'rgba(255,160,60,.1)'},{n:'Cool',c:'rgba(60,130,255,.1)'},{n:'Vintage',c:'rgba(180,140,80,.12)'},{n:'B&W',c:'rgba(0,0,0,.25)'},{n:'Vivid',c:'rgba(255,50,100,.07)'}];
-      body.innerHTML='<div style="display:flex;gap:6px;overflow-x:auto">'+fl.map(function(f){
-        return '<button style="min-width:52px;padding:6px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);cursor:pointer;color:#fff;font-family:inherit;text-align:center" onclick="document.getElementById(\'vfFilterOverlay\').style.background=\''+f.c+'\';showToast(\''+f.n+'\');closeRecPanel()"><div style="width:40px;height:40px;border-radius:6px;background:'+f.c+';margin:0 auto 3px;border:1px solid rgba(255,255,255,.08)"></div><div style="font-size:7px;color:rgba(255,255,255,.3)">'+f.n+'</div></button>';
-      }).join('')+'</div>';
-    }else if(type==='stats'){
-      var st=['Distance','Pace','Heart Rate','Elevation','Calories','Speed'];
-      body.innerHTML='<div style="display:flex;flex-direction:column;gap:3px">'+st.map(function(s){
-        return '<div style="display:flex;align-items:center;justify-content:space-between;padding:6px;border-radius:6px;background:rgba(255,255,255,.02)"><span style="font-size:10px;color:#fff;font-weight:600">'+s+'</span><div style="width:32px;height:18px;border-radius:9px;background:#CCFF00;position:relative;cursor:pointer" onclick="var d=this.dataset;d.on=d.on===\'1\'?\'0\':\'1\';this.style.background=d.on===\'1\'?\'#CCFF00\':\'rgba(255,255,255,.1)\';this.children[0].style.left=d.on===\'1\'?\'16px\':\'2px\'" data-on="1"><div style="width:14px;height:14px;border-radius:50%;background:#0a0a0a;position:absolute;top:2px;left:16px;transition:.12s"></div></div></div>';
-      }).join('')+'</div>';
-    }else if(type==='trim'){
-      body.innerHTML='<div style="text-align:center;padding:8px;color:rgba(255,255,255,.3);font-size:10px;margin-bottom:8px">Drag handles to trim your clip</div>'+
-        '<div style="width:100%;height:44px;background:rgba(255,255,255,.03);border-radius:8px;position:relative;overflow:hidden">'+
-          '<div style="position:absolute;top:0;bottom:0;left:10%;right:10%;background:rgba(204,255,0,.1);border-left:3px solid #CCFF00;border-right:3px solid #CCFF00"></div>'+
-          '<div style="position:absolute;top:50%;left:10%;transform:translate(-50%,-50%);width:14px;height:28px;background:#CCFF00;border-radius:4px;cursor:ew-resize;display:flex;align-items:center;justify-content:center"><div style="width:2px;height:12px;background:#0a0a0a;border-radius:2px"></div></div>'+
-          '<div style="position:absolute;top:50%;right:10%;transform:translate(50%,-50%);width:14px;height:28px;background:#CCFF00;border-radius:4px;cursor:ew-resize;display:flex;align-items:center;justify-content:center"><div style="width:2px;height:12px;background:#0a0a0a;border-radius:2px"></div></div>'+
-        '</div>';
-    }else{body.innerHTML='<div style="text-align:center;padding:14px;color:rgba(255,255,255,.2);font-size:10px">Coming soon ✨</div>';}
-    panel.style.display='block';
-  }catch(e){console.warn('openRecPanel:',e)}
-}
-function closeRecPanel(){try{document.getElementById('recPanel').style.display='none'}catch(e){}}
-var countdownActive = false;
-function toggleTimer(){
+function openRecPanel(type) {
   try {
-    if (countdownActive) return;
-    if (isRecording) { stopRec(); return; }
-    countdownActive = true;
-    var btn = document.getElementById('timerBtn');
-    var counts = [3,2,1];
-    var i = 0;
-    if (btn) btn.style.color = '#CCFF00';
-    showToast('⏱ Starting in 3...');
-    var iv = setInterval(function(){
-      i++;
-      if (i < counts.length) {
-        showToast('⏱ ' + counts[i] + '...');
-      } else {
-        clearInterval(iv);
-        countdownActive = false;
-        if (btn) btn.style.color = '';
-        startRec();
-      }
-    }, 1000);
-  } catch(e) { console.warn('toggleTimer:', e); }
+    var panel = document.getElementById('recPanel');
+    var title = document.getElementById('recPanelTitle');
+    var body  = document.getElementById('recPanelBody');
+    var titles = {music:'🎵 Music',filter:'🎨 Style',stats:'📊 Stats',trim:'✂️ Trim'};
+    title.textContent = titles[type] || type;
+
+    var trackList = [
+      {title:'Blinding Lights',artist:'The Weeknd',dur:'3:22',bg:'linear-gradient(135deg,#e03131,#c92a2a)'},
+      {title:'HUMBLE.',artist:'Kendrick Lamar',dur:'2:57',bg:'linear-gradient(135deg,#d9480f,#e8590c)'},
+      {title:'Unstoppable',artist:'Sia',dur:'3:37',bg:'linear-gradient(135deg,#5f3dc4,#7048e8)'},
+      {title:'Lose Yourself',artist:'Eminem',dur:'5:26',bg:'linear-gradient(135deg,#495057,#868e96)'},
+      {title:'Levitating',artist:'Dua Lipa',dur:'3:23',bg:'linear-gradient(135deg,#0b7285,#15aabf)'},
+      {title:'Industry Baby',artist:'Lil Nas X',dur:'3:32',bg:'linear-gradient(135deg,#d6336c,#f06595)'},
+      {title:'Kiss Me More',artist:'Doja Cat ft. SZA',dur:'3:28',bg:'linear-gradient(135deg,#c2255c,#e64980)'},
+      {title:'Redbone',artist:'Childish Gambino',dur:'5:26',bg:'linear-gradient(135deg,#1864ab,#1c7ed6)'},
+    ];
+
+    if (type === 'music') {
+      body.innerHTML = '<div style="display:flex;flex-direction:column;gap:6px">' +
+        trackList.map(function(s,i) {
+          return '<div style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:10px;background:rgba(255,255,255,.04);cursor:pointer" onclick="selectTrack(' + i + ')">' +
+            '<div style="width:38px;height:38px;border-radius:8px;background:' + s.bg + ';flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff">' + s.title[0] + '</div>' +
+            '<div style="flex:1"><div style="font-size:12px;font-weight:700;color:#fff">' + s.title + '</div><div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:1px">' + s.artist + '</div></div>' +
+            '<div style="font-size:10px;color:rgba(255,255,255,.2)">' + s.dur + '</div>' +
+          '</div>';
+        }).join('') + '</div>';
+    } else if (type === 'filter') {
+      var styles = [{n:'None',c:'transparent'},{n:'Warm',c:'rgba(255,160,60,.1)'},{n:'Cool',c:'rgba(60,130,255,.1)'},{n:'Fade',c:'rgba(200,200,200,.08)'},{n:'Vivid',c:'rgba(255,50,100,.06)'},{n:'B&W',c:'rgba(0,0,0,.2)'}];
+      body.innerHTML = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">' +
+        styles.map(function(f) {
+          return '<button style="padding:10px 4px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);cursor:pointer;font-family:inherit" onclick="document.getElementById(\'vfFilterOverlay\').style.background=\'' + f.c + '\';showToast(\'' + f.n + '\');closeRecPanel()">' +
+            '<div style="width:40px;height:28px;border-radius:6px;background:' + f.c + ';margin:0 auto 5px;border:1px solid rgba(255,255,255,.08)"></div>' +
+            '<div style="font-size:9px;color:rgba(255,255,255,.4);font-weight:700">' + f.n + '</div></button>';
+        }).join('') + '</div>';
+    } else if (type === 'stats') {
+      var t = sportThemes[currentSport];
+      body.innerHTML = '<div style="display:flex;flex-direction:column;gap:6px">' +
+        t.stats.map(function(s) {
+          return '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.04)">' +
+            '<span style="font-size:12px;color:#fff;font-weight:600">' + s + '</span>' +
+            '<div style="width:34px;height:20px;border-radius:10px;background:' + t.color + ';position:relative;cursor:pointer" onclick="showToast(\'Toggled\')"><div style="width:16px;height:16px;border-radius:50%;background:#0a0a0a;position:absolute;top:2px;right:2px"></div></div>' +
+          '</div>';
+        }).join('') + '</div>';
+    } else if (type === 'trim') {
+      body.innerHTML = '<div style="text-align:center;padding:12px;color:rgba(255,255,255,.3);font-size:11px;margin-bottom:10px">Drag handles to trim your clip</div>' +
+        '<div style="width:100%;height:44px;background:rgba(255,255,255,.04);border-radius:8px;position:relative;overflow:hidden">' +
+        '<div style="position:absolute;top:0;bottom:0;left:10%;right:15%;background:rgba(var(--sport-rgb,34,197,94),.1);border-left:3px solid var(--sport-color,#22c55e);border-right:3px solid var(--sport-color,#22c55e)"></div></div>';
+    }
+    panel.style.display = 'block';
+  } catch(e) { console.warn('openRecPanel:', e); }
 }
+
+function selectTrack(i) {
+  var tracks = ['Blinding Lights','HUMBLE.','Unstoppable','Lose Yourself','Levitating','Industry Baby','Kiss Me More','Redbone'];
+  var smLabel = document.getElementById('smLabel');
+  var smSub = document.getElementById('smSub');
+  if (smLabel) smLabel.textContent = tracks[i] || 'Track selected';
+  if (smSub) smSub.textContent = 'Now playing';
+  showToast('🎵 ' + (tracks[i] || 'Track selected'));
+  closeRecPanel();
+}
+
+function closeRecPanel() {
+  try { document.getElementById('recPanel').style.display = 'none'; } catch(e) {}
+}
+
+// Draggable stat cards in Record phase
+function _initRecord() {
+  document.querySelectorAll('.rr-stat-card.draggable').forEach(function(card) {
+    var ox = 0, oy = 0, dragging = false;
+    function startDrag(cx, cy) {
+      dragging = true;
+      var r = card.getBoundingClientRect();
+      var pr = card.parentElement.getBoundingClientRect();
+      ox = cx - r.left; oy = cy - r.top;
+      card.style.cursor = 'grabbing';
+    }
+    function moveDrag(cx, cy) {
+      if (!dragging) return;
+      var pr = card.parentElement.getBoundingClientRect();
+      var x = Math.max(0, Math.min(cx - pr.left - ox, pr.width - card.offsetWidth));
+      var y = Math.max(0, Math.min(cy - pr.top - oy, pr.height - card.offsetHeight));
+      card.style.left = x + 'px'; card.style.top = y + 'px';
+      card.style.right = 'auto'; card.style.bottom = 'auto';
+    }
+    function endDrag() { dragging = false; card.style.cursor = 'grab'; }
+    card.addEventListener('touchstart', function(e){ e.preventDefault(); startDrag(e.touches[0].clientX, e.touches[0].clientY); }, {passive:false});
+    card.addEventListener('touchmove', function(e){ e.preventDefault(); moveDrag(e.touches[0].clientX, e.touches[0].clientY); }, {passive:false});
+    card.addEventListener('touchend', endDrag);
+    card.addEventListener('mousedown', function(e){ e.preventDefault(); startDrag(e.clientX, e.clientY); });
+    window.addEventListener('mousemove', function(e){ moveDrag(e.clientX, e.clientY); });
+    window.addEventListener('mouseup', endDrag);
+  });
+
+  // Init sport selection colors on load
+  var activeBtn = document.querySelector('.sg-item.active');
+  if (activeBtn) selectSport(activeBtn);
+}
+
 
 // === ACTIVITY TAB FUNCTIONAL BUTTONS ===
 function openActivityModal(type) {
