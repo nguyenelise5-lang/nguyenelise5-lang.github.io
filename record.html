@@ -1,628 +1,337 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Rally · Record (Pro Kit)</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- Rally Record tab — Pro Kit direction.
+     This is a PARTIAL, loaded by index.html via fetch() + innerHTML.
+     Do NOT include <html>, <body>, or phone-frame wrappers here.
+     All CSS scoped to .rr2- prefix to avoid clashing with styles.css.
+     All JS lives in record-init.js (loaded from index.html after app.js). -->
+
 <style>
-:root{
-  --bg:#0a0a0a;
-  --ink:#0a0a0a;
-  --paper:#fafaf7;
-  --line:rgba(10,10,10,.08);
-  --line-dark:rgba(255,255,255,.08);
-  --muted:#6b6b6b;
-  --muted-dark:#8a8a8a;
-  --sport:#ff4500;
-  --sport-rgb:255,69,0;
-  --editor-bg:#0e0e10;
-  --editor-panel:#18181b;
-  --editor-line:#27272a;
-  --editor-ink:#fafafa;
-  --editor-muted:#71717a;
-}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0;font-family:'Inter Tight',system-ui,sans-serif;background:#0f0f10;color:#e5e5e5;min-height:100vh;font-feature-settings:'ss01','cv11'}
-.stage{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px 20px;background:
-  radial-gradient(1200px 600px at 20% 10%,rgba(255,69,0,.06),transparent 50%),
-  radial-gradient(800px 500px at 80% 90%,rgba(0,120,255,.04),transparent 50%),
-  #0f0f10}
-.header{position:fixed;top:16px;left:20px;right:20px;display:flex;justify-content:space-between;align-items:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:#666;letter-spacing:.08em;text-transform:uppercase;z-index:999;pointer-events:none}
-.header span{opacity:.6}
-.header b{color:#e5e5e5;font-weight:500}
+@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
-/* ============ PHONE FRAME ============ */
-.phone{
-  position:relative;width:390px;height:844px;border-radius:56px;overflow:hidden;
-  background:#000;
-  box-shadow:
-    0 0 0 12px #1a1a1c,
-    0 0 0 13px #2a2a2d,
-    0 40px 80px -20px rgba(0,0,0,.7),
-    0 20px 40px -10px rgba(0,0,0,.5);
-}
-.notch{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:118px;height:34px;background:#000;border-radius:20px;z-index:1000}
-.screen{position:absolute;inset:0;overflow:hidden}
-
-/* ============ TOP STATUS + TAB BAR ============ */
-.status{position:absolute;top:14px;left:0;right:0;display:flex;justify-content:space-between;padding:0 34px 0 36px;font-family:'Inter Tight',sans-serif;font-size:13px;font-weight:700;color:#fff;z-index:20;pointer-events:none}
-.status.dark{color:#0a0a0a}
-
-/* ============ PHASE CONTAINER ============ */
-.phase{position:absolute;inset:0;display:none;flex-direction:column}
-.phase.active{display:flex}
-
-/* ============ PHASE 1: SETUP (minimal) ============ */
-.setup{background:var(--paper);color:var(--ink);padding:60px 24px 24px}
-.setup-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:48px}
-.setup-close{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:transparent;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--ink)}
-.setup-lbl{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
-.setup-title{font-size:44px;line-height:.95;font-weight:800;letter-spacing:-.03em;margin:0 0 4px}
-.setup-sub{font-size:15px;color:var(--muted);margin:0 0 36px;font-weight:500}
-
-.sport-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:24px}
-.sport-pill{
-  background:#fff;border:1px solid var(--line);border-radius:14px;
-  padding:18px 16px;text-align:left;cursor:pointer;transition:all .15s;
-  display:flex;flex-direction:column;gap:6px;
-}
-.sport-pill:hover{border-color:var(--ink)}
-.sport-pill.sel{border-color:var(--ink);background:var(--ink);color:#fff}
-.sport-pill.sel .sport-sub{color:rgba(255,255,255,.55)}
-.sport-name{font-size:17px;font-weight:700;letter-spacing:-.01em}
-.sport-sub{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
-
-.setup-bottom{margin-top:auto;padding-top:24px}
-.setup-goal{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-top:1px solid var(--line)}
-.setup-goal-lbl{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
-.setup-goal-val{font-size:15px;font-weight:600}
-.setup-cta{
-  width:100%;padding:22px;border:none;border-radius:16px;
-  background:var(--ink);color:#fff;
-  font-family:'Inter Tight',sans-serif;font-size:17px;font-weight:800;letter-spacing:-.01em;
-  display:flex;align-items:center;justify-content:space-between;
-  cursor:pointer;margin-top:12px;
-  transition:transform .15s;
-}
-.setup-cta:active{transform:scale(.98)}
-.setup-cta .arrow{width:32px;height:32px;border-radius:50%;background:var(--sport);display:flex;align-items:center;justify-content:center;font-size:16px}
-
-/* ============ PHASE 2: CAPTURE (pure athletic) ============ */
-.cap{background:var(--paper);color:var(--ink);position:relative}
-.cap-view{
-  position:absolute;inset:0;
-  background:
-    linear-gradient(180deg,#f0efe9 0%,#e8e6dd 100%);
-}
-/* Fake camera feed texture */
-.cap-view::before{
-  content:'';position:absolute;inset:0;
-  background:
-    radial-gradient(ellipse 80% 60% at 50% 40%,rgba(255,255,255,.6),transparent 70%),
-    radial-gradient(ellipse 60% 40% at 30% 80%,rgba(var(--sport-rgb),.08),transparent 70%);
-}
-.cap-view::after{
-  content:'';position:absolute;inset:0;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .18 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  mix-blend-mode:multiply;opacity:.5;
-}
-
-.cap-top{position:absolute;top:56px;left:24px;right:24px;display:flex;justify-content:space-between;align-items:flex-start;z-index:10}
-.cap-rec{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
-.cap-rec .dot{width:8px;height:8px;border-radius:50%;background:var(--sport);box-shadow:0 0 0 4px rgba(var(--sport-rgb),.2);animation:pulse 1.4s ease-in-out infinite}
-@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(.85);opacity:.7}}
-.cap-meta{text-align:right;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;line-height:1.5}
-
-/* HERO numbers — this is the Nike/Strava moment */
-.cap-hero{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:0 24px;z-index:5}
-.cap-hero-lbl{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.18em;color:var(--muted);margin-bottom:8px}
-.cap-hero-num{
-  font-size:148px;line-height:.85;font-weight:900;letter-spacing:-.05em;
-  font-variant-numeric:tabular-nums;color:var(--ink);
-  display:flex;align-items:flex-start;
-}
-.cap-hero-num sup{font-size:38px;font-weight:700;margin-top:10px;margin-left:4px;letter-spacing:-.02em}
-.cap-hero-unit{font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:var(--ink);margin-top:10px;font-weight:700}
-
-/* Supporting stats — minimal, 2 more */
-.cap-sub{position:absolute;bottom:188px;left:24px;right:24px;display:grid;grid-template-columns:1fr 1fr;gap:0;z-index:5}
-.cap-sub-item{border-top:2px solid var(--ink);padding-top:10px}
-.cap-sub-item:last-child{text-align:right}
-.cap-sub-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:var(--muted);margin-bottom:4px;display:block}
-.cap-sub-val{font-size:32px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
-.cap-sub-val small{font-size:14px;font-weight:700;color:var(--muted);margin-left:2px}
-
-/* Bottom capture controls */
-.cap-ctrl{position:absolute;bottom:40px;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:40px;z-index:10}
-.cap-btn-sm{width:52px;height:52px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.6);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;color:var(--ink);cursor:pointer;font-size:18px}
-.cap-rec-btn{
-  width:84px;height:84px;border-radius:50%;border:none;
-  background:var(--ink);color:#fff;cursor:pointer;
-  font-family:'Inter Tight',sans-serif;font-size:13px;font-weight:800;
-  letter-spacing:.04em;text-transform:uppercase;
-  box-shadow:0 0 0 4px rgba(10,10,10,.1),0 12px 32px rgba(0,0,0,.2);
-  display:flex;align-items:center;justify-content:center;
+.rr2-root{
+  --rr2-ink:#0a0a0a;
+  --rr2-paper:#fafaf7;
+  --rr2-line:rgba(10,10,10,.08);
+  --rr2-muted:#6b6b6b;
+  --rr2-sport:#ff4500;
+  --rr2-sport-rgb:255,69,0;
+  --rr2-ed-bg:#0e0e10;
+  --rr2-ed-panel:#18181b;
+  --rr2-ed-line:#27272a;
+  --rr2-ed-ink:#fafafa;
+  --rr2-ed-muted:#71717a;
+  /* Fills whatever parent #s-record gives us, without assuming it's positioned. */
   position:relative;
-  transition:transform .15s;
+  flex:1 1 auto;
+  width:100%;
+  min-height:0;
+  height:100%;
+  font-family:'Inter Tight',system-ui,sans-serif;
+  font-feature-settings:'ss01','cv11';
+  overflow:hidden;
+  color:var(--rr2-ink);
 }
-.cap-rec-btn:active{transform:scale(.95)}
-.cap-rec-btn::before{content:'';position:absolute;inset:-8px;border-radius:50%;border:1.5px solid var(--ink);opacity:.3}
+.rr2-root *{box-sizing:border-box}
 
-/* Hairline grid (broadcast style) */
-.cap-grid{position:absolute;inset:0;pointer-events:none;z-index:2}
-.cap-grid::before,.cap-grid::after{content:'';position:absolute;background:var(--line)}
-.cap-grid::before{top:33.3%;left:24px;right:24px;height:1px}
-.cap-grid::after{top:66.6%;left:24px;right:24px;height:1px}
+/* Phase containers */
+.rr2-phase{position:absolute;inset:0;display:none;flex-direction:column;overflow:hidden}
+.rr2-phase.active{display:flex}
 
-/* ============ TRANSITION OVERLAY ============ */
-.transition{position:absolute;inset:0;background:var(--editor-bg);z-index:50;display:none;pointer-events:none}
-.transition.active{display:block;animation:transitionIn 1s cubic-bezier(.85,0,.15,1) forwards}
-@keyframes transitionIn{
-  0%{clip-path:circle(0% at 50% 90%);opacity:1}
-  100%{clip-path:circle(150% at 50% 90%);opacity:1}
-}
-.transition-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:0;text-align:center;line-height:1.8}
-.transition.active .transition-text{animation:tFade 1s ease .2s forwards}
-@keyframes tFade{0%{opacity:0;transform:translate(-50%,-40%)}50%{opacity:1}100%{opacity:0;transform:translate(-50%,-60%)}}
+/* ========== PHASE 1 · SETUP ========== */
+.rr2-setup{position:absolute;inset:0;background:var(--rr2-paper);padding:20px 22px 18px;display:flex;flex-direction:column;overflow-y:auto}
+.rr2-setup::-webkit-scrollbar{display:none}
+.rr2-setup-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
+.rr2-close{width:34px;height:34px;border-radius:50%;border:1px solid var(--rr2-line);background:transparent;font-size:17px;color:var(--rr2-ink);cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit}
+.rr2-lbl{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--rr2-muted)}
+.rr2-title{font-size:36px;line-height:.95;font-weight:800;letter-spacing:-.03em;margin:0 0 4px;color:var(--rr2-ink)}
+.rr2-sub{font-size:14px;color:var(--rr2-muted);margin:0 0 22px;font-weight:500}
 
-/* ============ PHASE 3: EDIT (CapCut-dense) ============ */
-.edit{background:var(--editor-bg);color:var(--editor-ink)}
-.edit-top{position:absolute;top:56px;left:16px;right:16px;display:flex;align-items:center;justify-content:space-between;z-index:10}
-.edit-top-btn{width:34px;height:34px;border-radius:10px;background:var(--editor-panel);border:1px solid var(--editor-line);color:var(--editor-ink);display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer}
-.edit-title{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--editor-muted);text-align:center}
-.edit-title b{display:block;color:#fff;font-size:11px;margin-top:2px}
-.edit-top-cta{padding:8px 14px;border-radius:10px;background:var(--sport);color:#fff;border:none;font-family:'Inter Tight',sans-serif;font-size:12px;font-weight:800;letter-spacing:.02em;cursor:pointer;text-transform:uppercase}
+.rr2-sport-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:18px}
+.rr2-pill{background:#fff;border:1px solid var(--rr2-line);border-radius:13px;padding:14px 14px;text-align:left;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;gap:5px;font-family:inherit;color:var(--rr2-ink)}
+.rr2-pill:hover{border-color:var(--rr2-ink)}
+.rr2-pill.sel{border-color:var(--rr2-ink);background:var(--rr2-ink);color:#fff}
+.rr2-pill.sel .rr2-pill-sub{color:rgba(255,255,255,.55)}
+.rr2-pill-name{font-size:16px;font-weight:700;letter-spacing:-.01em}
+.rr2-pill-sub{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--rr2-muted);text-transform:uppercase;letter-spacing:.1em}
 
-/* Video preview canvas */
-.edit-canvas{position:absolute;top:104px;left:16px;right:72px;height:320px;border-radius:14px;overflow:hidden;background:#1a1a1d;border:1px solid var(--editor-line)}
-.edit-canvas-bg{position:absolute;inset:0;background:linear-gradient(135deg,#2a2a2e 0%,#1a1a1d 100%)}
-.edit-canvas-bg::before{
-  content:'';position:absolute;inset:0;
-  background:
-    radial-gradient(ellipse 60% 40% at 40% 50%,rgba(var(--sport-rgb),.2),transparent 70%),
-    radial-gradient(ellipse 40% 60% at 70% 30%,rgba(255,255,255,.05),transparent 70%);
-}
-.edit-canvas-bg::after{
-  content:'';position:absolute;inset:0;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .25 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  mix-blend-mode:overlay;opacity:.4;
-}
-/* Stat stickers on canvas */
-.sticker{position:absolute;background:#fff;color:#0a0a0a;border-radius:10px;padding:8px 12px;font-family:'Inter Tight',sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.4);cursor:grab;z-index:3;border:2px solid transparent;transition:border-color .15s}
-.sticker:hover{border-color:var(--sport)}
-.sticker-lbl{font-family:'JetBrains Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:.1em;color:#999;display:block;line-height:1}
-.sticker-val{font-size:22px;font-weight:900;letter-spacing:-.02em;line-height:1;display:block;margin-top:2px;font-variant-numeric:tabular-nums}
-.sticker-val small{font-size:11px;font-weight:700;color:#999}
-.sticker.pace{top:16px;left:16px}
-.sticker.time{top:16px;right:16px;text-align:right}
-.sticker.hr{bottom:72px;left:16px;background:var(--sport);color:#fff}
-.sticker.hr .sticker-lbl{color:rgba(255,255,255,.7)}
-.sticker.hr .sticker-val small{color:rgba(255,255,255,.7)}
-.sticker.pr{bottom:72px;right:16px;background:#0a0a0a;color:#fff;border:1px solid var(--sport)}
-.sticker.pr .sticker-lbl{color:var(--sport)}
+.rr2-setup-bot{margin-top:auto;padding-top:14px}
+.rr2-goal{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-top:1px solid var(--rr2-line)}
+.rr2-goal-lbl{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--rr2-muted)}
+.rr2-goal-val{font-size:14px;font-weight:600;color:var(--rr2-ink);outline:none;border-bottom:1px dashed rgba(0,0,0,.22);padding:1px 3px;cursor:text;transition:border-color .15s,background .15s}
+.rr2-goal-val:hover{border-bottom-color:var(--rr2-sport)}
+.rr2-goal-val:focus{border-bottom-color:var(--rr2-sport);background:rgba(var(--rr2-sport-rgb),.08)}
+.rr2-cta{width:100%;padding:18px 20px;border:none;border-radius:15px;background:var(--rr2-ink);color:#fff;font-family:'Inter Tight',sans-serif;font-size:16px;font-weight:800;letter-spacing:-.01em;display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-top:10px;transition:transform .15s}
+.rr2-cta:active{transform:scale(.98)}
+.rr2-cta-arr{width:30px;height:30px;border-radius:50%;background:var(--rr2-sport);display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff}
 
-/* Play/scrub overlay */
-.edit-play{position:absolute;bottom:12px;left:12px;right:12px;display:flex;align-items:center;gap:10px;z-index:4}
-.edit-play-btn{width:36px;height:36px;border-radius:50%;background:#fff;color:#0a0a0a;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;flex-shrink:0}
-.edit-scrub{flex:1;height:3px;background:rgba(255,255,255,.2);border-radius:2px;position:relative}
-.edit-scrub::before{content:'';position:absolute;left:0;top:0;bottom:0;width:38%;background:#fff;border-radius:2px}
-.edit-scrub::after{content:'';position:absolute;left:38%;top:50%;transform:translate(-50%,-50%);width:12px;height:12px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.2)}
-.edit-time{font-family:'JetBrains Mono',monospace;font-size:10px;color:#fff;font-weight:700;flex-shrink:0}
+/* ========== PHASE 2 · CAPTURE ========== */
+.rr2-cap{position:absolute;inset:0;background:var(--rr2-paper);color:var(--rr2-ink);overflow:hidden}
+.rr2-cap-view{position:absolute;inset:0;background:linear-gradient(180deg,#f0efe9 0%,#e8e6dd 100%)}
+.rr2-cap-view::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(255,255,255,.6),transparent 70%),radial-gradient(ellipse 60% 40% at 30% 80%,rgba(var(--rr2-sport-rgb),.08),transparent 70%)}
+.rr2-cap-view::after{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .18 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");mix-blend-mode:multiply;opacity:.5}
 
-/* Tool rail (right side) */
-.edit-rail{position:absolute;top:104px;right:16px;width:48px;display:flex;flex-direction:column;gap:6px;z-index:10}
-.rail-btn{
-  width:48px;height:56px;border-radius:12px;
-  background:var(--editor-panel);border:1px solid var(--editor-line);
-  color:var(--editor-ink);cursor:pointer;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
-  font-family:'JetBrains Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:.06em;
-  transition:all .15s;
-}
-.rail-btn:hover,.rail-btn.active{border-color:var(--sport);background:rgba(var(--sport-rgb),.1);color:#fff}
-.rail-btn svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.8;fill:none}
+.rr2-cap-grid{position:absolute;inset:0;pointer-events:none;z-index:2}
+.rr2-cap-grid::before,.rr2-cap-grid::after{content:'';position:absolute;background:var(--rr2-line);left:22px;right:22px;height:1px}
+.rr2-cap-grid::before{top:33.3%}
+.rr2-cap-grid::after{top:66.6%}
 
-/* Effect chips strip (between canvas & timeline) */
-.edit-chips{position:absolute;top:436px;left:16px;right:16px;display:flex;gap:6px;overflow-x:auto;padding:2px 0;z-index:5}
-.edit-chips::-webkit-scrollbar{display:none}
-.chip{flex-shrink:0;padding:8px 14px;border-radius:20px;background:var(--editor-panel);border:1px solid var(--editor-line);color:var(--editor-muted);font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;white-space:nowrap;font-weight:600}
-.chip.active{background:var(--sport);border-color:var(--sport);color:#fff}
-.chip-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;margin-right:6px;vertical-align:middle;opacity:.6}
+.rr2-cap-top{position:absolute;top:18px;left:22px;right:22px;display:flex;justify-content:space-between;align-items:flex-start;z-index:10}
+.rr2-rec{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--rr2-ink)}
+.rr2-rec .rr2-dot{width:8px;height:8px;border-radius:50%;background:var(--rr2-sport);box-shadow:0 0 0 4px rgba(var(--rr2-sport-rgb),.2);animation:rr2pulse 1.4s ease-in-out infinite}
+@keyframes rr2pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(.85);opacity:.7}}
+.rr2-cap-meta{text-align:right;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--rr2-muted);letter-spacing:.08em;text-transform:uppercase;line-height:1.5}
 
-/* Timeline */
-.edit-tl{position:absolute;bottom:24px;left:16px;right:16px;height:180px;background:var(--editor-panel);border:1px solid var(--editor-line);border-radius:14px;padding:10px 12px;z-index:5;display:flex;flex-direction:column;gap:6px}
-.tl-head{display:flex;justify-content:space-between;align-items:center;padding-bottom:4px;border-bottom:1px solid var(--editor-line)}
-.tl-head-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--editor-muted)}
-.tl-head-tools{display:flex;gap:4px}
-.tl-tool{width:22px;height:22px;border-radius:5px;background:transparent;border:1px solid var(--editor-line);color:var(--editor-muted);font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.tl-tool.active{background:var(--sport);color:#fff;border-color:var(--sport)}
+.rr2-hero{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:0 22px;z-index:5}
+.rr2-hero-lbl{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.18em;color:var(--rr2-muted);margin-bottom:8px}
+.rr2-hero-num{font-size:clamp(96px,30vw,140px);line-height:.85;font-weight:900;letter-spacing:-.05em;font-variant-numeric:tabular-nums;color:var(--rr2-ink);display:flex;align-items:flex-start}
+.rr2-hero-unit{font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:var(--rr2-ink);margin-top:10px;font-weight:700}
 
-.tl-playhead{position:absolute;top:32px;bottom:8px;left:42%;width:2px;background:var(--sport);z-index:3;pointer-events:none}
-.tl-playhead::before{content:'';position:absolute;top:-4px;left:-4px;width:10px;height:10px;border-radius:2px;background:var(--sport);transform:rotate(45deg)}
+.rr2-sub-stats{position:absolute;bottom:150px;left:22px;right:22px;display:grid;grid-template-columns:1fr 1fr;gap:0;z-index:5}
+.rr2-sub-item{border-top:2px solid var(--rr2-ink);padding-top:9px}
+.rr2-sub-item.right{text-align:right}
+.rr2-sub-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:var(--rr2-muted);margin-bottom:3px;display:block}
+.rr2-sub-val{font-size:30px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--rr2-ink)}
+.rr2-sub-val small{font-size:13px;font-weight:700;color:var(--rr2-muted);margin-left:2px}
 
-/* Track rows */
-.tl-track{position:relative;height:28px;display:flex;align-items:center;gap:2px;margin-top:2px}
-.tl-track-lbl{position:absolute;left:-4px;top:-10px;font-family:'JetBrains Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:.1em;color:var(--editor-muted)}
-.clip{height:100%;border-radius:3px;flex-shrink:0;position:relative;overflow:hidden}
-.clip.video{background:linear-gradient(90deg,rgba(var(--sport-rgb),.8),rgba(var(--sport-rgb),.5))}
-.clip.video::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0,transparent 8px,rgba(255,255,255,.15) 8px,rgba(255,255,255,.15) 9px)}
-.clip.audio{background:#3f3f46;display:flex;align-items:center;padding:0 3px}
-.clip.audio::before{content:'';position:absolute;inset:4px;background:
-  linear-gradient(90deg,
-    #71717a 0,#71717a 2px,transparent 2px,transparent 5px,
-    #71717a 5px,#71717a 7px,transparent 7px,transparent 10px,
-    #71717a 10px,#71717a 13px,transparent 13px,transparent 16px,
-    #71717a 16px,#71717a 18px,transparent 18px,transparent 22px,
-    #71717a 22px,#71717a 25px,transparent 25px,transparent 28px,
-    #71717a 28px,#71717a 30px,transparent 30px);
-  mask:linear-gradient(0deg,#000 0%,#000 100%);
-  opacity:.8}
-.clip.stat{background:#18181b;border:1px solid var(--sport);padding:0}
-.stat-wave{position:absolute;inset:2px;display:flex;align-items:flex-end;gap:1px}
-.stat-wave i{flex:1;background:var(--sport);border-radius:1px;display:block}
-.clip.caption{background:#27272a;border:1px dashed var(--editor-muted)}
-.clip.caption::before{content:'Aa';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--editor-muted)}
+.rr2-ctrl{position:absolute;bottom:22px;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:36px;z-index:10}
+.rr2-btn-sm{width:48px;height:48px;border-radius:50%;border:1px solid var(--rr2-line);background:rgba(255,255,255,.7);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;color:var(--rr2-ink);cursor:pointer;font-size:17px;font-family:inherit}
+.rr2-rec-btn{width:78px;height:78px;border-radius:50%;border:none;background:var(--rr2-ink);color:#fff;cursor:pointer;font-family:'Inter Tight',sans-serif;font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;box-shadow:0 0 0 4px rgba(10,10,10,.1),0 12px 32px rgba(0,0,0,.2);position:relative;transition:transform .15s}
+.rr2-rec-btn:active{transform:scale(.95)}
+.rr2-rec-btn::before{content:'';position:absolute;inset:-8px;border-radius:50%;border:1.5px solid var(--rr2-ink);opacity:.3}
 
-/* Timeline ruler */
-.tl-ruler{display:flex;justify-content:space-between;padding:0 2px;margin-top:auto;font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--editor-muted);letter-spacing:.05em}
+.rr2-trans{position:absolute;inset:0;background:var(--rr2-ed-bg);z-index:50;display:none;pointer-events:none}
+.rr2-trans.active{display:block;animation:rr2tIn 1s cubic-bezier(.85,0,.15,1) forwards}
+@keyframes rr2tIn{0%{clip-path:circle(0% at 50% 90%);opacity:1}100%{clip-path:circle(150% at 50% 90%);opacity:1}}
+.rr2-trans-txt{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:0;text-align:center;line-height:1.8}
+.rr2-trans.active .rr2-trans-txt{animation:rr2tFade 1s ease .2s forwards}
+@keyframes rr2tFade{0%{opacity:0;transform:translate(-50%,-40%)}50%{opacity:1}100%{opacity:0;transform:translate(-50%,-60%)}}
 
-/* ============ UTILITY ============ */
-.hidden{display:none!important}
-@media (max-width:480px){
-  .phone{width:100vw;height:100vh;border-radius:0;box-shadow:none}
-  .notch{display:none}
-}
+/* ========== PHASE 3 · EDIT ========== */
+.rr2-edit{position:absolute;inset:0;background:var(--rr2-ed-bg);color:var(--rr2-ed-ink);overflow:hidden}
+.rr2-edit-top{position:absolute;top:16px;left:14px;right:14px;display:flex;align-items:center;justify-content:space-between;z-index:10}
+.rr2-edit-top-btn{width:32px;height:32px;border-radius:9px;background:var(--rr2-ed-panel);border:1px solid var(--rr2-ed-line);color:var(--rr2-ed-ink);font-size:14px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center}
+.rr2-edit-title{font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--rr2-ed-muted);text-align:center}
+.rr2-edit-title b{display:block;color:#fff;font-size:10px;margin-top:2px}
+.rr2-edit-cta{padding:7px 13px;border-radius:9px;background:var(--rr2-sport);color:#fff;border:none;font-family:'Inter Tight',sans-serif;font-size:11px;font-weight:800;letter-spacing:.02em;cursor:pointer;text-transform:uppercase}
+
+.rr2-canvas{position:absolute;top:60px;left:14px;right:68px;height:280px;border-radius:13px;overflow:hidden;background:#1a1a1d;border:1px solid var(--rr2-ed-line)}
+.rr2-canvas-bg{position:absolute;inset:0;background:linear-gradient(135deg,#2a2a2e 0%,#1a1a1d 100%)}
+.rr2-canvas-bg::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 40% at 40% 50%,rgba(var(--rr2-sport-rgb),.2),transparent 70%),radial-gradient(ellipse 40% 60% at 70% 30%,rgba(255,255,255,.05),transparent 70%)}
+.rr2-canvas-bg::after{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .25 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");mix-blend-mode:overlay;opacity:.4}
+
+.rr2-stk{position:absolute;background:#fff;color:#0a0a0a;border-radius:9px;padding:7px 11px;font-family:'Inter Tight',sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.4);cursor:grab;z-index:3;border:2px solid transparent;transition:border-color .15s;user-select:none}
+.rr2-stk:hover{border-color:var(--rr2-sport)}
+.rr2-stk-lbl{font-family:'JetBrains Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:.1em;color:#999;display:block;line-height:1}
+.rr2-stk-val{font-size:20px;font-weight:900;letter-spacing:-.02em;line-height:1;display:block;margin-top:2px;font-variant-numeric:tabular-nums}
+.rr2-stk-val small{font-size:10px;font-weight:700;color:#999}
+.rr2-stk.pace{top:14px;left:14px}
+.rr2-stk.time{top:14px;right:14px;text-align:right}
+.rr2-stk.hr{bottom:64px;left:14px;background:var(--rr2-sport);color:#fff}
+.rr2-stk.hr .rr2-stk-lbl{color:rgba(255,255,255,.7)}
+.rr2-stk.hr .rr2-stk-val small{color:rgba(255,255,255,.7)}
+.rr2-stk.pr{bottom:64px;right:14px;background:#0a0a0a;color:#fff;border:1px solid var(--rr2-sport)}
+.rr2-stk.pr .rr2-stk-lbl{color:var(--rr2-sport)}
+
+.rr2-play{position:absolute;bottom:10px;left:10px;right:10px;display:flex;align-items:center;gap:9px;z-index:4}
+.rr2-play-btn{width:32px;height:32px;border-radius:50%;background:#fff;color:#0a0a0a;border:none;cursor:pointer;font-size:12px;flex-shrink:0;font-family:inherit;display:flex;align-items:center;justify-content:center}
+.rr2-scrub{flex:1;height:3px;background:rgba(255,255,255,.2);border-radius:2px;position:relative}
+.rr2-scrub::before{content:'';position:absolute;left:0;top:0;bottom:0;width:38%;background:#fff;border-radius:2px}
+.rr2-scrub::after{content:'';position:absolute;left:38%;top:50%;transform:translate(-50%,-50%);width:11px;height:11px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.2)}
+.rr2-edit-time{font-family:'JetBrains Mono',monospace;font-size:10px;color:#fff;font-weight:700;flex-shrink:0}
+
+.rr2-rail{position:absolute;top:60px;right:14px;width:46px;display:flex;flex-direction:column;gap:5px;z-index:10}
+.rr2-rail-btn{width:46px;height:52px;border-radius:11px;background:var(--rr2-ed-panel);border:1px solid var(--rr2-ed-line);color:var(--rr2-ed-ink);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-family:'JetBrains Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:.06em;transition:all .15s}
+.rr2-rail-btn:hover,.rr2-rail-btn.active{border-color:var(--rr2-sport);background:rgba(var(--rr2-sport-rgb),.1);color:#fff}
+.rr2-rail-btn svg{width:17px;height:17px;stroke:currentColor;stroke-width:1.8;fill:none}
+
+.rr2-chips{position:absolute;top:350px;left:14px;right:14px;display:flex;gap:6px;overflow-x:auto;padding:2px 0;z-index:5}
+.rr2-chips::-webkit-scrollbar{display:none}
+.rr2-chip{flex-shrink:0;padding:7px 13px;border-radius:18px;background:var(--rr2-ed-panel);border:1px solid var(--rr2-ed-line);color:var(--rr2-ed-muted);font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;white-space:nowrap;font-weight:600}
+.rr2-chip.active{background:var(--rr2-sport);border-color:var(--rr2-sport);color:#fff}
+.rr2-chip-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;margin-right:5px;vertical-align:middle;opacity:.6}
+
+.rr2-tl{position:absolute;bottom:14px;left:14px;right:14px;height:168px;background:var(--rr2-ed-panel);border:1px solid var(--rr2-ed-line);border-radius:13px;padding:10px 12px;z-index:5;display:flex;flex-direction:column;gap:5px}
+.rr2-tl-head{display:flex;justify-content:space-between;align-items:center;padding-bottom:4px;border-bottom:1px solid var(--rr2-ed-line)}
+.rr2-tl-head-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--rr2-ed-muted)}
+.rr2-tl-head-tools{display:flex;gap:4px}
+.rr2-tl-tool{width:22px;height:22px;border-radius:5px;background:transparent;border:1px solid var(--rr2-ed-line);color:var(--rr2-ed-muted);font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit}
+.rr2-tl-tool.active{background:var(--rr2-sport);color:#fff;border-color:var(--rr2-sport)}
+.rr2-tl-playhead{position:absolute;top:30px;bottom:20px;left:42%;width:2px;background:var(--rr2-sport);z-index:3;pointer-events:none}
+.rr2-tl-playhead::before{content:'';position:absolute;top:-4px;left:-4px;width:10px;height:10px;border-radius:2px;background:var(--rr2-sport);transform:rotate(45deg)}
+.rr2-tl-track{position:relative;height:24px;display:flex;align-items:center;gap:2px;margin-top:2px}
+.rr2-tl-track-lbl{position:absolute;left:-4px;top:-9px;font-family:'JetBrains Mono',monospace;font-size:7px;text-transform:uppercase;letter-spacing:.1em;color:var(--rr2-ed-muted)}
+.rr2-clip{height:100%;border-radius:3px;flex-shrink:0;position:relative;overflow:hidden}
+.rr2-clip.video{background:linear-gradient(90deg,rgba(var(--rr2-sport-rgb),.8),rgba(var(--rr2-sport-rgb),.5))}
+.rr2-clip.video::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0,transparent 8px,rgba(255,255,255,.15) 8px,rgba(255,255,255,.15) 9px)}
+.rr2-clip.audio{background:#3f3f46}
+.rr2-clip.audio::before{content:'';position:absolute;inset:4px;background:repeating-linear-gradient(90deg,#71717a 0,#71717a 2px,transparent 2px,transparent 6px,#71717a 6px,#71717a 9px,transparent 9px,transparent 14px,#71717a 14px,#71717a 16px,transparent 16px,transparent 20px);opacity:.8}
+.rr2-clip.stat{background:#18181b;border:1px solid var(--rr2-sport)}
+.rr2-stat-wave{position:absolute;inset:2px;display:flex;align-items:flex-end;gap:1px}
+.rr2-stat-wave i{flex:1;background:var(--rr2-sport);border-radius:1px;display:block}
+.rr2-clip.caption{background:#27272a;border:1px dashed var(--rr2-ed-muted)}
+.rr2-clip.caption::before{content:'Aa';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--rr2-ed-muted)}
+.rr2-tl-ruler{display:flex;justify-content:space-between;padding:0 2px;margin-top:auto;font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--rr2-ed-muted);letter-spacing:.05em}
 </style>
-</head>
-<body>
-<div class="header">
-  <span>RALLY · RECORD REDESIGN</span>
-  <b>DIRECTION B · PRO KIT</b>
-  <span id="phase-indicator">01 / SETUP</span>
-</div>
 
-<div class="stage">
-<div class="phone">
-  <div class="notch"></div>
-  <div class="screen">
+<div class="rr2-root" id="rr2Root">
 
-    <!-- ============ PHASE 1: SETUP ============ -->
-    <div class="phase active" data-phase="setup">
-      <div class="status dark"><span>9:41</span><span>●●●  ▲  ▮</span></div>
-      <div class="setup">
-        <div class="setup-top">
-          <button class="setup-close">×</button>
-          <span class="setup-lbl">NEW SESSION</span>
-          <div style="width:36px"></div>
+  <!-- PHASE 1 · SETUP -->
+  <div class="rr2-phase active" data-phase="setup">
+    <div class="rr2-setup">
+      <div class="rr2-setup-top">
+        <button class="rr2-close" onclick="go('home')">×</button>
+        <span class="rr2-lbl">NEW SESSION</span>
+        <div style="width:34px"></div>
+      </div>
+      <h1 class="rr2-title">What are<br>you training<br>for today?</h1>
+      <p class="rr2-sub">Pick a sport — we'll tune the capture.</p>
+
+      <!-- Sport grid is populated by record-init.js (_initRecord) from RR2.sportList.
+           To add/remove/reorder sports, edit record-init.js, NOT this file. -->
+      <div class="rr2-sport-grid" id="rr2Sports"></div>
+
+      <div class="rr2-setup-bot">
+        <div class="rr2-goal">
+          <span class="rr2-goal-lbl">Goal</span>
+          <span class="rr2-goal-val" id="rr2GoalVal" contenteditable="true" spellcheck="false">5K · sub 24:00</span>
         </div>
-        <h1 class="setup-title">What are<br>you training<br>for today?</h1>
-        <p class="setup-sub">Pick a sport — we'll tune the capture.</p>
-
-        <div class="sport-grid" id="sports">
-          <button class="sport-pill sel" data-sport="run" data-color="#ff4500" data-rgb="255,69,0">
-            <span class="sport-name">Run</span>
-            <span class="sport-sub">PACE · DIST · HR</span>
-          </button>
-          <button class="sport-pill" data-sport="bball" data-color="#f97316" data-rgb="249,115,22">
-            <span class="sport-name">Basketball</span>
-            <span class="sport-sub">PTS · SHOTS · REB</span>
-          </button>
-          <button class="sport-pill" data-sport="lift" data-color="#06b6d4" data-rgb="6,182,212">
-            <span class="sport-name">Lift</span>
-            <span class="sport-sub">SETS · REPS · VOL</span>
-          </button>
-          <button class="sport-pill" data-sport="skate" data-color="#a855f7" data-rgb="168,85,247">
-            <span class="sport-name">Skate</span>
-            <span class="sport-sub">TRICKS · AIR · SESH</span>
-          </button>
-          <button class="sport-pill" data-sport="cycle" data-color="#22c55e" data-rgb="34,197,94">
-            <span class="sport-name">Cycle</span>
-            <span class="sport-sub">SPEED · DIST · WATTS</span>
-          </button>
-          <button class="sport-pill" data-sport="climb" data-color="#eab308" data-rgb="234,179,8">
-            <span class="sport-name">Climb</span>
-            <span class="sport-sub">ROUTES · GRADE · V</span>
-          </button>
-        </div>
-
-        <div class="setup-bottom">
-          <div class="setup-goal">
-            <span class="setup-goal-lbl">Goal</span>
-            <span class="setup-goal-val">5K · sub 24:00</span>
-          </div>
-          <div class="setup-goal">
-            <span class="setup-goal-lbl">Capture</span>
-            <span class="setup-goal-val">Auto-highlights ON</span>
-          </div>
-          <button class="setup-cta" onclick="go('cap')">
-            Start session
-            <span class="arrow">→</span>
-          </button>
-        </div>
+        <button class="rr2-cta" onclick="rr2Go('cap')">
+          Start session
+          <span class="rr2-cta-arr">→</span>
+        </button>
       </div>
     </div>
-
-    <!-- ============ PHASE 2: CAPTURE ============ -->
-    <div class="phase" data-phase="cap">
-      <div class="cap">
-        <div class="cap-view"></div>
-        <div class="cap-grid"></div>
-
-        <div class="status dark"><span>9:42</span><span>●●●  ▲  ▮</span></div>
-
-        <div class="cap-top">
-          <div class="cap-rec"><span class="dot"></span><span id="capTime">00:04:12</span></div>
-          <div class="cap-meta">
-            RUN · OUTDOOR<br>
-            <span id="capLoc">CENTRAL PK · LOOP 2</span>
-          </div>
-        </div>
-
-        <div class="cap-hero">
-          <span class="cap-hero-lbl">CURRENT PACE</span>
-          <div class="cap-hero-num"><span id="paceMin">7</span>:<span id="paceSec">42</span></div>
-          <span class="cap-hero-unit">MIN / MI</span>
-        </div>
-
-        <div class="cap-sub">
-          <div class="cap-sub-item">
-            <span class="cap-sub-lbl">Distance</span>
-            <div class="cap-sub-val"><span id="capDist">2.47</span><small>MI</small></div>
-          </div>
-          <div class="cap-sub-item">
-            <span class="cap-sub-lbl">Heart rate</span>
-            <div class="cap-sub-val"><span id="capHr">162</span><small>BPM</small></div>
-          </div>
-        </div>
-
-        <div class="cap-ctrl">
-          <button class="cap-btn-sm" title="Flip camera">⟲</button>
-          <button class="cap-rec-btn" onclick="triggerTransition()">Finish</button>
-          <button class="cap-btn-sm" title="Tag moment">✦</button>
-        </div>
-
-        <!-- Transition overlay -->
-        <div class="transition" id="trans">
-          <div class="transition-text">
-            ASSEMBLING<br>
-            <span style="font-size:20px;letter-spacing:.08em">24:18 · 47 moments · 9 highlights</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============ PHASE 3: EDIT ============ -->
-    <div class="phase" data-phase="edit">
-      <div class="edit">
-        <div class="status"><span>9:42</span><span>●●●  ▲  ▮</span></div>
-
-        <div class="edit-top">
-          <button class="edit-top-btn">‹</button>
-          <div class="edit-title">
-            <span>EDIT · RUN</span>
-            <b>CENTRAL PARK · 2.47 MI</b>
-          </div>
-          <button class="edit-top-cta">POST</button>
-        </div>
-
-        <!-- Video preview canvas with draggable stickers -->
-        <div class="edit-canvas">
-          <div class="edit-canvas-bg"></div>
-
-          <div class="sticker pace">
-            <span class="sticker-lbl">AVG PACE</span>
-            <span class="sticker-val">7:42<small>/mi</small></span>
-          </div>
-          <div class="sticker time">
-            <span class="sticker-lbl">TIME</span>
-            <span class="sticker-val">24:18</span>
-          </div>
-          <div class="sticker hr">
-            <span class="sticker-lbl">PEAK HR</span>
-            <span class="sticker-val">178<small>bpm</small></span>
-          </div>
-          <div class="sticker pr">
-            <span class="sticker-lbl">◆ NEW PR</span>
-            <span class="sticker-val">2.4mi<small> 5K PB</small></span>
-          </div>
-
-          <div class="edit-play">
-            <button class="edit-play-btn">▶</button>
-            <div class="edit-scrub"></div>
-            <span class="edit-time">09:14 / 24:18</span>
-          </div>
-        </div>
-
-        <!-- Tool rail (right) -->
-        <div class="edit-rail">
-          <button class="rail-btn active">
-            <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3"/></svg>
-            CLIPS
-          </button>
-          <button class="rail-btn">
-            <svg viewBox="0 0 24 24"><path d="M9 18V6l12-3v12"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="15" r="3"/></svg>
-            MUSIC
-          </button>
-          <button class="rail-btn">
-            <svg viewBox="0 0 24 24"><path d="M4 20h16M4 14l4-4 4 4 8-8"/></svg>
-            STATS
-          </button>
-          <button class="rail-btn">
-            <svg viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/><circle cx="12" cy="12" r="4"/></svg>
-            FX
-          </button>
-          <button class="rail-btn">
-            <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
-            TEXT
-          </button>
-          <button class="rail-btn">
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></svg>
-            VIBE
-          </button>
-        </div>
-
-        <!-- Effect chips -->
-        <div class="edit-chips">
-          <button class="chip active"><span class="chip-dot"></span>AUTO-CUT</button>
-          <button class="chip">BEAT SYNC</button>
-          <button class="chip">RAMP SLOW-MO</button>
-          <button class="chip">SPLIT REVEAL</button>
-          <button class="chip">HR PULSE</button>
-          <button class="chip">MAP DRAW</button>
-          <button class="chip">PR FLASH</button>
-        </div>
-
-        <!-- Timeline -->
-        <div class="edit-tl">
-          <div class="tl-head">
-            <span class="tl-head-lbl">◆ TIMELINE · 24:18</span>
-            <div class="tl-head-tools">
-              <button class="tl-tool">↶</button>
-              <button class="tl-tool">↷</button>
-              <button class="tl-tool active">✂</button>
-              <button class="tl-tool">⧉</button>
-            </div>
-          </div>
-          <div class="tl-playhead"></div>
-
-          <div class="tl-track">
-            <span class="tl-track-lbl">V1 · VIDEO</span>
-            <div class="clip video" style="width:18%"></div>
-            <div class="clip video" style="width:12%"></div>
-            <div class="clip video" style="width:22%"></div>
-            <div class="clip video" style="width:14%"></div>
-            <div class="clip video" style="width:20%"></div>
-            <div class="clip video" style="width:12%"></div>
-          </div>
-
-          <div class="tl-track">
-            <span class="tl-track-lbl">S1 · STATS</span>
-            <div class="clip stat" style="width:100%">
-              <div class="stat-wave" id="statWave"></div>
-            </div>
-          </div>
-
-          <div class="tl-track">
-            <span class="tl-track-lbl">A1 · AUDIO</span>
-            <div class="clip audio" style="width:100%"></div>
-          </div>
-
-          <div class="tl-track">
-            <span class="tl-track-lbl">T1 · TEXT</span>
-            <div class="clip caption" style="width:8%;margin-left:6%"></div>
-            <div class="clip caption" style="width:10%;margin-left:14%"></div>
-            <div class="clip caption" style="width:6%;margin-left:18%"></div>
-          </div>
-
-          <div class="tl-ruler">
-            <span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:18</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
   </div>
+
+  <!-- PHASE 2 · CAPTURE -->
+  <div class="rr2-phase" data-phase="cap">
+    <div class="rr2-cap">
+      <div class="rr2-cap-view"></div>
+      <div class="rr2-cap-grid"></div>
+
+      <div class="rr2-cap-top">
+        <div class="rr2-rec"><span class="rr2-dot"></span><span id="rr2CapTime">00:04:12</span></div>
+        <div class="rr2-cap-meta">
+          <span id="rr2CapSport">RUN · OUTDOOR</span><br>
+          <span id="rr2CapLoc">CENTRAL PK · LOOP 2</span>
+        </div>
+      </div>
+
+      <div class="rr2-hero">
+        <span class="rr2-hero-lbl" id="rr2HeroLbl">CURRENT PACE</span>
+        <div class="rr2-hero-num"><span id="rr2PaceMin">7</span>:<span id="rr2PaceSec">42</span></div>
+        <span class="rr2-hero-unit" id="rr2HeroUnit">MIN / MI</span>
+      </div>
+
+      <div class="rr2-sub-stats">
+        <div class="rr2-sub-item">
+          <span class="rr2-sub-lbl" id="rr2Sub1Lbl">Distance</span>
+          <div class="rr2-sub-val"><span id="rr2Sub1Val">2.47</span><small id="rr2Sub1Unit">MI</small></div>
+        </div>
+        <div class="rr2-sub-item right">
+          <span class="rr2-sub-lbl" id="rr2Sub2Lbl">Heart rate</span>
+          <div class="rr2-sub-val"><span id="rr2Sub2Val">162</span><small id="rr2Sub2Unit">BPM</small></div>
+        </div>
+      </div>
+
+      <div class="rr2-ctrl">
+        <button class="rr2-btn-sm" title="Flip camera">⟲</button>
+        <button class="rr2-rec-btn" onclick="rr2TriggerTransition()">Finish</button>
+        <button class="rr2-btn-sm" title="Tag moment">✦</button>
+      </div>
+
+      <div class="rr2-trans" id="rr2Trans">
+        <div class="rr2-trans-txt">
+          ASSEMBLING<br>
+          <span style="font-size:18px;letter-spacing:.08em">24:18 · 47 moments · 9 highlights</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 3 · EDIT -->
+  <div class="rr2-phase" data-phase="edit">
+    <div class="rr2-edit">
+      <div class="rr2-edit-top">
+        <button class="rr2-edit-top-btn" onclick="rr2Go('setup')">‹</button>
+        <div class="rr2-edit-title">
+          <span>EDIT · <span id="rr2EditSport">RUN</span></span>
+          <b id="rr2EditCtx">CENTRAL PARK · 2.47 MI</b>
+        </div>
+        <button class="rr2-edit-cta" onclick="showToast && showToast('Posted to Rally 🎉')">POST</button>
+      </div>
+
+      <div class="rr2-canvas">
+        <div class="rr2-canvas-bg"></div>
+        <div class="rr2-stk pace"><span class="rr2-stk-lbl">AVG PACE</span><span class="rr2-stk-val">7:42<small>/mi</small></span></div>
+        <div class="rr2-stk time"><span class="rr2-stk-lbl">TIME</span><span class="rr2-stk-val">24:18</span></div>
+        <div class="rr2-stk hr"><span class="rr2-stk-lbl">PEAK HR</span><span class="rr2-stk-val">178<small>bpm</small></span></div>
+        <div class="rr2-stk pr"><span class="rr2-stk-lbl">◆ NEW PR</span><span class="rr2-stk-val">2.4mi<small> 5K PB</small></span></div>
+
+        <div class="rr2-play">
+          <button class="rr2-play-btn">▶</button>
+          <div class="rr2-scrub"></div>
+          <span class="rr2-edit-time">09:14 / 24:18</span>
+        </div>
+      </div>
+
+      <div class="rr2-rail">
+        <button class="rr2-rail-btn active" onclick="rr2PickRail(this)"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3"/></svg>CLIPS</button>
+        <button class="rr2-rail-btn" onclick="rr2PickRail(this)"><svg viewBox="0 0 24 24"><path d="M9 18V6l12-3v12"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="15" r="3"/></svg>MUSIC</button>
+        <button class="rr2-rail-btn" onclick="rr2PickRail(this)"><svg viewBox="0 0 24 24"><path d="M4 20h16M4 14l4-4 4 4 8-8"/></svg>STATS</button>
+        <button class="rr2-rail-btn" onclick="rr2PickRail(this)"><svg viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/><circle cx="12" cy="12" r="4"/></svg>FX</button>
+        <button class="rr2-rail-btn" onclick="rr2PickRail(this)"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg>TEXT</button>
+        <button class="rr2-rail-btn" onclick="rr2PickRail(this)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></svg>VIBE</button>
+      </div>
+
+      <div class="rr2-chips">
+        <button class="rr2-chip active" onclick="rr2ToggleChip(this)"><span class="rr2-chip-dot"></span>AUTO-CUT</button>
+        <button class="rr2-chip" onclick="rr2ToggleChip(this)">BEAT SYNC</button>
+        <button class="rr2-chip" onclick="rr2ToggleChip(this)">RAMP SLOW-MO</button>
+        <button class="rr2-chip" onclick="rr2ToggleChip(this)">SPLIT REVEAL</button>
+        <button class="rr2-chip" onclick="rr2ToggleChip(this)">HR PULSE</button>
+        <button class="rr2-chip" onclick="rr2ToggleChip(this)">MAP DRAW</button>
+        <button class="rr2-chip" onclick="rr2ToggleChip(this)">PR FLASH</button>
+      </div>
+
+      <div class="rr2-tl">
+        <div class="rr2-tl-head">
+          <span class="rr2-tl-head-lbl">◆ TIMELINE · 24:18</span>
+          <div class="rr2-tl-head-tools">
+            <button class="rr2-tl-tool">↶</button>
+            <button class="rr2-tl-tool">↷</button>
+            <button class="rr2-tl-tool active">✂</button>
+            <button class="rr2-tl-tool">⧉</button>
+          </div>
+        </div>
+        <div class="rr2-tl-playhead"></div>
+        <div class="rr2-tl-track">
+          <span class="rr2-tl-track-lbl">V1 · VIDEO</span>
+          <div class="rr2-clip video" style="width:18%"></div>
+          <div class="rr2-clip video" style="width:12%"></div>
+          <div class="rr2-clip video" style="width:22%"></div>
+          <div class="rr2-clip video" style="width:14%"></div>
+          <div class="rr2-clip video" style="width:20%"></div>
+          <div class="rr2-clip video" style="width:12%"></div>
+        </div>
+        <div class="rr2-tl-track">
+          <span class="rr2-tl-track-lbl">S1 · STATS</span>
+          <div class="rr2-clip stat" style="width:100%"><div class="rr2-stat-wave" id="rr2StatWave"></div></div>
+        </div>
+        <div class="rr2-tl-track">
+          <span class="rr2-tl-track-lbl">A1 · AUDIO</span>
+          <div class="rr2-clip audio" style="width:100%"></div>
+        </div>
+        <div class="rr2-tl-track">
+          <span class="rr2-tl-track-lbl">T1 · TEXT</span>
+          <div class="rr2-clip caption" style="width:8%;margin-left:6%"></div>
+          <div class="rr2-clip caption" style="width:10%;margin-left:14%"></div>
+          <div class="rr2-clip caption" style="width:6%;margin-left:18%"></div>
+        </div>
+        <div class="rr2-tl-ruler">
+          <span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:18</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
-</div>
-
-<script>
-const phases=['setup','cap','edit'];
-function go(p){
-  document.querySelectorAll('.phase').forEach(el=>el.classList.remove('active'));
-  document.querySelector(`[data-phase="${p}"]`).classList.add('active');
-  const idx=phases.indexOf(p);
-  document.getElementById('phase-indicator').textContent=`0${idx+1} / ${p.toUpperCase()}`;
-}
-
-// Sport picker
-document.querySelectorAll('.sport-pill').forEach(p=>{
-  p.addEventListener('click',()=>{
-    document.querySelectorAll('.sport-pill').forEach(x=>x.classList.remove('sel'));
-    p.classList.add('sel');
-    document.documentElement.style.setProperty('--sport',p.dataset.color);
-    document.documentElement.style.setProperty('--sport-rgb',p.dataset.rgb);
-  });
-});
-
-// Capture simulation
-let capSec=252;let capDist=2.47;let capHr=162;let capTimer=null;
-function startCap(){
-  stopCap();
-  capTimer=setInterval(()=>{
-    capSec++;
-    capDist+=0.006+Math.random()*0.004;
-    capHr=158+Math.round(Math.sin(capSec/8)*8+Math.random()*4);
-    const h=Math.floor(capSec/3600),m=Math.floor((capSec%3600)/60),s=capSec%60;
-    document.getElementById('capTime').textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-    document.getElementById('capDist').textContent=capDist.toFixed(2);
-    document.getElementById('capHr').textContent=capHr;
-    // Live pace jitter
-    const pm=7,ps=38+Math.round(Math.sin(capSec/5)*6);
-    document.getElementById('paceMin').textContent=pm;
-    document.getElementById('paceSec').textContent=String(ps).padStart(2,'0');
-  },250);
-}
-function stopCap(){if(capTimer){clearInterval(capTimer);capTimer=null}}
-
-function triggerTransition(){
-  const t=document.getElementById('trans');
-  t.classList.add('active');
-  stopCap();
-  setTimeout(()=>{
-    go('edit');
-    t.classList.remove('active');
-    buildStatWave();
-  },950);
-}
-
-// Override go() to start capture sim when entering cap
-const _go=go;
-go=function(p){_go(p);if(p==='cap')startCap();else stopCap()};
-
-// Build stat waveform
-function buildStatWave(){
-  const el=document.getElementById('statWave');
-  if(!el)return;
-  el.innerHTML='';
-  for(let i=0;i<60;i++){
-    const h=20+Math.sin(i/6)*30+Math.sin(i/2)*15+Math.random()*10;
-    const bar=document.createElement('i');
-    bar.style.height=Math.max(10,Math.min(100,h))+'%';
-    el.appendChild(bar);
-  }
-}
-
-// Make stickers draggable
-document.querySelectorAll('.sticker').forEach(s=>{
-  let dx=0,dy=0,ox=0,oy=0,drag=false;
-  s.addEventListener('mousedown',e=>{
-    drag=true;ox=e.clientX;oy=e.clientY;
-    const r=s.getBoundingClientRect();dx=r.left;dy=r.top;
-    s.style.cursor='grabbing';e.preventDefault();
-  });
-  document.addEventListener('mousemove',e=>{
-    if(!drag)return;
-    const parent=s.offsetParent.getBoundingClientRect();
-    s.style.left=(dx+e.clientX-ox-parent.left)+'px';
-    s.style.top=(dy+e.clientY-oy-parent.top)+'px';
-    s.style.right='auto';s.style.bottom='auto';
-  });
-  document.addEventListener('mouseup',()=>{drag=false;s.style.cursor='grab'});
-});
-
-// Tool rail + chips interaction
-document.querySelectorAll('.rail-btn').forEach(b=>{
-  b.addEventListener('click',()=>{
-    document.querySelectorAll('.rail-btn').forEach(x=>x.classList.remove('active'));
-    b.classList.add('active');
-  });
-});
-document.querySelectorAll('.chip').forEach(b=>{
-  b.addEventListener('click',()=>{b.classList.toggle('active')});
-});
-</script>
-</body>
-</html>
