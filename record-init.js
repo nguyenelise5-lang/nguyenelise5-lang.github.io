@@ -178,8 +178,24 @@
     root.querySelectorAll('.rr2-phase').forEach(function(p){ p.classList.remove('active'); });
     var target = root.querySelector('[data-phase="'+phase+'"]');
     if(target) target.classList.add('active');
-    if(phase === 'cap') RR2.startCap();
-    else RR2.stopCap();
+    if(phase === 'cap'){
+      RR2.startCap();
+      // Clear gallery + moments for fresh session
+      RR2.moments = [];
+      var gallery = document.getElementById('rr2Gallery');
+      if(gallery) gallery.innerHTML = '';
+    } else {
+      RR2.stopCap();
+    }
+    // Reset playback when returning to setup
+    if(phase === 'setup'){
+      RR2.editPlaying = false;
+      if(RR2.editPlayTimer) clearInterval(RR2.editPlayTimer);
+      RR2.editPlayPos = 0;
+      // Hide route sticker
+      var routeWrap = document.getElementById('rr2RouteStkWrap');
+      if(routeWrap) routeWrap.style.display = 'none';
+    }
   };
 
   // Sport select — updates theme + capture hero labels to match sport
@@ -405,7 +421,9 @@
       window.rr2Go('edit');
       t.classList.remove('active');
       RR2.buildStatWave();
-      RR2.bindStickers(); // rebind after DOM updates
+      RR2.buildRoute();
+      RR2.buildMomentClips();
+      RR2.bindStickers(); // rebind after DOM updates (includes route sticker)
     }, 950);
   };
 
@@ -473,6 +491,113 @@
         timeEl.textContent = pad(cm)+':'+pad(cs)+' / '+pad(tm)+':'+pad(ts);
       }
     }, 80);
+  };
+
+  // ===== CAMERA SNAP + GALLERY =====
+  // Captures simulated "moments" during the workout with a shutter flash.
+  // Moments appear as thumbnails in a gallery tray and become clips in the edit timeline.
+  RR2.moments = [];
+  RR2.snapIcons = ['📸','🏃','🔥','💪','🎯','⚡','🌊','🏔️','🎾','⛳'];
+
+  window.rr2Snap = function(type){
+    type = type || 'photo';
+    var pad = function(n){ return String(n).padStart(2,'0'); };
+    var m = Math.floor((RR2.capSec%3600)/60), s = RR2.capSec%60;
+    var timeStr = pad(m) + ':' + pad(s);
+    var icon = RR2.snapIcons[Math.floor(Math.random()*RR2.snapIcons.length)];
+
+    // Record moment
+    RR2.moments.push({type:type, time:timeStr, sec:RR2.capSec, icon:icon});
+
+    // Flash animation
+    var flash = document.getElementById('rr2Flash');
+    if(flash){
+      flash.classList.remove('active');
+      void flash.offsetWidth; // reflow
+      flash.classList.add('active');
+    }
+
+    // Add thumbnail to gallery tray
+    var gallery = document.getElementById('rr2Gallery');
+    if(gallery){
+      var thumb = document.createElement('div');
+      thumb.className = 'rr2-gallery-thumb' + (type==='video' ? ' video' : '');
+      thumb.innerHTML = '<div class="rr2-gallery-thumb-inner">' + icon + '</div>' +
+                        '<span class="rr2-gallery-thumb-time">' + timeStr + '</span>';
+      gallery.appendChild(thumb);
+      // Auto-scroll to latest
+      gallery.scrollLeft = gallery.scrollWidth;
+    }
+  };
+
+  // ===== GPS ROUTE GENERATOR =====
+  // Builds a fake but plausible Strava-style route SVG per sport type.
+  // Loop for run/walk/hike, out-and-back for cycle/kayak, court shape for racket sports, etc.
+  RR2.routeShapes = {
+    loop:  'M10,45 C10,20 25,5 40,10 C55,15 70,10 68,28 C66,42 55,50 40,48 C25,46 12,50 10,45 Z',
+    outback:'M8,28 C15,15 30,10 45,18 C55,24 65,20 72,28 M72,28 C65,36 55,32 45,38 C30,46 15,41 8,28',
+    figure8:'M15,28 C15,10 35,10 35,28 C35,46 55,46 55,28 C55,10 75,10 75,28 C75,46 55,46 55,28 C55,10 35,10 35,28 C35,46 15,46 15,28',
+    court: 'M20,10 L60,10 L60,46 L20,46 Z M40,10 L40,46 M20,28 L60,28',
+    field: 'M10,10 L70,10 L70,46 L10,46 Z M40,10 C40,28 40,28 40,46 M10,28 C25,28 55,28 70,28',
+    wave:  'M5,28 C15,8 25,48 35,28 C45,8 55,48 65,28 C72,14 75,28 75,28',
+    point: 'M40,48 L15,30 L25,8 L55,8 L65,30 Z'
+  };
+  RR2.sportRouteMap = {
+    run:'loop',walk:'loop',hike:'loop',trail:'loop',
+    cycle:'outback',mtb:'outback',gravel:'outback',ebike:'outback',
+    swim:'outback',surf:'wave',kayak:'outback',sup:'outback',row:'outback',windsurf:'wave',
+    tennis:'court',pickle:'court',badminton:'court',squash:'court',padel:'court',racquetball:'court',
+    soccer:'field',basketball:'court',volleyball:'court',football:'field',lacrosse:'field',cricket:'field',
+    lift:'point',crossfit:'point',hiit:'point',yoga:'point',pilates:'point',climb:'point',
+    ski:'outback',snowboard:'outback',xcski:'outback',
+    golf:'loop',skate:'loop',dance:'point',martial:'point',horse:'outback'
+  };
+
+  RR2.buildRoute = function(){
+    var wrap = document.getElementById('rr2RouteStkWrap');
+    if(!wrap) return;
+    var cfg = RR2.sports[RR2.currentSport];
+    var shapeKey = RR2.sportRouteMap[RR2.currentSport] || 'loop';
+    var path = RR2.routeShapes[shapeKey] || RR2.routeShapes.loop;
+    var pathEl = document.getElementById('rr2RoutePath');
+    var startEl = document.getElementById('rr2RouteStart');
+    var endEl = document.getElementById('rr2RouteEnd');
+    var lblEl = document.getElementById('rr2RouteLbl');
+    var distEl = document.getElementById('rr2RouteDist');
+
+    if(pathEl) pathEl.setAttribute('d', path);
+    // Start dot at first point of path
+    if(startEl){ startEl.setAttribute('cx','10'); startEl.setAttribute('cy','45'); }
+    if(endEl){
+      var isLoop = (shapeKey === 'loop' || shapeKey === 'point');
+      endEl.setAttribute('cx', isLoop ? '10' : '72');
+      endEl.setAttribute('cy', isLoop ? '45' : '28');
+    }
+    if(lblEl) lblEl.textContent = (cfg ? cfg.loc : 'ROUTE');
+    if(distEl){
+      var dist = cfg ? cfg.sub1[1] + ' ' + cfg.sub1[2] : '2.5 MI';
+      distEl.textContent = dist;
+    }
+    wrap.style.display = '';
+  };
+
+  // ===== POPULATE EDIT TIMELINE WITH MOMENTS =====
+  // Called during the transition — inserts captured moments as extra clip blocks.
+  RR2.buildMomentClips = function(){
+    var momTrack = document.getElementById('rr2MomTrack');
+    if(!momTrack || !RR2.moments.length) return;
+    // Show the moment track row
+    momTrack.style.display = 'flex';
+    var clips = momTrack.querySelectorAll('.rr2-clip.moment');
+    clips.forEach(function(c){ c.remove(); });
+    RR2.moments.forEach(function(mo){
+      var clip = document.createElement('div');
+      clip.className = 'rr2-clip moment';
+      var w = 8 + Math.random()*10;
+      clip.style.width = w + '%';
+      clip.innerHTML = '<span style="position:absolute;left:3px;top:2px;font-size:8px">' + mo.icon + '</span>';
+      momTrack.appendChild(clip);
+    });
   };
 
   // Draggable stat stickers on the edit canvas
