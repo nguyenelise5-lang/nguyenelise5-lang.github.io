@@ -217,10 +217,62 @@
     if(goalEl && RR2.goals[key]) goalEl.textContent = RR2.goals[key];
   };
 
-  // Capture simulation — live-updating clock (and pace ticking for Run)
+  // ===== CAPTURE SIMULATION =====
+  // Realistic live-updating clock + per-sport hero/sub stat ticking.
+  // Groups sports by stat type so each one gets a believable sim.
+  RR2.simCfg = {
+    // pace sports — hero is M:SS, jitters around base
+    run:  {type:'pace', base:462, amp:6},  // 7:42 → seconds base
+    trail:{type:'pace', base:554, amp:8},
+    walk: {type:'pace', base:900, amp:10},
+    hike: {type:'pace', base:1080, amp:12},
+    kayak:{type:'pace', base:520, amp:7},
+    xcski:{type:'pace', base:500, amp:6},
+    row:  {type:'split',base:118, amp:4}, // 1:58 /500m
+    // speed sports — hero is XX.X MPH/KPH, jitters
+    cycle: {type:'speed', base:18.4, amp:1.2},
+    mtb:   {type:'speed', base:14.2, amp:2.0},
+    gravel:{type:'speed', base:16.1, amp:1.0},
+    ebike: {type:'speed', base:22.3, amp:0.8},
+    sup:   {type:'speed', base:4.2,  amp:0.5},
+    windsurf:{type:'speed', base:18.6, amp:2.5},
+    ski:   {type:'speed', base:32.4, amp:4.0},
+    snowboard:{type:'speed', base:28.6, amp:3.5},
+    skate: {type:'speed', base:12.8, amp:1.5},
+    horse: {type:'speed', base:6.2,  amp:0.8},
+    // count sports — hero ticks up periodically
+    swim:      {type:'count', base:0,  rate:0.08, label:'LAPS',  unit:'POOL'},
+    surf:      {type:'count', base:0,  rate:0.03, label:'WAVES', unit:'RIDDEN'},
+    tennis:    {type:'count', base:0,  rate:0.04, label:'LONGEST RALLY', unit:'SHOTS'},
+    pickle:    {type:'count', base:0,  rate:0.05, label:'LONGEST RALLY', unit:'SHOTS'},
+    badminton: {type:'count', base:0,  rate:0.03, label:'SETS',  unit:'PLAYED'},
+    squash:    {type:'count', base:0,  rate:0.04, label:'GAMES', unit:'WON'},
+    padel:     {type:'count', base:0,  rate:0.03, label:'SETS',  unit:'PLAYED'},
+    racquetball:{type:'count',base:0,  rate:0.04, label:'GAMES', unit:'WON'},
+    soccer:    {type:'dist',  base:0,  rate:0.002},
+    basketball:{type:'count', base:0,  rate:0.06, label:'POINTS',unit:'SCORED'},
+    volleyball:{type:'count', base:0,  rate:0.03, label:'SETS',  unit:'WON'},
+    football:  {type:'dist',  base:0,  rate:0.002},
+    lacrosse:  {type:'dist',  base:0,  rate:0.0025},
+    cricket:   {type:'count', base:0,  rate:0.05, label:'RUNS',  unit:'SCORED'},
+    lift:      {type:'reps',  base:0,  rate:0.12},
+    crossfit:  {type:'count', base:0,  rate:0.025, label:'ROUNDS',unit:'DONE'},
+    hiit:      {type:'count', base:0,  rate:0.03,  label:'ROUNDS',unit:'DONE'},
+    yoga:      {type:'dur'},
+    pilates:   {type:'dur'},
+    dance:     {type:'dur'},
+    climb:     {type:'count', base:0, rate:0.02, label:'ROUTES', unit:'DONE'},
+    martial:   {type:'count', base:0, rate:0.025, label:'ROUNDS',unit:'DONE'},
+    golf:      {type:'count', base:0, rate:0.015, label:'HOLES', unit:'PLAYED'}
+  };
+
   RR2.startCap = function(){
     RR2.stopCap();
     RR2.capSec = 0;
+    RR2.capCount = 0;
+    RR2.capDist = 0;
+    var sim = RR2.simCfg[RR2.currentSport] || {type:'dur'};
+
     RR2.capTimer = setInterval(function(){
       RR2.capSec++;
       var h = Math.floor(RR2.capSec/3600),
@@ -228,12 +280,57 @@
           s = RR2.capSec%60;
       var pad = function(n){ return String(n).padStart(2,'0'); };
       var $ = function(id){ return document.getElementById(id); };
+      var heroEl = document.querySelector('.rr2-hero-num');
       if($('rr2CapTime')) $('rr2CapTime').textContent = pad(h)+':'+pad(m)+':'+pad(s);
-      // Run-specific live pace jitter on the hero number
-      if(RR2.currentSport === 'run'){
-        var ps = 38 + Math.round(Math.sin(RR2.capSec/5)*6);
-        var heroNum = document.querySelector('.rr2-hero-num');
-        if(heroNum) heroNum.innerHTML = '7:'+pad(ps);
+
+      // Per-sport hero number simulation
+      if(sim.type === 'pace' || sim.type === 'split'){
+        var sec = sim.base + Math.round(Math.sin(RR2.capSec/5)*sim.amp);
+        var pm = Math.floor(sec/60), ps = sec%60;
+        if(heroEl) heroEl.innerHTML = pm+':'+pad(ps);
+      }
+      else if(sim.type === 'speed'){
+        var spd = sim.base + Math.sin(RR2.capSec/4)*sim.amp;
+        if(heroEl) heroEl.innerHTML = spd.toFixed(1);
+      }
+      else if(sim.type === 'count'){
+        if(Math.random() < sim.rate) RR2.capCount++;
+        if(heroEl) heroEl.innerHTML = String(RR2.capCount);
+      }
+      else if(sim.type === 'dist'){
+        RR2.capDist += (sim.rate || 0.002) + Math.random()*0.001;
+        if(heroEl) heroEl.innerHTML = RR2.capDist.toFixed(1);
+      }
+      else if(sim.type === 'reps'){
+        if(Math.random() < (sim.rate || 0.1)) RR2.capCount++;
+        if(heroEl) heroEl.innerHTML = String(RR2.capCount);
+      }
+      else if(sim.type === 'dur'){
+        // Duration sports — hero shows the live clock itself
+        if(heroEl) heroEl.innerHTML = pad(m)+':'+pad(s);
+      }
+
+      // Sub-stat 1: slow tick (distance, reps, laps, etc.)
+      if($('rr2Sub1Val')){
+        var cfg = RR2.sports[RR2.currentSport];
+        if(cfg){
+          var baseVal = parseFloat(cfg.sub1[1].replace(/,/g,''));
+          if(!isNaN(baseVal) && baseVal > 0){
+            var drift = baseVal * (1 + RR2.capSec * 0.0004 + Math.sin(RR2.capSec/8)*0.003);
+            $('rr2Sub1Val').textContent = drift > 100 ? Math.round(drift).toLocaleString() : drift.toFixed(drift<10?2:1);
+          }
+        }
+      }
+      // Sub-stat 2: jitter (HR, calories, etc.)
+      if($('rr2Sub2Val')){
+        var cfg2 = RR2.sports[RR2.currentSport];
+        if(cfg2){
+          var baseVal2 = parseFloat(cfg2.sub2[1].replace(/,/g,''));
+          if(!isNaN(baseVal2) && baseVal2 > 0){
+            var jit = baseVal2 + Math.round(Math.sin(RR2.capSec/3)*3 + Math.random()*2);
+            $('rr2Sub2Val').textContent = jit > 100 ? Math.round(jit).toLocaleString() : String(jit);
+          }
+        }
       }
     }, 250);
   };
@@ -241,16 +338,74 @@
     if(RR2.capTimer){ clearInterval(RR2.capTimer); RR2.capTimer = null; }
   };
 
-  // Finish → transition → edit
+  // Finish → transition → edit.
+  // Snapshots the capture phase stats and writes them into the edit stickers + header.
   window.rr2TriggerTransition = function(){
     var t = document.getElementById('rr2Trans');
     if(!t) return;
+    // Snapshot captured values before stopping
+    var heroEl = document.querySelector('.rr2-hero-num');
+    var $ = function(id){ return document.getElementById(id); };
+    var pad = function(n){ return String(n).padStart(2,'0'); };
+    var h = Math.floor(RR2.capSec/3600),
+        m = Math.floor((RR2.capSec%3600)/60),
+        s = RR2.capSec%60;
+    var timeStr = (h>0 ? h+':' : '') + pad(m) + ':' + pad(s);
+    var heroVal = heroEl ? heroEl.textContent.trim() : '--';
+    var sub1Val = $('rr2Sub1Val') ? $('rr2Sub1Val').textContent.trim() : '--';
+    var sub1Unit= $('rr2Sub1Unit')? $('rr2Sub1Unit').textContent.trim() : '';
+    var sub2Val = $('rr2Sub2Val') ? $('rr2Sub2Val').textContent.trim() : '--';
+    var sub2Unit= $('rr2Sub2Unit')? $('rr2Sub2Unit').textContent.trim() : '';
+    var cfg = RR2.sports[RR2.currentSport] || {};
+
+    // Update transition text with real captured stats
+    var transTxt = t.querySelector('.rr2-trans-txt');
+    if(transTxt){
+      var moments = 8 + Math.floor(Math.random()*40);
+      var highlights = 2 + Math.floor(Math.random()*8);
+      transTxt.innerHTML = 'ASSEMBLING<br><span style="font-size:18px;letter-spacing:.08em">' +
+        timeStr + ' · ' + moments + ' moments · ' + highlights + ' highlights</span>';
+    }
+
     t.classList.add('active');
     RR2.stopCap();
+
     setTimeout(function(){
+      // Populate edit stickers with captured sport data
+      var stickers = document.querySelectorAll('.rr2-stk');
+      var stkData = [
+        {lbl: cfg.hero ? cfg.hero[0] : 'STAT', val: heroVal, unit: cfg.hero ? cfg.hero[2].replace(/\s/g,'').toLowerCase() : ''},
+        {lbl: 'TIME', val: timeStr, unit: ''},
+        {lbl: cfg.sub2 ? cfg.sub2[0].toUpperCase() : 'STAT', val: sub2Val, unit: sub2Unit.toLowerCase()},
+        {lbl: '◆ SESSION ' + (cfg.label||'').toUpperCase(), val: sub1Val + (sub1Unit ? ' ' + sub1Unit.toLowerCase() : ''), unit: ''}
+      ];
+      stickers.forEach(function(stk, i){
+        var d = stkData[i] || stkData[0];
+        var lblEl = stk.querySelector('.rr2-stk-lbl');
+        var valEl = stk.querySelector('.rr2-stk-val');
+        if(lblEl) lblEl.textContent = d.lbl;
+        if(valEl) valEl.innerHTML = d.val + (d.unit ? '<small>' + d.unit + '</small>' : '');
+      });
+
+      // Update edit header context line
+      if($('rr2EditCtx')){
+        var loc = cfg.loc || 'SESSION';
+        $('rr2EditCtx').textContent = loc + ' · ' + timeStr;
+      }
+      // Update timeline label
+      var tlLbl = document.querySelector('.rr2-tl-head-lbl');
+      if(tlLbl) tlLbl.textContent = '◆ TIMELINE · ' + timeStr;
+      // Update scrubber time
+      var editTime = document.querySelector('.rr2-edit-time');
+      if(editTime) editTime.textContent = '00:00 / ' + timeStr;
+
+      // Store for play simulation
+      RR2.editTotalSec = RR2.capSec;
+
       window.rr2Go('edit');
       t.classList.remove('active');
       RR2.buildStatWave();
+      RR2.bindStickers(); // rebind after DOM updates
     }, 950);
   };
 
@@ -273,6 +428,52 @@
     el.classList.add('active');
   };
   window.rr2ToggleChip = function(el){ el.classList.toggle('active'); };
+
+  // ===== EDIT PLAYBACK SIMULATION =====
+  // Play button toggles a playhead animation across the timeline + updates scrub time.
+  RR2.editPlaying = false;
+  RR2.editPlayTimer = null;
+  RR2.editPlayPos = 0; // 0–1
+
+  window.rr2TogglePlay = function(){
+    var playBtn = document.querySelector('.rr2-play-btn');
+    var playhead = document.querySelector('.rr2-tl-playhead');
+    var scrubBar = document.querySelector('.rr2-scrub');
+    var timeEl = document.querySelector('.rr2-edit-time');
+    var pad = function(n){ return String(n).padStart(2,'0'); };
+    var totalSec = RR2.editTotalSec || 60;
+
+    if(RR2.editPlaying){
+      // Pause
+      RR2.editPlaying = false;
+      if(RR2.editPlayTimer) clearInterval(RR2.editPlayTimer);
+      if(playBtn) playBtn.textContent = '▶';
+      return;
+    }
+    // Play
+    RR2.editPlaying = true;
+    if(playBtn) playBtn.textContent = '❚❚';
+    if(RR2.editPlayPos >= 1) RR2.editPlayPos = 0;
+
+    RR2.editPlayTimer = setInterval(function(){
+      RR2.editPlayPos += 0.005; // advance ~0.5% per tick
+      if(RR2.editPlayPos >= 1){
+        RR2.editPlayPos = 1;
+        RR2.editPlaying = false;
+        clearInterval(RR2.editPlayTimer);
+        if(playBtn) playBtn.textContent = '▶';
+      }
+      var pct = (RR2.editPlayPos * 100).toFixed(1) + '%';
+      if(playhead) playhead.style.left = pct;
+      if(scrubBar) scrubBar.style.setProperty('--pos', RR2.editPlayPos.toFixed(3));
+      if(timeEl){
+        var cur = Math.round(RR2.editPlayPos * totalSec);
+        var cm = Math.floor(cur/60), cs = cur%60;
+        var tm = Math.floor(totalSec/60), ts = totalSec%60;
+        timeEl.textContent = pad(cm)+':'+pad(cs)+' / '+pad(tm)+':'+pad(ts);
+      }
+    }, 80);
+  };
 
   // Draggable stat stickers on the edit canvas
   RR2.bindStickers = function(){
