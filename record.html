@@ -107,6 +107,32 @@
 .rr2-rec-btn:active{transform:scale(.95)}
 .rr2-rec-btn::before{content:'';position:absolute;inset:-8px;border-radius:50%;border:1.5px solid var(--rr2-ink);opacity:.3}
 
+/* Camera gallery tray — horizontal filmstrip above controls during capture */
+.rr2-gallery{position:absolute;bottom:115px;left:22px;right:22px;display:flex;gap:8px;overflow-x:auto;z-index:8;padding:4px 0;scrollbar-width:none}
+.rr2-gallery::-webkit-scrollbar{display:none}
+.rr2-gallery:empty{display:none}
+.rr2-gallery-thumb{flex:0 0 52px;width:52px;height:52px;border-radius:8px;background:rgba(var(--rr2-sport-rgb),.25);border:2px solid rgba(255,255,255,.5);position:relative;overflow:hidden;opacity:0;animation:rr2thumbIn .3s ease forwards}
+@keyframes rr2thumbIn{to{opacity:1;transform:scale(1)}from{opacity:0;transform:scale(.7)}}
+.rr2-gallery-thumb-inner{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:16px}
+.rr2-gallery-thumb-time{position:absolute;bottom:2px;right:3px;font-family:'JetBrains Mono',monospace;font-size:7px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6);font-weight:700}
+.rr2-gallery-thumb.video .rr2-gallery-thumb-inner::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(var(--rr2-sport-rgb),.4),rgba(var(--rr2-sport-rgb),.15))}
+
+/* Camera button (in capture controls) */
+.rr2-cam-btn{width:48px;height:48px;border-radius:50%;border:1px solid var(--rr2-line);background:rgba(255,255,255,.7);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;color:var(--rr2-ink);cursor:pointer;font-size:20px;font-family:inherit;position:relative;transition:transform .1s}
+.rr2-cam-btn:active{transform:scale(.9)}
+.rr2-cam-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8}
+
+/* Camera snap flash overlay */
+.rr2-snap-flash{position:absolute;inset:0;background:#fff;z-index:40;opacity:0;pointer-events:none}
+.rr2-snap-flash.active{animation:rr2flash .25s ease-out}
+@keyframes rr2flash{0%{opacity:.85}100%{opacity:0}}
+
+/* Route sticker in edit canvas */
+.rr2-stk.route{bottom:64px;left:50%;transform:translateX(-50%);background:#0a0a0a;color:#fff;padding:8px 12px;width:auto;min-width:100px;text-align:center;border:1px solid var(--rr2-ed-line)}
+.rr2-route-svg{display:block;width:80px;height:56px;margin:0 auto 2px}
+.rr2-route-svg path{fill:none;stroke:var(--rr2-sport);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.rr2-route-svg circle{fill:var(--rr2-sport);r:3}
+
 .rr2-trans{position:absolute;inset:0;background:var(--rr2-ed-bg);z-index:50;display:none;pointer-events:none}
 .rr2-trans.active{display:block;animation:rr2tIn 1s cubic-bezier(.85,0,.15,1) forwards}
 @keyframes rr2tIn{0%{clip-path:circle(0% at 50% 90%);opacity:1}100%{clip-path:circle(150% at 50% 90%);opacity:1}}
@@ -171,6 +197,7 @@
 .rr2-tl-track-lbl{position:absolute;left:-4px;top:-9px;font-family:'JetBrains Mono',monospace;font-size:7px;text-transform:uppercase;letter-spacing:.1em;color:var(--rr2-ed-muted)}
 .rr2-clip{height:100%;border-radius:3px;flex-shrink:0;position:relative;overflow:hidden}
 .rr2-clip.video{background:linear-gradient(90deg,rgba(var(--rr2-sport-rgb),.8),rgba(var(--rr2-sport-rgb),.5))}
+.rr2-clip.moment{background:linear-gradient(90deg,rgba(255,255,255,.25),rgba(255,255,255,.12));border:1px solid rgba(255,255,255,.2);position:relative}
 .rr2-clip.video::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0,transparent 8px,rgba(255,255,255,.15) 8px,rgba(255,255,255,.15) 9px)}
 .rr2-clip.audio{background:#3f3f46}
 .rr2-clip.audio::before{content:'';position:absolute;inset:4px;background:repeating-linear-gradient(90deg,#71717a 0,#71717a 2px,transparent 2px,transparent 6px,#71717a 6px,#71717a 9px,transparent 9px,transparent 14px,#71717a 14px,#71717a 16px,transparent 16px,transparent 20px);opacity:.8}
@@ -246,11 +273,19 @@
         </div>
       </div>
 
+      <!-- Gallery tray — thumbnails of mid-workout captures -->
+      <div class="rr2-gallery" id="rr2Gallery"></div>
+
       <div class="rr2-ctrl">
-        <button class="rr2-btn-sm" title="Flip camera">⟲</button>
+        <button class="rr2-cam-btn" onclick="rr2Snap()" title="Capture photo">
+          <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </button>
         <button class="rr2-rec-btn" onclick="rr2TriggerTransition()">Finish</button>
-        <button class="rr2-btn-sm" title="Tag moment">✦</button>
+        <button class="rr2-btn-sm" title="Tag moment" onclick="rr2Snap('video')">✦</button>
       </div>
+
+      <!-- Camera snap flash -->
+      <div class="rr2-snap-flash" id="rr2Flash"></div>
 
       <div class="rr2-trans" id="rr2Trans">
         <div class="rr2-trans-txt">
@@ -279,6 +314,13 @@
         <div class="rr2-stk time"><span class="rr2-stk-lbl">TIME</span><span class="rr2-stk-val">24:18</span></div>
         <div class="rr2-stk hr"><span class="rr2-stk-lbl">PEAK HR</span><span class="rr2-stk-val">178<small>bpm</small></span></div>
         <div class="rr2-stk pr"><span class="rr2-stk-lbl">◆ NEW PR</span><span class="rr2-stk-val">2.4mi<small> 5K PB</small></span></div>
+
+        <!-- GPS route sticker — populated by JS with a simulated route SVG -->
+        <div class="rr2-stk route" id="rr2RouteStkWrap" style="display:none">
+          <span class="rr2-stk-lbl" id="rr2RouteLbl">ROUTE</span>
+          <svg class="rr2-route-svg" id="rr2RouteSvg" viewBox="0 0 80 56"><path id="rr2RoutePath" d=""/><circle id="rr2RouteStart" cx="0" cy="0"/><circle id="rr2RouteEnd" cx="0" cy="0" r="3" fill="#fff" stroke="var(--rr2-sport)" stroke-width="1.5"/></svg>
+          <span class="rr2-stk-val" id="rr2RouteDist" style="font-size:14px">2.47 mi</span>
+        </div>
 
         <div class="rr2-play">
           <button class="rr2-play-btn" onclick="rr2TogglePlay()">▶</button>
@@ -325,6 +367,10 @@
           <div class="rr2-clip video" style="width:14%"></div>
           <div class="rr2-clip video" style="width:20%"></div>
           <div class="rr2-clip video" style="width:12%"></div>
+        </div>
+        <div class="rr2-tl-track" id="rr2MomTrack" style="display:none">
+          <span class="rr2-tl-track-lbl">M1 · MOMENTS</span>
+          <!-- Moment clips injected by JS from captured snaps -->
         </div>
         <div class="rr2-tl-track">
           <span class="rr2-tl-track-lbl">S1 · STATS</span>
