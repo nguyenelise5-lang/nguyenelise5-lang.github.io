@@ -142,9 +142,10 @@
 
 .rr2-play{position:absolute;bottom:10px;left:10px;right:10px;display:flex;align-items:center;gap:9px;z-index:4}
 .rr2-play-btn{width:32px;height:32px;border-radius:50%;background:#fff;color:#0a0a0a;border:none;cursor:pointer;font-size:12px;flex-shrink:0;font-family:inherit;display:flex;align-items:center;justify-content:center}
-.rr2-scrub{flex:1;height:3px;background:rgba(255,255,255,.2);border-radius:2px;position:relative}
-.rr2-scrub::before{content:'';position:absolute;left:0;top:0;bottom:0;width:38%;background:#fff;border-radius:2px}
-.rr2-scrub::after{content:'';position:absolute;left:38%;top:50%;transform:translate(-50%,-50%);width:11px;height:11px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.2)}
+/* .rr2-scrub: --pos (0–1) set by JS drives fill + knob position */
+.rr2-scrub{flex:1;height:3px;background:rgba(255,255,255,.2);border-radius:2px;position:relative;--pos:0}
+.rr2-scrub::before{content:'';position:absolute;left:0;top:0;bottom:0;width:calc(var(--pos)*100%);background:#fff;border-radius:2px}
+.rr2-scrub::after{content:'';position:absolute;left:calc(var(--pos)*100%);top:50%;transform:translate(-50%,-50%);width:11px;height:11px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.2)}
 .rr2-edit-time{font-family:'JetBrains Mono',monospace;font-size:10px;color:#fff;font-weight:700;flex-shrink:0}
 
 .rr2-rail{position:absolute;top:60px;right:14px;width:46px;display:flex;flex-direction:column;gap:5px;z-index:10}
@@ -280,7 +281,7 @@
         <div class="rr2-stk pr"><span class="rr2-stk-lbl">◆ NEW PR</span><span class="rr2-stk-val">2.4mi<small> 5K PB</small></span></div>
 
         <div class="rr2-play">
-          <button class="rr2-play-btn">▶</button>
+          <button class="rr2-play-btn" onclick="rr2TogglePlay()">▶</button>
           <div class="rr2-scrub"></div>
           <span class="rr2-edit-time">09:14 / 24:18</span>
         </div>
@@ -335,3 +336,15 @@
         </div>
         <div class="rr2-tl-track">
           <span class="rr2-tl-track-lbl">T1 · TEXT</span>
+          <div class="rr2-clip caption" style="width:8%;margin-left:6%"></div>
+          <div class="rr2-clip caption" style="width:10%;margin-left:14%"></div>
+          <div class="rr2-clip caption" style="width:6%;margin-left:18%"></div>
+        </div>
+        <div class="rr2-tl-ruler">
+          <span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:18</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
