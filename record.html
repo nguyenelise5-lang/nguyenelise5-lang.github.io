@@ -207,6 +207,171 @@
 .rr2-clip.caption{background:#27272a;border:1px dashed var(--rr2-ed-muted)}
 .rr2-clip.caption::before{content:'Aa';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--rr2-ed-muted)}
 .rr2-tl-ruler{display:flex;justify-content:space-between;padding:0 2px;margin-top:auto;font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--rr2-ed-muted);letter-spacing:.05em}
+
+/* ========== MEDIA TYPE TOGGLE (Photo ↔ Video) ========== */
+.rr2-post-toggle{display:flex;gap:4px;background:var(--rr2-ed-panel);border:1px solid var(--rr2-ed-line);border-radius:8px;padding:3px;margin:0 auto}
+.rr2-post-tog{padding:5px 14px;border:none;border-radius:6px;background:transparent;color:var(--rr2-ed-muted);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
+.rr2-post-tog.sel{background:var(--rr2-sport);color:#fff}
+.rr2-post-tog:not(.sel):hover{color:var(--rr2-ed-ink)}
+
+/* ========== EDITOR IS ALWAYS MEDIA MODE ========== */
+/* Stat stickers hidden by default — shown only when Activity Card sticker is active */
+.rr2-stk:not(.route):not(.activity-card){display:none!important}
+/* Old card-only rail + chips hidden — CapCut tools are always present */
+.rr2-chips{display:none}
+.rr2-rail{display:none}
+
+/* Activity Card overlay sticker on canvas */
+.rr2-stk.activity-card{position:absolute;top:8px;right:8px;width:120px;background:#0a0a0a;color:#fff;border-radius:10px;padding:8px 10px;font-family:'Inter Tight',sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.5);z-index:8;border:2px solid transparent;cursor:grab;user-select:none;display:none}
+.rr2-stk.activity-card.visible{display:block}
+.rr2-stk.activity-card:hover{border-color:var(--rr2-sport)}
+.rr2-ac-sport{font-family:'JetBrains Mono',monospace;font-size:7px;text-transform:uppercase;letter-spacing:.08em;color:var(--rr2-sport);margin-bottom:4px;display:block}
+.rr2-ac-hero{font-size:28px;font-weight:900;line-height:.9;letter-spacing:-.03em;color:#fff;display:block}
+.rr2-ac-unit{font-family:'JetBrains Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.5);display:block;margin-top:2px}
+.rr2-ac-stats{display:flex;gap:8px;margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.12)}
+.rr2-ac-stat{flex:1}
+.rr2-ac-stat-lbl{font-family:'JetBrains Mono',monospace;font-size:6px;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.4);display:block}
+.rr2-ac-stat-val{font-size:13px;font-weight:800;color:#fff;display:block;letter-spacing:-.02em}
+.rr2-ac-stat-val small{font-size:8px;color:rgba(255,255,255,.4);font-weight:600}
+.rr2-ac-route{margin-top:4px;width:100%;height:36px;opacity:.6}
+.rr2-ac-route path{fill:none;stroke:var(--rr2-sport);stroke-width:2;stroke-linecap:round}
+.rr2-ac-brand{font-family:'JetBrains Mono',monospace;font-size:6px;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.25);text-align:right;display:block;margin-top:3px}
+
+/* ========== ACTIVITY CARD SHARE OVERLAY ========== */
+.rr2-share-overlay{position:absolute;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);z-index:30;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+.rr2-share-overlay.active{display:flex}
+.rr2-share-close{position:absolute;top:16px;left:14px;width:32px;height:32px;border-radius:9px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit}
+.rr2-share-card{width:260px;background:#0e0e10;border-radius:16px;padding:18px 16px;border:1px solid rgba(255,255,255,.1)}
+.rr2-share-card-sport{font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--rr2-sport);margin-bottom:4px}
+.rr2-share-card-hero{font-size:52px;font-weight:900;color:#fff;line-height:.85;letter-spacing:-.04em;margin-bottom:2px}
+.rr2-share-card-unit{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:rgba(255,255,255,.4);margin-bottom:14px}
+.rr2-share-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.rr2-share-card-item{background:rgba(255,255,255,.06);border-radius:10px;padding:10px}
+.rr2-share-card-item-lbl{font-family:'JetBrains Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.4);display:block;margin-bottom:2px}
+.rr2-share-card-item-val{font-size:22px;font-weight:800;color:#fff;letter-spacing:-.02em}
+.rr2-share-card-item-val small{font-size:10px;color:rgba(255,255,255,.4);font-weight:600;margin-left:2px}
+.rr2-share-card-item.accent{background:rgba(var(--rr2-sport-rgb),.15)}
+.rr2-share-card-item.accent .rr2-share-card-item-lbl{color:var(--rr2-sport)}
+.rr2-share-card-route{width:100%;height:60px;margin-bottom:10px;opacity:.7}
+.rr2-share-card-route path{fill:none;stroke:var(--rr2-sport);stroke-width:2.5;stroke-linecap:round}
+.rr2-share-card-route circle{fill:var(--rr2-sport)}
+.rr2-share-card-meta{display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid rgba(255,255,255,.08)}
+.rr2-share-card-user{display:flex;align-items:center;gap:8px}
+.rr2-share-card-avatar{width:24px;height:24px;border-radius:50%;background:var(--rr2-sport);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
+.rr2-share-card-name{font-size:11px;font-weight:600;color:#fff}
+.rr2-share-card-handle{font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.4)}
+.rr2-share-card-watermark{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.12em;color:rgba(255,255,255,.2);font-weight:700;text-transform:uppercase}
+.rr2-share-actions{display:flex;gap:8px;margin-top:18px}
+.rr2-share-btn{padding:10px 20px;border-radius:10px;border:none;font-family:'Inter Tight',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px}
+.rr2-share-btn.primary{background:var(--rr2-sport);color:#fff}
+.rr2-share-btn.secondary{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.15)}
+.rr2-share-btn:active{transform:scale(.96)}
+
+/* Video preview overlay on canvas — always visible (editor is always media editor) */
+.rr2-vid-preview{position:absolute;inset:0;display:flex;flex-direction:column;z-index:6}
+
+/* Simulated video frame mosaic */
+.rr2-vid-frames{flex:1;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:2px;padding:6px;opacity:.85}
+.rr2-vid-frame{border-radius:4px;position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(255,255,255,.06) 0%,rgba(255,255,255,.02) 100%);border:1px solid rgba(255,255,255,.08)}
+.rr2-vid-frame::before{content:attr(data-icon);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:24px;opacity:.6}
+.rr2-vid-frame::after{content:attr(data-ts);position:absolute;bottom:3px;right:4px;font-family:'JetBrains Mono',monospace;font-size:7px;color:rgba(255,255,255,.4);font-weight:700}
+.rr2-vid-frame.active{border-color:var(--rr2-sport);box-shadow:0 0 8px rgba(var(--rr2-sport-rgb),.3)}
+.rr2-vid-frame.hero{grid-column:1/3;grid-row:1/2;background:linear-gradient(135deg,rgba(var(--rr2-sport-rgb),.2),rgba(var(--rr2-sport-rgb),.05))}
+
+/* Now Playing indicator in video preview */
+.rr2-vid-playing{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:52px;height:52px;border-radius:50%;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,.3);z-index:7;cursor:pointer}
+.rr2-vid-playing svg{width:20px;height:20px;fill:#fff;margin-left:3px}
+
+/* ========== CAPCUT-STYLE BOTTOM TOOL BAR ========== */
+.rr2-vid-toolbar{position:absolute;bottom:188px;left:14px;right:14px;display:block;z-index:6}
+
+.rr2-vid-tools{display:flex;gap:2px;overflow-x:auto;padding:2px 0;scrollbar-width:none}
+.rr2-vid-tools::-webkit-scrollbar{display:none}
+.rr2-vid-tool{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 14px;border-radius:10px;background:transparent;border:none;color:var(--rr2-ed-muted);cursor:pointer;transition:all .15s;font-family:inherit;min-width:56px}
+.rr2-vid-tool:hover{color:var(--rr2-ed-ink)}
+.rr2-vid-tool.sel{color:var(--rr2-sport);background:rgba(var(--rr2-sport-rgb),.1)}
+.rr2-vid-tool svg{width:22px;height:22px;stroke:currentColor;stroke-width:1.7;fill:none}
+.rr2-vid-tool-lbl{font-family:'JetBrains Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;white-space:nowrap}
+
+/* ========== TOOL PANELS (slide up from toolbar) ========== */
+.rr2-tool-panel{display:none;background:var(--rr2-ed-panel);border:1px solid var(--rr2-ed-line);border-radius:12px;padding:10px 12px;margin-bottom:8px;animation:rr2panelIn .2s ease}
+.rr2-tool-panel.active{display:block}
+@keyframes rr2panelIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.rr2-panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.rr2-panel-title{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--rr2-ed-muted);font-weight:700}
+.rr2-panel-close{width:22px;height:22px;border-radius:6px;background:transparent;border:1px solid var(--rr2-ed-line);color:var(--rr2-ed-muted);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit}
+
+/* Filter presets in panel */
+.rr2-filter-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.rr2-filter-opt{aspect-ratio:1;border-radius:8px;border:2px solid var(--rr2-ed-line);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;transition:all .15s;position:relative;overflow:hidden}
+.rr2-filter-opt::before{content:'';position:absolute;inset:0;border-radius:6px}
+.rr2-filter-opt.f-none::before{background:linear-gradient(135deg,#2a2a2e,#1a1a1d)}
+.rr2-filter-opt.f-warm::before{background:linear-gradient(135deg,#3d2b1f,#2a1f15)}
+.rr2-filter-opt.f-cool::before{background:linear-gradient(135deg,#1a2333,#152030)}
+.rr2-filter-opt.f-bw::before{background:linear-gradient(135deg,#333,#1a1a1a)}
+.rr2-filter-opt.f-vivid::before{background:linear-gradient(135deg,rgba(var(--rr2-sport-rgb),.3),#1a1a2e)}
+.rr2-filter-opt.f-matte::before{background:linear-gradient(135deg,#2d2b28,#1e1d1b)}
+.rr2-filter-opt.f-neon::before{background:linear-gradient(135deg,#0a1a2e,#1a0a2e)}
+.rr2-filter-opt.f-film::before{background:linear-gradient(135deg,#2e2a1e,#1a1815)}
+.rr2-filter-opt .rr2-filter-name{position:relative;z-index:1;font-family:'JetBrains Mono',monospace;font-size:7px;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.7);font-weight:600}
+.rr2-filter-opt.sel{border-color:var(--rr2-sport)}
+.rr2-filter-opt.sel .rr2-filter-name{color:#fff}
+
+/* Speed controls */
+.rr2-speed-row{display:flex;gap:4px;justify-content:center}
+.rr2-speed-btn{padding:8px 14px;border-radius:8px;border:1px solid var(--rr2-ed-line);background:transparent;color:var(--rr2-ed-muted);font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s}
+.rr2-speed-btn.sel{background:var(--rr2-sport);border-color:var(--rr2-sport);color:#fff}
+
+/* Text style options */
+.rr2-text-styles{display:flex;gap:6px;overflow-x:auto;padding:2px 0;scrollbar-width:none}
+.rr2-text-styles::-webkit-scrollbar{display:none}
+.rr2-text-sty{flex:0 0 auto;padding:10px 16px;border-radius:8px;border:1px solid var(--rr2-ed-line);cursor:pointer;transition:all .15s;text-align:center;min-width:72px}
+.rr2-text-sty.sel{border-color:var(--rr2-sport);background:rgba(var(--rr2-sport-rgb),.1)}
+.rr2-text-sty-name{font-size:8px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--rr2-ed-muted);display:block;margin-top:4px}
+.rr2-text-sty-preview{font-size:16px;font-weight:800;color:var(--rr2-ed-ink);font-family:'Inter Tight',sans-serif}
+.rr2-text-sty.bold .rr2-text-sty-preview{font-weight:900;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+.rr2-text-sty.outline .rr2-text-sty-preview{-webkit-text-stroke:1px var(--rr2-ed-ink);color:transparent}
+.rr2-text-sty.neon .rr2-text-sty-preview{color:var(--rr2-sport);text-shadow:0 0 8px rgba(var(--rr2-sport-rgb),.6)}
+.rr2-text-sty.glitch .rr2-text-sty-preview{font-family:'JetBrains Mono',monospace;font-size:14px;letter-spacing:.08em}
+
+/* Transition options */
+.rr2-trans-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.rr2-trans-opt{padding:10px 6px;border-radius:8px;border:1px solid var(--rr2-ed-line);cursor:pointer;text-align:center;transition:all .15s}
+.rr2-trans-opt.sel{border-color:var(--rr2-sport);background:rgba(var(--rr2-sport-rgb),.1)}
+.rr2-trans-opt-icon{font-size:18px;display:block;margin-bottom:3px}
+.rr2-trans-opt-name{font-family:'JetBrains Mono',monospace;font-size:7px;text-transform:uppercase;letter-spacing:.06em;color:var(--rr2-ed-muted)}
+.rr2-trans-opt.sel .rr2-trans-opt-name{color:var(--rr2-sport)}
+
+/* Music browser panel */
+.rr2-music-list{display:flex;flex-direction:column;gap:4px}
+.rr2-music-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:1px solid var(--rr2-ed-line);cursor:pointer;transition:all .15s}
+.rr2-music-item:hover,.rr2-music-item.sel{border-color:var(--rr2-sport);background:rgba(var(--rr2-sport-rgb),.08)}
+.rr2-music-play{width:28px;height:28px;border-radius:50%;background:var(--rr2-ed-panel);border:1px solid var(--rr2-ed-line);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--rr2-ed-ink);flex-shrink:0}
+.rr2-music-item.sel .rr2-music-play{background:var(--rr2-sport);color:#fff;border-color:var(--rr2-sport)}
+.rr2-music-info{flex:1;min-width:0}
+.rr2-music-name{font-size:12px;font-weight:600;color:var(--rr2-ed-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rr2-music-artist{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--rr2-ed-muted);text-transform:uppercase;letter-spacing:.05em}
+.rr2-music-dur{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--rr2-ed-muted);flex-shrink:0}
+.rr2-music-wave{display:flex;align-items:flex-end;gap:1px;height:20px;flex-shrink:0}
+.rr2-music-wave i{width:2px;background:var(--rr2-sport);border-radius:1px;display:block;opacity:.5}
+.rr2-music-item.sel .rr2-music-wave i{opacity:1;animation:rr2wavePulse .6s ease infinite alternate}
+@keyframes rr2wavePulse{from{opacity:.5}to{opacity:1}}
+
+/* Sticker shelf */
+.rr2-sticker-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.rr2-sticker-opt{aspect-ratio:1;border-radius:10px;border:1px solid var(--rr2-ed-line);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:24px;transition:all .15s;background:var(--rr2-ed-panel)}
+.rr2-sticker-opt:hover{border-color:var(--rr2-sport);transform:scale(1.05)}
+.rr2-sticker-opt.sel{border-color:var(--rr2-sport);background:rgba(var(--rr2-sport-rgb),.15)}
+
+/* Trim handles visualization */
+.rr2-trim-vis{display:flex;align-items:center;gap:0;height:48px;background:var(--rr2-ed-panel);border-radius:8px;overflow:hidden;position:relative;border:1px solid var(--rr2-ed-line)}
+.rr2-trim-handle{width:14px;height:100%;background:var(--rr2-sport);cursor:col-resize;display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:2}
+.rr2-trim-handle::after{content:'';width:3px;height:16px;border-radius:1px;background:rgba(255,255,255,.6)}
+.rr2-trim-body{flex:1;display:flex;align-items:flex-end;gap:1px;padding:4px 2px;height:100%}
+.rr2-trim-body i{flex:1;background:rgba(var(--rr2-sport-rgb),.5);border-radius:1px;display:block}
+.rr2-trim-dimmed{flex:0 0 15%;background:rgba(0,0,0,.5);height:100%}
+.rr2-trim-range{position:absolute;top:0;left:50%;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--rr2-sport);font-weight:700;padding:2px 6px;background:rgba(0,0,0,.6);border-radius:0 0 4px 4px}
 </style>
 
 <div class="rr2-root" id="rr2Root">
@@ -308,12 +473,48 @@
         <button class="rr2-edit-cta" onclick="showToast && showToast('Posted to Rally 🎉')">POST</button>
       </div>
 
-      <div class="rr2-canvas">
+      <!-- Media type toggle + Activity Card button -->
+      <div style="position:absolute;top:52px;left:14px;right:14px;display:flex;justify-content:space-between;align-items:center;z-index:11">
+        <div class="rr2-post-toggle">
+          <button class="rr2-post-tog sel" data-mode="photo" onclick="rr2SwitchMedia('photo',this)">PHOTO</button>
+          <button class="rr2-post-tog" data-mode="video" onclick="rr2SwitchMedia('video',this)">VIDEO</button>
+        </div>
+        <button class="rr2-edit-top-btn" onclick="rr2OpenShareCard()" title="Activity Card" style="background:var(--rr2-ed-panel);border:1px solid var(--rr2-ed-line);font-size:11px;width:auto;padding:0 10px;gap:4px;display:flex;align-items:center;height:32px;border-radius:9px;color:var(--rr2-ed-ink);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.06em;font-weight:600;text-transform:uppercase">◆ CARD</button>
+      </div>
+
+      <div class="rr2-canvas" style="top:78px">
         <div class="rr2-canvas-bg"></div>
+        <!-- Old stat stickers (kept for data population, hidden by default) -->
         <div class="rr2-stk pace"><span class="rr2-stk-lbl">AVG PACE</span><span class="rr2-stk-val">7:42<small>/mi</small></span></div>
         <div class="rr2-stk time"><span class="rr2-stk-lbl">TIME</span><span class="rr2-stk-val">24:18</span></div>
         <div class="rr2-stk hr"><span class="rr2-stk-lbl">PEAK HR</span><span class="rr2-stk-val">178<small>bpm</small></span></div>
         <div class="rr2-stk pr"><span class="rr2-stk-lbl">◆ NEW PR</span><span class="rr2-stk-val">2.4mi<small> 5K PB</small></span></div>
+
+        <!-- Mini Activity Card sticker (draggable overlay on photo/video) -->
+        <div class="rr2-stk activity-card" id="rr2ActivityCardStk">
+          <span class="rr2-ac-sport" id="rr2AcSport">RUN · OUTDOOR</span>
+          <span class="rr2-ac-hero" id="rr2AcHero">7:42</span>
+          <span class="rr2-ac-unit" id="rr2AcUnit">MIN / MI</span>
+          <div class="rr2-ac-stats">
+            <div class="rr2-ac-stat"><span class="rr2-ac-stat-lbl">DIST</span><span class="rr2-ac-stat-val" id="rr2AcStat1">2.47<small>mi</small></span></div>
+            <div class="rr2-ac-stat"><span class="rr2-ac-stat-lbl">TIME</span><span class="rr2-ac-stat-val" id="rr2AcStat2">24:18</span></div>
+          </div>
+          <span class="rr2-ac-brand">RALLY</span>
+        </div>
+
+        <!-- Video preview (shown in video mode) -->
+        <div class="rr2-vid-preview" id="rr2VidPreview">
+          <div class="rr2-vid-frames" id="rr2VidFrames">
+            <div class="rr2-vid-frame hero active" data-icon="🏃" data-ts="00:12"></div>
+            <div class="rr2-vid-frame" data-icon="🌳" data-ts="04:30"></div>
+            <div class="rr2-vid-frame" data-icon="💪" data-ts="08:15"></div>
+            <div class="rr2-vid-frame" data-icon="🔥" data-ts="12:44"></div>
+            <div class="rr2-vid-frame" data-icon="📸" data-ts="18:02"></div>
+          </div>
+          <div class="rr2-vid-playing" onclick="rr2TogglePlay()">
+            <svg viewBox="0 0 24 24"><polygon points="8,5 20,12 8,19"/></svg>
+          </div>
+        </div>
 
         <!-- GPS route sticker — populated by JS with a simulated route SVG -->
         <div class="rr2-stk route" id="rr2RouteStkWrap" style="display:none">
@@ -329,7 +530,7 @@
         </div>
       </div>
 
-      <div class="rr2-rail">
+      <div class="rr2-rail" style="top:78px">
         <button class="rr2-rail-btn active" onclick="rr2PickRail(this)"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3"/></svg>CLIPS</button>
         <button class="rr2-rail-btn" onclick="rr2PickRail(this)"><svg viewBox="0 0 24 24"><path d="M9 18V6l12-3v12"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="15" r="3"/></svg>MUSIC</button>
         <button class="rr2-rail-btn" onclick="rr2PickRail(this)"><svg viewBox="0 0 24 24"><path d="M4 20h16M4 14l4-4 4 4 8-8"/></svg>STATS</button>
@@ -338,7 +539,7 @@
         <button class="rr2-rail-btn" onclick="rr2PickRail(this)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></svg>VIBE</button>
       </div>
 
-      <div class="rr2-chips">
+      <div class="rr2-chips" style="top:368px">
         <button class="rr2-chip active" onclick="rr2ToggleChip(this)"><span class="rr2-chip-dot"></span>AUTO-CUT</button>
         <button class="rr2-chip" onclick="rr2ToggleChip(this)">BEAT SYNC</button>
         <button class="rr2-chip" onclick="rr2ToggleChip(this)">RAMP SLOW-MO</button>
@@ -346,6 +547,139 @@
         <button class="rr2-chip" onclick="rr2ToggleChip(this)">HR PULSE</button>
         <button class="rr2-chip" onclick="rr2ToggleChip(this)">MAP DRAW</button>
         <button class="rr2-chip" onclick="rr2ToggleChip(this)">PR FLASH</button>
+      </div>
+
+      <!-- CapCut-style video editing toolbar (shown in video mode) -->
+      <div class="rr2-vid-toolbar" id="rr2VidToolbar">
+        <!-- Active tool panel appears here -->
+        <div class="rr2-tool-panel" id="rr2PanelTrim">
+          <div class="rr2-panel-head"><span class="rr2-panel-title">Trim</span><button class="rr2-panel-close" onclick="rr2ClosePanel()">×</button></div>
+          <div class="rr2-trim-vis">
+            <div class="rr2-trim-dimmed"></div>
+            <div class="rr2-trim-handle"></div>
+            <div class="rr2-trim-body" id="rr2TrimWave"></div>
+            <div class="rr2-trim-handle"></div>
+            <div class="rr2-trim-dimmed"></div>
+            <span class="rr2-trim-range">00:03 — 00:18</span>
+          </div>
+        </div>
+        <div class="rr2-tool-panel" id="rr2PanelFilter">
+          <div class="rr2-panel-head"><span class="rr2-panel-title">Filters</span><button class="rr2-panel-close" onclick="rr2ClosePanel()">×</button></div>
+          <div class="rr2-filter-grid">
+            <div class="rr2-filter-opt f-none sel" onclick="rr2PickFilter(this)"><span class="rr2-filter-name">None</span></div>
+            <div class="rr2-filter-opt f-warm" onclick="rr2PickFilter(this)"><span class="rr2-filter-name">Warm</span></div>
+            <div class="rr2-filter-opt f-cool" onclick="rr2PickFilter(this)"><span class="rr2-filter-name">Cool</span></div>
+            <div class="rr2-filter-opt f-bw" onclick="rr2PickFilter(this)"><span class="rr2-filter-name">B&W</span></div>
+            <div class="rr2-filter-opt f-vivid" onclick="rr2PickFilter(this)"><span class="rr2-filter-name">Vivid</span></div>
+            <div class="rr2-filter-opt f-matte" onclick="rr2PickFilter(this)"><span class="rr2-filter-name">Matte</span></div>
+            <div class="rr2-filter-opt f-neon" onclick="rr2PickFilter(this)"><span class="rr2-filter-name">Neon</span></div>
+            <div class="rr2-filter-opt f-film" onclick="rr2PickFilter(this)"><span class="rr2-filter-name">Film</span></div>
+          </div>
+        </div>
+        <div class="rr2-tool-panel" id="rr2PanelText">
+          <div class="rr2-panel-head"><span class="rr2-panel-title">Text Styles</span><button class="rr2-panel-close" onclick="rr2ClosePanel()">×</button></div>
+          <div class="rr2-text-styles">
+            <div class="rr2-text-sty sel" onclick="rr2PickTextStyle(this)"><span class="rr2-text-sty-preview">Aa</span><span class="rr2-text-sty-name">Clean</span></div>
+            <div class="rr2-text-sty bold" onclick="rr2PickTextStyle(this)"><span class="rr2-text-sty-preview">Aa</span><span class="rr2-text-sty-name">Bold</span></div>
+            <div class="rr2-text-sty outline" onclick="rr2PickTextStyle(this)"><span class="rr2-text-sty-preview">Aa</span><span class="rr2-text-sty-name">Outline</span></div>
+            <div class="rr2-text-sty neon" onclick="rr2PickTextStyle(this)"><span class="rr2-text-sty-preview">Aa</span><span class="rr2-text-sty-name">Neon</span></div>
+            <div class="rr2-text-sty glitch" onclick="rr2PickTextStyle(this)"><span class="rr2-text-sty-preview">Aa</span><span class="rr2-text-sty-name">Mono</span></div>
+          </div>
+        </div>
+        <div class="rr2-tool-panel" id="rr2PanelTransition">
+          <div class="rr2-panel-head"><span class="rr2-panel-title">Transitions</span><button class="rr2-panel-close" onclick="rr2ClosePanel()">×</button></div>
+          <div class="rr2-trans-grid">
+            <div class="rr2-trans-opt sel" onclick="rr2PickTrans(this)"><span class="rr2-trans-opt-icon">⊘</span><span class="rr2-trans-opt-name">Cut</span></div>
+            <div class="rr2-trans-opt" onclick="rr2PickTrans(this)"><span class="rr2-trans-opt-icon">◐</span><span class="rr2-trans-opt-name">Fade</span></div>
+            <div class="rr2-trans-opt" onclick="rr2PickTrans(this)"><span class="rr2-trans-opt-icon">◧</span><span class="rr2-trans-opt-name">Slide</span></div>
+            <div class="rr2-trans-opt" onclick="rr2PickTrans(this)"><span class="rr2-trans-opt-icon">◉</span><span class="rr2-trans-opt-name">Zoom</span></div>
+            <div class="rr2-trans-opt" onclick="rr2PickTrans(this)"><span class="rr2-trans-opt-icon">⟳</span><span class="rr2-trans-opt-name">Spin</span></div>
+            <div class="rr2-trans-opt" onclick="rr2PickTrans(this)"><span class="rr2-trans-opt-icon">▤</span><span class="rr2-trans-opt-name">Wipe</span></div>
+            <div class="rr2-trans-opt" onclick="rr2PickTrans(this)"><span class="rr2-trans-opt-icon">◫</span><span class="rr2-trans-opt-name">Split</span></div>
+            <div class="rr2-trans-opt" onclick="rr2PickTrans(this)"><span class="rr2-trans-opt-icon">⬡</span><span class="rr2-trans-opt-name">Glitch</span></div>
+          </div>
+        </div>
+        <div class="rr2-tool-panel" id="rr2PanelMusic">
+          <div class="rr2-panel-head"><span class="rr2-panel-title">Music</span><button class="rr2-panel-close" onclick="rr2ClosePanel()">×</button></div>
+          <div class="rr2-music-list">
+            <div class="rr2-music-item sel" onclick="rr2PickMusic(this)">
+              <span class="rr2-music-play">▶</span>
+              <div class="rr2-music-info"><span class="rr2-music-name">Runner's High</span><span class="rr2-music-artist">Rally Beats</span></div>
+              <div class="rr2-music-wave" id="rr2MusicWave1"></div>
+              <span class="rr2-music-dur">2:18</span>
+            </div>
+            <div class="rr2-music-item" onclick="rr2PickMusic(this)">
+              <span class="rr2-music-play">▶</span>
+              <div class="rr2-music-info"><span class="rr2-music-name">Beat Drop</span><span class="rr2-music-artist">Rally Beats</span></div>
+              <div class="rr2-music-wave" id="rr2MusicWave2"></div>
+              <span class="rr2-music-dur">1:44</span>
+            </div>
+            <div class="rr2-music-item" onclick="rr2PickMusic(this)">
+              <span class="rr2-music-play">▶</span>
+              <div class="rr2-music-info"><span class="rr2-music-name">Morning Miles</span><span class="rr2-music-artist">Rally Beats</span></div>
+              <div class="rr2-music-wave" id="rr2MusicWave3"></div>
+              <span class="rr2-music-dur">3:02</span>
+            </div>
+          </div>
+        </div>
+        <div class="rr2-tool-panel" id="rr2PanelSpeed">
+          <div class="rr2-panel-head"><span class="rr2-panel-title">Speed</span><button class="rr2-panel-close" onclick="rr2ClosePanel()">×</button></div>
+          <div class="rr2-speed-row">
+            <button class="rr2-speed-btn" onclick="rr2PickSpeed(this)">0.25x</button>
+            <button class="rr2-speed-btn" onclick="rr2PickSpeed(this)">0.5x</button>
+            <button class="rr2-speed-btn sel" onclick="rr2PickSpeed(this)">1x</button>
+            <button class="rr2-speed-btn" onclick="rr2PickSpeed(this)">1.5x</button>
+            <button class="rr2-speed-btn" onclick="rr2PickSpeed(this)">2x</button>
+            <button class="rr2-speed-btn" onclick="rr2PickSpeed(this)">3x</button>
+          </div>
+        </div>
+        <div class="rr2-tool-panel" id="rr2PanelSticker">
+          <div class="rr2-panel-head"><span class="rr2-panel-title">Stickers</span><button class="rr2-panel-close" onclick="rr2ClosePanel()">×</button></div>
+          <div class="rr2-sticker-grid">
+            <div class="rr2-sticker-opt" onclick="rr2ToggleActivityCard()" style="font-size:11px;font-family:'JetBrains Mono',monospace;font-weight:700;letter-spacing:.04em;color:var(--rr2-sport)" id="rr2AcStickerBtn">◆</div>
+            <div class="rr2-sticker-opt" onclick="rr2PickSticker(this)">🏃</div>
+            <div class="rr2-sticker-opt" onclick="rr2PickSticker(this)">🔥</div>
+            <div class="rr2-sticker-opt" onclick="rr2PickSticker(this)">💪</div>
+            <div class="rr2-sticker-opt" onclick="rr2PickSticker(this)">⚡</div>
+            <div class="rr2-sticker-opt" onclick="rr2PickSticker(this)">🎯</div>
+            <div class="rr2-sticker-opt" onclick="rr2PickSticker(this)">🏆</div>
+            <div class="rr2-sticker-opt" onclick="rr2PickSticker(this)">❤️</div>
+            <div class="rr2-sticker-opt" onclick="rr2PickSticker(this)">🌊</div>
+            <div class="rr2-sticker-opt" onclick="rr2PickSticker(this)">✨</div>
+          </div>
+        </div>
+
+        <!-- Tool buttons row -->
+        <div class="rr2-vid-tools">
+          <button class="rr2-vid-tool" data-panel="rr2PanelTrim" onclick="rr2OpenVidTool(this)">
+            <svg viewBox="0 0 24 24"><path d="M6 9a3 3 0 100-6 3 3 0 000 6zM6 6l12 12M6 21a3 3 0 100-6 3 3 0 000 6zM6 18l12-12"/></svg>
+            <span class="rr2-vid-tool-lbl">Trim</span>
+          </button>
+          <button class="rr2-vid-tool" data-panel="rr2PanelFilter" onclick="rr2OpenVidTool(this)">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 010 18c-3 0-5.5-4-5.5-9S9 3 12 3z"/></svg>
+            <span class="rr2-vid-tool-lbl">Filters</span>
+          </button>
+          <button class="rr2-vid-tool" data-panel="rr2PanelText" onclick="rr2OpenVidTool(this)">
+            <svg viewBox="0 0 24 24"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg>
+            <span class="rr2-vid-tool-lbl">Text</span>
+          </button>
+          <button class="rr2-vid-tool" data-panel="rr2PanelTransition" onclick="rr2OpenVidTool(this)">
+            <svg viewBox="0 0 24 24"><rect x="2" y="4" width="8" height="16" rx="1"/><rect x="14" y="4" width="8" height="16" rx="1"/><path d="M10 12h4" stroke-dasharray="2 2"/></svg>
+            <span class="rr2-vid-tool-lbl">Transitions</span>
+          </button>
+          <button class="rr2-vid-tool" data-panel="rr2PanelMusic" onclick="rr2OpenVidTool(this)">
+            <svg viewBox="0 0 24 24"><path d="M9 18V6l12-3v12"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="15" r="3"/></svg>
+            <span class="rr2-vid-tool-lbl">Music</span>
+          </button>
+          <button class="rr2-vid-tool" data-panel="rr2PanelSpeed" onclick="rr2OpenVidTool(this)">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>
+            <span class="rr2-vid-tool-lbl">Speed</span>
+          </button>
+          <button class="rr2-vid-tool" data-panel="rr2PanelSticker" onclick="rr2OpenVidTool(this)">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></svg>
+            <span class="rr2-vid-tool-lbl">Stickers</span>
+          </button>
+        </div>
       </div>
 
       <div class="rr2-tl">
@@ -390,6 +724,39 @@
           <span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:18</span>
         </div>
       </div>
+
+      <!-- Activity Card Share Overlay -->
+      <div class="rr2-share-overlay" id="rr2ShareOverlay">
+        <button class="rr2-share-close" onclick="rr2CloseShareCard()">×</button>
+        <div class="rr2-share-card">
+          <div class="rr2-share-card-sport" id="rr2ShareSport">RUN · OUTDOOR</div>
+          <div class="rr2-share-card-hero" id="rr2ShareHero">7:42</div>
+          <div class="rr2-share-card-unit" id="rr2ShareUnit">MIN / MI</div>
+          <div class="rr2-share-card-grid">
+            <div class="rr2-share-card-item"><span class="rr2-share-card-item-lbl">DISTANCE</span><span class="rr2-share-card-item-val" id="rr2ShareStat1">2.47<small>MI</small></span></div>
+            <div class="rr2-share-card-item accent"><span class="rr2-share-card-item-lbl">HEART RATE</span><span class="rr2-share-card-item-val" id="rr2ShareStat2">162<small>BPM</small></span></div>
+            <div class="rr2-share-card-item"><span class="rr2-share-card-item-lbl">ELEVATION</span><span class="rr2-share-card-item-val">124<small>FT</small></span></div>
+            <div class="rr2-share-card-item"><span class="rr2-share-card-item-lbl">CALORIES</span><span class="rr2-share-card-item-val">320<small>KCAL</small></span></div>
+          </div>
+          <svg class="rr2-share-card-route" id="rr2ShareRoute" viewBox="0 0 260 60"><path id="rr2ShareRoutePath" d="M20,50 C20,20 60,5 130,15 C200,25 230,10 240,30 C245,45 210,55 130,45 C50,35 25,55 20,50 Z"/><circle cx="20" cy="50" r="3"/></svg>
+          <div class="rr2-share-card-meta">
+            <div class="rr2-share-card-user">
+              <div class="rr2-share-card-avatar">E</div>
+              <div>
+                <div class="rr2-share-card-name">Elise Nguyen</div>
+                <div class="rr2-share-card-handle">@elise</div>
+              </div>
+            </div>
+            <span class="rr2-share-card-watermark">RALLY</span>
+          </div>
+        </div>
+        <div class="rr2-share-actions">
+          <button class="rr2-share-btn primary" onclick="rr2CopyCardToPost()">Add to Post</button>
+          <button class="rr2-share-btn secondary" onclick="showToast && showToast('Card copied as PNG!')">Copy PNG</button>
+          <button class="rr2-share-btn secondary" onclick="showToast && showToast('Shared to Stories!')">Share</button>
+        </div>
+      </div>
+
     </div>
   </div>
 
