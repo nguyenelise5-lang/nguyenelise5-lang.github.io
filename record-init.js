@@ -187,7 +187,7 @@
     } else {
       RR2.stopCap();
     }
-    // Reset playback when returning to setup
+    // Reset playback + video mode when returning to setup
     if(phase === 'setup'){
       RR2.editPlaying = false;
       if(RR2.editPlayTimer) clearInterval(RR2.editPlayTimer);
@@ -195,6 +195,19 @@
       // Hide route sticker
       var routeWrap = document.getElementById('rr2RouteStkWrap');
       if(routeWrap) routeWrap.style.display = 'none';
+      // Reset media toggle to photo
+      RR2.mediaType = 'photo';
+      var photoTog = document.querySelector('.rr2-post-tog[data-mode="photo"]');
+      var vidTog = document.querySelector('.rr2-post-tog[data-mode="video"]');
+      if(photoTog) photoTog.classList.add('sel');
+      if(vidTog) vidTog.classList.remove('sel');
+      // Hide activity card sticker + close share overlay
+      RR2.activityCardVisible = false;
+      var acStk = document.getElementById('rr2ActivityCardStk');
+      if(acStk) acStk.classList.remove('visible');
+      var acBtn = document.getElementById('rr2AcStickerBtn');
+      if(acBtn) acBtn.classList.remove('sel');
+      rr2CloseShareCard();
     }
   };
 
@@ -630,6 +643,224 @@
       s.addEventListener('touchmove',  function(e){ e.preventDefault(); var t = e.touches[0]; move(t.clientX, t.clientY); }, {passive:false});
       s.addEventListener('touchend', end);
     });
+  };
+
+  // ===== MEDIA TYPE TOGGLE: Photo ↔ Video =====
+  RR2.mediaType = 'photo'; // 'photo' or 'video'
+
+  window.rr2SwitchMedia = function(mode, el){
+    RR2.mediaType = mode;
+    // Update toggle buttons
+    document.querySelectorAll('.rr2-post-tog').forEach(function(b){ b.classList.remove('sel'); });
+    if(el) el.classList.add('sel');
+    // Close any open video tool panels
+    rr2ClosePanel();
+    // Build trim waveform and music waves
+    RR2.buildTrimWave();
+    RR2.buildMusicWaves();
+    RR2.buildVidFrames();
+    // Update video preview visibility based on mode
+    var vidPreview = document.getElementById('rr2VidPreview');
+    if(vidPreview){
+      // In video mode show frame mosaic, in photo mode show single frame
+      var frames = vidPreview.querySelector('.rr2-vid-frames');
+      if(frames){
+        frames.style.gridTemplateColumns = mode === 'video' ? 'repeat(3,1fr)' : '1fr';
+        frames.style.gridTemplateRows = mode === 'video' ? 'repeat(2,1fr)' : '1fr';
+        // In photo mode, only show the hero frame
+        var allFrames = frames.querySelectorAll('.rr2-vid-frame');
+        allFrames.forEach(function(f, idx){ f.style.display = (mode === 'photo' && idx > 0) ? 'none' : ''; });
+      }
+    }
+  };
+
+  // Build trim waveform bars
+  RR2.buildTrimWave = function(){
+    var el = document.getElementById('rr2TrimWave');
+    if(!el || el.children.length > 0) return;
+    for(var i = 0; i < 40; i++){
+      var h = 30 + Math.sin(i/4)*30 + Math.sin(i/2)*15 + Math.random()*20;
+      var bar = document.createElement('i');
+      bar.style.height = Math.max(15, Math.min(100, h)) + '%';
+      el.appendChild(bar);
+    }
+  };
+
+  // Build music mini-waveforms
+  RR2.buildMusicWaves = function(){
+    for(var w = 1; w <= 3; w++){
+      var el = document.getElementById('rr2MusicWave' + w);
+      if(!el || el.children.length > 0) continue;
+      for(var i = 0; i < 12; i++){
+        var h = 6 + Math.random()*14;
+        var bar = document.createElement('i');
+        bar.style.height = h + 'px';
+        bar.style.animationDelay = (i * 0.05) + 's';
+        el.appendChild(bar);
+      }
+    }
+  };
+
+  // Populate video preview frames from captured moments
+  RR2.buildVidFrames = function(){
+    var container = document.getElementById('rr2VidFrames');
+    if(!container) return;
+    // If we have captured moments, use them; otherwise keep the defaults
+    if(RR2.moments && RR2.moments.length > 0){
+      container.innerHTML = '';
+      var icons = RR2.moments.slice(0, 5);
+      // If fewer than 5, pad with defaults
+      var defaults = [{icon:'🏃',time:'00:00'},{icon:'🌳',time:'04:30'},{icon:'💪',time:'08:15'},{icon:'🔥',time:'12:44'},{icon:'📸',time:'18:02'}];
+      while(icons.length < 5) icons.push(defaults[icons.length]);
+      icons.forEach(function(mo, idx){
+        var frame = document.createElement('div');
+        frame.className = 'rr2-vid-frame' + (idx === 0 ? ' hero active' : '');
+        frame.dataset.icon = mo.icon || '📸';
+        frame.dataset.ts = mo.time || mo.timeStr || '00:00';
+        container.appendChild(frame);
+      });
+    }
+  };
+
+  // ===== VIDEO TOOL PANELS =====
+  window.rr2OpenVidTool = function(el){
+    var panelId = el.dataset.panel;
+    if(!panelId) return;
+    // Toggle: if already selected, deselect & close
+    if(el.classList.contains('sel')){
+      el.classList.remove('sel');
+      rr2ClosePanel();
+      return;
+    }
+    // Deselect all tools, close all panels
+    document.querySelectorAll('.rr2-vid-tool').forEach(function(t){ t.classList.remove('sel'); });
+    document.querySelectorAll('.rr2-tool-panel').forEach(function(p){ p.classList.remove('active'); });
+    // Select this tool and open its panel
+    el.classList.add('sel');
+    var panel = document.getElementById(panelId);
+    if(panel) panel.classList.add('active');
+  };
+
+  window.rr2ClosePanel = function(){
+    document.querySelectorAll('.rr2-tool-panel').forEach(function(p){ p.classList.remove('active'); });
+    document.querySelectorAll('.rr2-vid-tool').forEach(function(t){ t.classList.remove('sel'); });
+  };
+
+  // Filter picker
+  window.rr2PickFilter = function(el){
+    el.parentElement.querySelectorAll('.rr2-filter-opt').forEach(function(f){ f.classList.remove('sel'); });
+    el.classList.add('sel');
+  };
+
+  // Text style picker
+  window.rr2PickTextStyle = function(el){
+    el.parentElement.querySelectorAll('.rr2-text-sty').forEach(function(s){ s.classList.remove('sel'); });
+    el.classList.add('sel');
+  };
+
+  // Transition picker
+  window.rr2PickTrans = function(el){
+    el.parentElement.querySelectorAll('.rr2-trans-opt').forEach(function(t){ t.classList.remove('sel'); });
+    el.classList.add('sel');
+  };
+
+  // Music picker
+  window.rr2PickMusic = function(el){
+    el.parentElement.querySelectorAll('.rr2-music-item').forEach(function(m){ m.classList.remove('sel'); });
+    el.classList.add('sel');
+  };
+
+  // Speed picker
+  window.rr2PickSpeed = function(el){
+    el.parentElement.querySelectorAll('.rr2-speed-btn').forEach(function(s){ s.classList.remove('sel'); });
+    el.classList.add('sel');
+  };
+
+  // Sticker picker
+  window.rr2PickSticker = function(el){
+    el.classList.toggle('sel');
+  };
+
+  // ===== ACTIVITY CARD STICKER (on-canvas mini card) =====
+  RR2.activityCardVisible = false;
+
+  window.rr2ToggleActivityCard = function(){
+    var stk = document.getElementById('rr2ActivityCardStk');
+    var btn = document.getElementById('rr2AcStickerBtn');
+    if(!stk) return;
+    RR2.activityCardVisible = !RR2.activityCardVisible;
+    if(RR2.activityCardVisible){
+      stk.classList.add('visible');
+      if(btn) btn.classList.add('sel');
+      RR2.populateActivityCard();
+    } else {
+      stk.classList.remove('visible');
+      if(btn) btn.classList.remove('sel');
+    }
+  };
+
+  RR2.populateActivityCard = function(){
+    var cfg = RR2.sports[RR2.currentSport] || {};
+    var $ = function(id){ return document.getElementById(id); };
+    // Pull values from the hidden stat stickers (populated during transition)
+    var heroVal = document.querySelector('.rr2-stk.pace .rr2-stk-val');
+    var timeVal = document.querySelector('.rr2-stk.time .rr2-stk-val');
+    if($('rr2AcSport')) $('rr2AcSport').textContent = cfg.meta || 'ACTIVITY';
+    if($('rr2AcHero'))  $('rr2AcHero').textContent = heroVal ? heroVal.textContent.trim() : '--';
+    if($('rr2AcUnit'))  $('rr2AcUnit').textContent = cfg.hero ? cfg.hero[2] : '';
+    if($('rr2AcStat1')){
+      var sub1 = document.querySelector('.rr2-stk.hr .rr2-stk-val');
+      $('rr2AcStat1').innerHTML = sub1 ? sub1.innerHTML : '--';
+    }
+    if($('rr2AcStat2')){
+      $('rr2AcStat2').textContent = timeVal ? timeVal.textContent.trim() : '--';
+    }
+  };
+
+  // ===== ACTIVITY CARD SHARE OVERLAY =====
+  window.rr2OpenShareCard = function(){
+    var overlay = document.getElementById('rr2ShareOverlay');
+    if(!overlay) return;
+    // Populate share card from captured data
+    var cfg = RR2.sports[RR2.currentSport] || {};
+    var $ = function(id){ return document.getElementById(id); };
+    var heroVal = document.querySelector('.rr2-stk.pace .rr2-stk-val');
+    var timeVal = document.querySelector('.rr2-stk.time .rr2-stk-val');
+    var hrVal = document.querySelector('.rr2-stk.hr .rr2-stk-val');
+    if($('rr2ShareSport')) $('rr2ShareSport').textContent = cfg.meta || 'ACTIVITY';
+    if($('rr2ShareHero'))  $('rr2ShareHero').textContent = heroVal ? heroVal.textContent.replace(/<[^>]+>/g,'').trim() : '--';
+    if($('rr2ShareUnit'))  $('rr2ShareUnit').textContent = cfg.hero ? cfg.hero[2] : '';
+    if($('rr2ShareStat1')){
+      var sub1El = document.querySelector('.rr2-stk.hr .rr2-stk-val');
+      $('rr2ShareStat1').innerHTML = sub1El ? sub1El.innerHTML : '--';
+    }
+    if($('rr2ShareStat2')){
+      // Use the PR sticker data for stat2
+      var prVal = document.querySelector('.rr2-stk.pr .rr2-stk-val');
+      $('rr2ShareStat2').innerHTML = hrVal ? hrVal.innerHTML : '--';
+    }
+    // Copy route SVG to share card
+    var srcPath = document.getElementById('rr2RoutePath');
+    var destPath = document.getElementById('rr2ShareRoutePath');
+    if(srcPath && destPath && srcPath.getAttribute('d')){
+      // Scale the route to fit the wider viewBox
+      destPath.setAttribute('d', srcPath.getAttribute('d')
+        .replace(/(\d+\.?\d*)/g, function(m){ return (parseFloat(m) * 3.25).toFixed(1); }));
+    }
+    overlay.classList.add('active');
+  };
+
+  window.rr2CloseShareCard = function(){
+    var overlay = document.getElementById('rr2ShareOverlay');
+    if(overlay) overlay.classList.remove('active');
+  };
+
+  // "Add to Post" — closes overlay and toggles the activity card sticker on the canvas
+  window.rr2CopyCardToPost = function(){
+    rr2CloseShareCard();
+    if(!RR2.activityCardVisible){
+      rr2ToggleActivityCard();
+    }
   };
 
   // ===== OVERRIDE _initRecord in app.js =====
